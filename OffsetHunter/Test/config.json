@@ -1,5 +1,7 @@
 {
 	"output_name" : "OffsetMgr",
 	"main_category" : "OffMgr",
-	"dump_targets_path" : "targets.json"
+	"dump_targets_path" : "targets.json",
+	"enable_extern" : true,
+	"extern_name" : "g_Offs"
 }

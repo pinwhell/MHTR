@@ -1,0 +1,26 @@
+[ // Offsets
+	{ // Single Offset
+	// Offset Finder Test with Standerd offset Finder Strategy
+			"method" : "std",
+			"name" : "name1",
+			"pattern" : "? ? ? E5 1E FF 2F E1", // [0x0] == 0x4
+			"disp" : 0,
+			"comment" : "This is a commnet!"
+	},
+	{ // Single Offset
+	// Offset Finder  Test with Nested Pattern Finder Strategy
+			"method" : "npf",
+			"name" : "name2",
+			"call" : "? ? ? E2 ? ? ? EB ? ? ? E2", // [0x8 + 0x4] =~= 0x0
+			"cdisp" : 4, // Disp to the call
+			"pattern" : "? ? ? E5 1E FF 2F E1", // Func Boundaries => { 0x0 - 0x8 }, [0x0] == 0x4
+			"pdisp" : 0, // Disp to the Pattern
+			"comment" : "This is a commnet!"
+	},
+	{// Single Offset
+	// Hardcoded Offset Example
+			"name" : "name3",
+			"value" : 4, // => 4
+			"comment" : "This is a commnet!"
+	}
+]
