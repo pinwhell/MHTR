@@ -16,3 +16,8 @@ const std::vector<uint64_t>& IOffsetScanAlgo::getResults()
 {
 	return mResults;
 }
+
+void IOffsetScanAlgo::setAlgoMetadata(const JsonValueWrapper& metadata)
+{
+	mAlgoMetadata = metadata;
+}

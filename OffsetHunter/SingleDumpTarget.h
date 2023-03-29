@@ -9,16 +9,23 @@
 class SingleDumpTarget : public IDumpTarget
 {
 private:
+
 	std::string mCategoryName;
 	std::unordered_map<IOffset*, std::unique_ptr<IOffset>> mOffsets;
 	CapstoneHelperProvider* mCapstoneHelperProvider;
 	std::unique_ptr<ICapstoneHelper> mCapstoneHelper;
-	std::string mTargetJsonPath;
-	
+	std::string mTargetMetadataPath;
+	JsonValueWrapper mTargetMetadataRoot;
+	std::string mTargetBinaryPath;
+
+	std::vector<unsigned char> mTargetBinary;
 
 public:
 
 	bool Init() override;
+
+	bool LoadMetadata();
+	bool InitAllMetadata();
 
 	void AddOffset(std::unique_ptr<IOffset>& offset);
 	void RemoveOffset(IOffset* offset);

@@ -162,7 +162,9 @@
     <ClCompile Include="ICapstoneHelper.cpp" />
     <ClCompile Include="ICapstoneHelperFactory.cpp" />
     <ClCompile Include="IOffset.cpp" />
-    <ClCompile Include="IOffsetInfo.cpp" />
+    <ClCompile Include="NestedPatternScanAlgo.cpp" />
+    <ClCompile Include="OffsetClassifier.cpp" />
+    <ClCompile Include="OffsetInfo.cpp" />
     <ClCompile Include="IOffsetScanAlgo.cpp" />
     <ClCompile Include="IScanListener.cpp" />
     <ClCompile Include="JsonHelper.cpp" />
@@ -172,6 +174,8 @@
     <ClCompile Include="OffsetHunterCLI.cpp" />
     <ClCompile Include="OffsetManager.cpp" />
     <ClCompile Include="PlainPatternScanAlgo.cpp" />
+    <ClCompile Include="ScanAlgoClassifier.cpp" />
+    <ClCompile Include="ScanMethodClassifier.cpp" />
     <ClCompile Include="SingleDumpTarget.cpp" />
     <ClCompile Include="TargetManager.cpp" />
   </ItemGroup>
@@ -186,6 +190,8 @@
     <ClInclude Include="ICapstoneHelper.h" />
     <ClInclude Include="ICapstoneHelperFactory.h" />
     <ClInclude Include="IOffset.h" />
+    <ClInclude Include="NestedPatternScanAlgo.h" />
+    <ClInclude Include="OffsetClassifier.h" />
     <ClInclude Include="JsonHelper.h" />
     <ClInclude Include="JsonValueWrapper.h" />
     <ClInclude Include="OffsetInfo.h" />
@@ -195,6 +201,7 @@
     <ClInclude Include="OffsetHunterCLI.h" />
     <ClInclude Include="OffsetManager.h" />
     <ClInclude Include="PlainPatternScanAlgo.h" />
+    <ClInclude Include="ScanAlgoClassifier.h" />
     <ClInclude Include="SingleDumpTarget.h" />
     <ClInclude Include="TargetManager.h" />
   </ItemGroup>

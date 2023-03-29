@@ -9,7 +9,7 @@ JsonValueWrapper::JsonValueWrapper(Json::Value& json)
 	*(Json::Value*)this = json;
 }
 
-Json::Value& JsonValueWrapper::getJsonValue()
+const Json::Value& JsonValueWrapper::getJsonValue() const
 {
 	return *this;
 }

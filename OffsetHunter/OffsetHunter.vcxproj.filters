@@ -45,7 +45,7 @@
     <ClCompile Include="OffsetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IOffsetInfo.cpp">
+    <ClCompile Include="OffsetInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HardcodedOffsetInfo.cpp">
@@ -82,6 +82,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DumpTargetGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OffsetClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScanMethodClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScanAlgoClassifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NestedPatternScanAlgo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -147,6 +159,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DumpTargetGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OffsetClassifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScanAlgoClassifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NestedPatternScanAlgo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

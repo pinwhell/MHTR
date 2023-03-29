@@ -7,6 +7,20 @@ OffsetInfo::OffsetInfo()
 	mComment = "";
 }
 
+bool OffsetInfo::Init()
+{
+	if (JSON_ASSERT_STR_EMPTY(mMetadata, "name") == false)
+	{
+		printf("Cant find \"name\" field");
+		return false;
+	}
+
+	mName = mMetadata.get<std::string>("name", "");
+	mComment = mMetadata.get<std::string>("comment", "");
+
+	return true;
+}
+
 void OffsetInfo::setName(const std::string& name)
 {
 	mName = name;
@@ -35,4 +49,14 @@ const std::string& OffsetInfo::getComment()
 uint64_t OffsetInfo::getFinalOffset()
 {
 	return mFinalOffset;
+}
+
+void OffsetInfo::setMetadata(const JsonValueWrapper& metadata)
+{
+	mMetadata = metadata;
+}
+
+const JsonValueWrapper& OffsetInfo::getMetadata()
+{
+	return mMetadata;
 }

@@ -51,3 +51,17 @@ bool FileHelper::ReadFile(const std::string& filePath, std::string& output)
 	return true;
 }
 
+bool FileHelper::ReadFileBinary(const std::string& filePath, std::vector<unsigned char>& output)
+{
+	std::ifstream file(filePath, std::ios::binary);
+
+	if (file.is_open() == false)
+		return false;
+
+	output = std::vector<unsigned char>(std::istreambuf_iterator<char>(file), {});
+
+	file.close();
+
+	return true;
+}
+

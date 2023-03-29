@@ -1,10 +1,9 @@
 #include "FutureOffset.h"
+#include "ScanAlgoClassifier.h"
 
 FutureOffset::FutureOffset()
 {
-
-	mStatus = Status::IDDLE;
-
+	
 }
 
 void FutureOffset::OnFound()
@@ -20,6 +19,20 @@ void FutureOffset::OnNotFound()
 void FutureOffset::OnMultipleFound()
 {
 
+}
+
+bool FutureOffset::Init()
+{
+	if (IOffset::Init() == false)
+		return false;
+
+	if (ScanAlgoClassifier::Classify(mOffsetInfo.getMetadata(), mScanAlgo) == false)
+	{
+
+		return false;
+	}
+
+	return false;
 }
 
 void FutureOffset::OnScanFinished()

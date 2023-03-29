@@ -1,5 +1,5 @@
 [ // Offsets
-	{ // Single Offset
+	{ // Single Offset (FutureOffset)
 	// Offset Finder Test with Standerd offset Finder Strategy
 			"method" : "std",
 			"name" : "name1",
@@ -7,7 +7,7 @@
 			"disp" : 0,
 			"comment" : "This is a commnet!"
 	},
-	{ // Single Offset
+	{ // Single Offset (FutureOffset)
 	// Offset Finder  Test with Nested Pattern Finder Strategy
 			"method" : "npf",
 			"name" : "name2",
@@ -17,7 +17,7 @@
 			"pdisp" : 0, // Disp to the Pattern
 			"comment" : "This is a commnet!"
 	},
-	{// Single Offset
+	{// Single Offset (HardcodedOffset)
 	// Hardcoded Offset Example
 			"name" : "name3",
 			"value" : 4, // => 4

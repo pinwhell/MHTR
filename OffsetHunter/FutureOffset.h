@@ -8,22 +8,14 @@
 
 class FutureOffset : public IOffset, public IScanListener
 {
-public:
-	enum class Status
-	{
-		IDDLE,
-		RUNNING,
-		FINISH
-	};
-
 private:
-	Status mStatus;
 	std::unique_ptr<IOffsetScanAlgo> mScanAlgo;
 
 public:
 
 	FutureOffset();
 
+	bool Init() override;
 	void OnScanFinished() override;
 
 	void OnFound();

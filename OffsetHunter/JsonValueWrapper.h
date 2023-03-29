@@ -11,24 +11,29 @@ public:
 	JsonValueWrapper(Json::Value& json);
 
 	template<typename T>
-	T get(const std::string& key, T def);
+	T get(const std::string& key, T def) const;
 
-	template<>
+	/*template<>
 	std::string get(const std::string& key, std::string def);
 
 	template<>
-	int get(const std::string& key, int def);
+	int get(const std::string& key, int def);*/
 
-	Json::Value& getJsonValue();
+	const Json::Value& getJsonValue() const;
 
 };
 
 
 template<typename T>
-inline T JsonValueWrapper::get(const std::string& key, T def)
-{}
+inline T JsonValueWrapper::get(const std::string& key, T def) const
+{
+	if (JSON_ASSERT(*this, key) == false)
+		return def;
 
-template<>
+	return (*this)[key].as<T>();
+}
+
+/*template<>
 inline std::string JsonValueWrapper::get(const std::string& key, std::string def)
 {
 	if (JSON_ASSERT(*this, key))
@@ -45,5 +50,5 @@ inline int JsonValueWrapper::get(const std::string& key, int def)
 
 	return (*this)[key].asInt();
 }
-
+*/
 

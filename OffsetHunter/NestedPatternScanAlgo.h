@@ -1,7 +1,6 @@
 #pragma once
 #include "IOffsetScanAlgo.h"
-
-class PlainPatternScanAlgo : public IOffsetScanAlgo
+class NestedPatternScanAlgo : public IOffsetScanAlgo
 {
 public:
 	bool Init() override;

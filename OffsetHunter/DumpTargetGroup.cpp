@@ -69,4 +69,6 @@ bool DumpTargetGroup::ReadAllTarget()
 
         AddTarget(dumpTarget);
     }
+
+    return true;
 }
