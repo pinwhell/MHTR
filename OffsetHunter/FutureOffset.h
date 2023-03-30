@@ -4,8 +4,6 @@
 #include "IScanListener.h"
 #include <memory>
 
-
-
 class FutureOffset : public IOffset, public IScanListener
 {
 private:

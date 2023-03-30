@@ -1,6 +1,7 @@
 #include "SingleDumpTarget.h"
 #include "FileHelper.h"
 #include "OffsetClassifier.h"
+#include <ThreadPool.h>
 
 bool SingleDumpTarget::Init()
 {
@@ -65,6 +66,7 @@ bool SingleDumpTarget::LoadMetadata()
 		std::unique_ptr<IOffset> currOff; OffsetClassifier::Classify(curr, currOff);
 
 		currOff->setParent(this);
+		currOff->setBufferInfo((const char*)mTargetBinary.data(), mTargetBinary.size());
 
 		AddOffset(currOff);
 	}
@@ -103,6 +105,13 @@ void SingleDumpTarget::RemoveOffset(IOffset* offset)
 
 void SingleDumpTarget::ComputeAll()
 {
+	ThreadPool tp;
+
 	for (auto& kv : mOffsets)
-		kv.second->ComputeOffset();
+	{
+		tp.enqueue([&](IOffset* pOff) {
+			pOff->ComputeOffset();
+			}, kv.second.get());
+	}
+		
 }

@@ -63,7 +63,7 @@
     <ClCompile Include="SingleDumpTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FutureOffsetDesc.cpp">
+    <ClCompile Include="FutureOffset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IScanListener.cpp">
@@ -87,13 +87,13 @@
     <ClCompile Include="OffsetClassifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ScanMethodClassifier.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ScanAlgoClassifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NestedPatternScanAlgo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContainerDisplacer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -168,6 +168,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NestedPatternScanAlgo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContainerDisplacer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

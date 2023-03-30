@@ -2,5 +2,5 @@
 
 bool NestedPatternScanAlgo::Init()
 {
-	return false;
+	return true;
 }

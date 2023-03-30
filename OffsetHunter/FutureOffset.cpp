@@ -1,5 +1,6 @@
 #include "FutureOffset.h"
 #include "ScanAlgoClassifier.h"
+#include "SingleDumpTarget.h"
 
 FutureOffset::FutureOffset()
 {
@@ -27,12 +28,15 @@ bool FutureOffset::Init()
 		return false;
 
 	if (ScanAlgoClassifier::Classify(mOffsetInfo.getMetadata(), mScanAlgo) == false)
-	{
-
 		return false;
-	}
 
-	return false;
+	mScanAlgo->setParent(this);
+	mScanAlgo->setBufferInfo(mBuffer, mBuffSize);
+
+	if (mScanAlgo->Init() == false)
+		return false;
+
+	return true;
 }
 
 void FutureOffset::OnScanFinished()

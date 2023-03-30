@@ -10,7 +10,7 @@ bool HardcodedOffsetInfo::Init()
 
 void HardcodedOffsetInfo::ComputeOffset()
 {
-    if (JSON_ASSERT(mOffsetInfo.getMetadata(), "value"))
+    if (JSON_ASSERT(mOffsetInfo.getMetadata(), "value") == false)
         return;
 
     uintptr_t value = mOffsetInfo.getMetadata().get<uintptr_t>("value", 0);

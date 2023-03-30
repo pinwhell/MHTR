@@ -17,3 +17,14 @@ void IOffset::setParent(SingleDumpTarget* parent)
 {
 	mParent = parent;
 }
+
+std::string IOffset::getName()
+{
+	return mOffsetInfo.getName();
+}
+
+void IOffset::setBufferInfo(const char* buff, size_t buffSz)
+{
+	mBuffer = buff;
+	mBuffSize = buffSz;
+}
