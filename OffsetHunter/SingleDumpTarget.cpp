@@ -25,8 +25,8 @@ bool SingleDumpTarget::Init()
 		return false;
 	}
 
-	mTargetMetadataPath = mDumpTargetDesc.get("dataset_path", "");
-	mTargetBinaryPath = mDumpTargetDesc.get("bin_path", "");
+	mTargetMetadataPath = mDumpTargetDesc.get<std::string>("dataset_path", "");
+	mTargetBinaryPath = mDumpTargetDesc.get<std::string>("bin_path", "");
 
 	if (FileHelper::IsValidFilePath(mTargetMetadataPath, true, true) == false)
 		return false;

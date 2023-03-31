@@ -14,12 +14,14 @@ void FutureOffset::OnFound()
 
 void FutureOffset::OnNotFound()
 {
-
+	auto name = getName();
+	printf("\"%s\" Not found\n", name.c_str());
 }
 
 void FutureOffset::OnMultipleFound()
 {
-
+	auto name = getName();
+	printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
 }
 
 bool FutureOffset::Init()

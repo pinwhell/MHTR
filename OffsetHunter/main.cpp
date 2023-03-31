@@ -1,7 +1,6 @@
 // OffsetHunter.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include <iostream>
 #include "OffsetHunterCLI.h"
 
 int main(int argc, const char** argv)

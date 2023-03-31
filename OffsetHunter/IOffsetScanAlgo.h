@@ -14,18 +14,18 @@ protected:
 	size_t mBuffSize;
 
 	FutureOffset* mParent;
-	std::vector<uint64_t> mResults;
+	std::vector<uintptr_t> mResults;
 	JsonValueWrapper mAlgoMetadata;
 
-	ContainerDisplacer<std::vector<uint64_t>> mDisplacer; 
-	// i will be used to displace all of the results
+
+	int64_t mMainDisp;
 
 
 public:
 	virtual bool Init();
 	virtual void IgniteScan();
 	virtual void OnScanFinished();
-	const std::vector<uint64_t>& getResults();
+	const std::vector<uintptr_t>& getResults();
 	void setAlgoMetadata(const JsonValueWrapper& metadata);
 	void setParent(FutureOffset* parent);
 

@@ -5,9 +5,8 @@ JsonValueWrapper::JsonValueWrapper()
 }
 
 JsonValueWrapper::JsonValueWrapper(Json::Value& json)
-{
-	*(Json::Value*)this = json;
-}
+	: Json::Value(json)
+{}
 
 const Json::Value& JsonValueWrapper::getJsonValue() const
 {

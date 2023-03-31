@@ -2,22 +2,26 @@
 
 #include <iterator>
 
-template <typename Container>
+
 class ContainerDisplacer
 {
 private:
-	typedef typename Container::iterator Iterator;
-	typedef typename Container::value_type ValType;
-	ValType mDisp;
+	
+	//ValType mDisp;
 
 public:
-	void Displace(Iterator begin, Iterator end)
+	template <typename Container, typename Displacer>
+	static void Displace(typename Container::iterator begin, typename Container::iterator end, Displacer disp)
 	{
 		for (auto it = begin; it < end; it++)
-			*it += mDisp;
+		{
+			auto curr = *it;
+			Displacer _new = (Displacer)curr + disp;
+			*it = _new;
+		}
 	}
 
-	void setDisp(ValType disp)
+	/*void setDisp(ValType disp)
 	{
 		mDisp = disp;
 	}
@@ -25,5 +29,5 @@ public:
 	ValType getDisp()
 	{
 		return mDisp;
-	}
+	}*/
 };

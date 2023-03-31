@@ -1,5 +1,6 @@
 #include "PlainPatternScanAlgo.h"
 #include "FutureOffset.h"
+#include <ThunderByteScan.hpp>
 
 bool PlainPatternScanAlgo::Init()
 {
@@ -15,10 +16,18 @@ bool PlainPatternScanAlgo::Init()
         return false;
     }
 
+    mPattern = mAlgoMetadata.get<std::string>("pattern", "");
+
     return true;
 }
 
 void PlainPatternScanAlgo::IgniteScan()
 {
     IOffsetScanAlgo::IgniteScan();
+
+    ThunderByteScan::LocalFindPattern(mPattern, (uintptr_t)mBuffer, (uintptr_t)mBuffer + mBuffSize, mResults);
+
+    ContainerDisplacer::Displace<std::vector<uintptr_t>, int64_t>(mResults.begin(), mResults.end(), -((int64_t)mBuffer));
+
+    IOffsetScanAlgo::OnScanFinished();
 }

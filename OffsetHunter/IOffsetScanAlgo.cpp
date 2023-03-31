@@ -3,7 +3,7 @@
 
 bool IOffsetScanAlgo::Init()
 {
-	mDisplacer.setDisp(mAlgoMetadata.get<int64_t>("disp", 0));
+	mMainDisp = mAlgoMetadata.get<int64_t>("disp", 0);
 
 	return true;
 }
@@ -21,7 +21,7 @@ void IOffsetScanAlgo::OnScanFinished()
 		mParent->OnScanFinished();
 }
 
-const std::vector<uint64_t>& IOffsetScanAlgo::getResults()
+const std::vector<uintptr_t>& IOffsetScanAlgo::getResults()
 {
 	return mResults;
 }
@@ -38,8 +38,7 @@ void IOffsetScanAlgo::setParent(FutureOffset* parent)
 
 void IOffsetScanAlgo::HandleAllDisp()
 {
-	if (mResults.empty() == false && mDisplacer.getDisp() != 0)
-		mDisplacer.Displace(mResults.begin(), mResults.end());
+	ContainerDisplacer::Displace<std::vector<uintptr_t>, int64_t>(mResults.begin(), mResults.end(), mMainDisp);
 	// Right after the scan finish, applying the Displacement predefined at the metadata or 0 if none defined
 }
 

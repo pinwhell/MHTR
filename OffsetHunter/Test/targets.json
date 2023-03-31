@@ -29,12 +29,12 @@
 		"targets" : [
 			{ // Single Dump Target
 				"name" : "BinArm32A",
-				"bin_path" : "BinArm64A.json",
+				"bin_path" : "BinArm64A.bin",
 				"dataset_path" : "BinArm64A.json"
 			},
 			{ // Single Dump Target
 				"name" : "BinArm32B",
-				"bin_path" : "BinArm64B.json",
+				"bin_path" : "BinArm64B.bin",
 				"dataset_path" : "BinArm64B.json"
 			}
 		]
