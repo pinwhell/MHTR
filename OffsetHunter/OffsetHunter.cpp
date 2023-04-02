@@ -19,6 +19,10 @@ bool OffsetHunter::Init()
     mTargetManager->setDumpTargetPath(mConfigManager->getDumpTargetPath());
     mTargetManager->setMainCategoryName(mConfigManager->getMainCategoryName());
     mTargetManager->setHppOutputPath(mConfigManager->getHppOutputPath());
+    mTargetManager->setDumpDynamic(mConfigManager->getDumpDynamic());
+    mTargetManager->setDumpJsonLibName(mConfigManager->getDumpJsonLibName());
+    mTargetManager->setDeclareGlobalDumpObj(mConfigManager->getDeclareGlobalDumpObj());
+    mTargetManager->setGlobalDumpObjectName(mConfigManager->getGlobalDumpObjectName());
 
     if (mTargetManager->Init() == false)
         return false;

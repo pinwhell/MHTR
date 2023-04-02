@@ -1,11 +1,16 @@
 #include "JsonCppAcessor.h"
 
-std::string JsonCppAcessor::genGetInt()
+std::string JsonCppAcessor::genGetInt(const std::string& key, uint32_t xorend)
 {
-    return  IJsonAccesor::genJsonAccess() + ".asInt()" + IJsonAccesor::genXorend();
+    return  IJsonAccesor::genJsonAccess(key) + ".asInt()" + IJsonAccesor::genXorend(xorend);
 }
 
-std::string JsonCppAcessor::genGetUInt()
+std::string JsonCppAcessor::genGetUInt(const std::string& key, uint32_t xorend)
 {
-    return IJsonAccesor::genJsonAccess() + ".asUInt()" + IJsonAccesor::genXorend();
+    return IJsonAccesor::genJsonAccess(key) + ".asUInt()" + IJsonAccesor::genXorend(xorend);
+}
+
+std::string JsonCppAcessor::getGlobalInclude()
+{
+    return "json/json.h";
 }

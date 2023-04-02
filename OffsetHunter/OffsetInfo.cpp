@@ -18,6 +18,7 @@ bool OffsetInfo::Init()
 
 	mName = mMetadata.get<std::string>("name", "");
 	mComment = mMetadata.get<std::string>("comment", "");
+	mNameHash = std::to_string(fnv1a_32(mName.c_str(), mName.size()));
 
 	return true;
 }
@@ -62,22 +63,7 @@ const JsonValueWrapper& OffsetInfo::getMetadata()
 	return mMetadata;
 }
 
-void OffsetInfo::setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor)
-{
-	mJsonAccesor = std::move(accesor);
-}
-
-IJsonAccesor* OffsetInfo::getJsonAccesor()
-{
-	return mJsonAccesor.get();
-}
-
-uint32_t OffsetInfo::getNameHash()
-{
-	return fnv1a_32(mName.c_str(), mName.size());
-}
-
 std::string OffsetInfo::getNameHashStr()
 {
-	return std::to_string(getNameHash());
+	return mNameHash;
 }

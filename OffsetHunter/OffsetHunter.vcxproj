@@ -166,6 +166,7 @@
     <ClCompile Include="ICapstoneHelperFactory.cpp" />
     <ClCompile Include="IJsonAccesor.cpp" />
     <ClCompile Include="IOffset.cpp" />
+    <ClCompile Include="JsonAccesorClassifier.cpp" />
     <ClCompile Include="JsonCppAcessor.cpp" />
     <ClCompile Include="NestedPatternScanAlgo.cpp" />
     <ClCompile Include="OffsetClassifier.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="ICapstoneHelperFactory.h" />
     <ClInclude Include="IJsonAccesor.h" />
     <ClInclude Include="IOffset.h" />
+    <ClInclude Include="JsonAccesorClassifier.h" />
     <ClInclude Include="JsonCppAcessor.h" />
     <ClInclude Include="NestedPatternScanAlgo.h" />
     <ClInclude Include="OffsetClassifier.h" />

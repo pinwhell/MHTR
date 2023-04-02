@@ -2,6 +2,7 @@
 #include "FileHelper.h"
 #include "DumpTargetGroup.h"
 #include <iostream>
+#include "JsonAccesorClassifier.h"
 
 TargetManager::TargetManager()
 {
@@ -38,6 +39,12 @@ bool TargetManager::Init()
 		}
 
 		mHppWriter->SetOwnFStream(mHppOutputFile);
+	}
+
+	if (JsonAccesorClassifier::Classify(mDumpJsonLibName, mJsonAccesor) == false)
+	{
+		printf("\"%s\" Library mistyped or not supported\n", mDumpJsonLibName.c_str());
+		return false;
 	}
 
 	return true;
@@ -90,7 +97,9 @@ bool TargetManager::SaveHpp()
 	mHppWriter->AppendGlobalInclude("cstdint");
 
 	if (mDumpDynamic)
-		mHppWriter->AppendGlobalInclude(mJsonGlobalInclude);
+		mHppWriter->AppendGlobalInclude(mJsonAccesor->getGlobalInclude());
+
+	mHppWriter->AppendNextLine();
 
 	mHppWriter->BeginStruct(mMainCategoryName);
 
@@ -99,14 +108,11 @@ bool TargetManager::SaveHpp()
 	mHppWriter->AppendMacroIfDefined("STATIC_OFFS");
 
 
-
 	if (mDumpDynamic)
 	{
 		mHppWriter->AppendMacroElse();
 
-
 	}
-
 
 	mHppWriter->AppendMacroEndIf();
 	/*Outside the struct*/
@@ -117,8 +123,6 @@ bool TargetManager::SaveHpp()
 		decls.push_back(StructDeclarationInfo(mGlobalDumpObjName, true, true));
 
 	mHppWriter->EndStruct(mMainCategoryName, decls);
-
-	
 
 	return true;
 }
@@ -198,11 +202,6 @@ void TargetManager::setDumpDynamic(bool b)
 	mDumpDynamic = b;
 }
 
-void TargetManager::setJsonGlobalInclude(const std::string& jsonGlobInc)
-{
-	mJsonGlobalInclude = jsonGlobInc;
-}
-
 void TargetManager::setDeclareGlobalDumpObj(bool b)
 {
 	mDeclareDumpObject = b;
@@ -211,4 +210,19 @@ void TargetManager::setDeclareGlobalDumpObj(bool b)
 void TargetManager::setGlobalDumpObjectName(const std::string& globalObjName)
 {
 	mGlobalDumpObjName = globalObjName;
+}
+
+void TargetManager::setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor)
+{
+	mJsonAccesor = std::move(accesor);
+}
+
+IJsonAccesor* TargetManager::getJsonAccesor()
+{
+	return mJsonAccesor.get();
+}
+
+void TargetManager::setDumpJsonLibName(const std::string& dumpJsonLibName)
+{
+	mDumpJsonLibName = dumpJsonLibName;
 }

@@ -6,12 +6,6 @@ bool IOffset::Init()
 	if (mOffsetInfo.Init() == false)
 		return false;
 
-	// For now defualt use is JsonCpp Accesor
-
-	mOffsetInfo.setJsonAccesor(std::make_unique<JsonCppAcessor>());
-	mOffsetInfo.getJsonAccesor()->setJsonObjectName("obj"); // Default "obj", obj["xyz"].asXyz();
-	mOffsetInfo.getJsonAccesor()->setKey(mOffsetInfo.getNameHashStr());
-
 	return true;
 }
 

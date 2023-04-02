@@ -6,6 +6,7 @@
 #include "JsonValueWrapper.h"
 #include "HPPManager.h"
 #include "IChild.h"
+#include "IJsonAccesor.h"
 
 class OffsetHunter;
 
@@ -13,14 +14,17 @@ class TargetManager : public IChild<OffsetHunter>
 {
 private:
 	std::unordered_map<IDumpTarget*, std::unique_ptr<IDumpTarget>> mAllTargets;
+
 	std::string mDumpTargetsPath;
 	std::string mMainCategoryName;
-	std::string mJsonGlobalInclude;
 	std::string mHppOutputPath;
 	std::string mGlobalDumpObjName;
+	std::string mDumpJsonLibName;
 
 	JsonValueWrapper mDumpTargetsRoot;
 	std::unique_ptr<HeaderFileManager> mHppWriter;
+
+	std::unique_ptr<IJsonAccesor> mJsonAccesor;
 
 	bool mDumpDynamic;
 	bool mDeclareDumpObject;
@@ -52,8 +56,12 @@ public:
 	HeaderFileManager* getHppWriter();
 
 	void setDumpDynamic(bool b);
-	void setJsonGlobalInclude(const std::string& jsonGlobInc);
 	void setDeclareGlobalDumpObj(bool b);
 	void setGlobalDumpObjectName(const std::string& globalObjName);
+
+	void setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor);
+	IJsonAccesor* getJsonAccesor();
+
+	void setDumpJsonLibName(const std::string& dumpJsonLibName);
 };
 

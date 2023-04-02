@@ -1,18 +1,18 @@
 #include "IJsonAccesor.h"
 
-std::string IJsonAccesor::genGetInt()
+std::string IJsonAccesor::genGetInt(const std::string& key, uint32_t xorend)
 {
-    return genJsonAccess() + genXorend();
+    return genJsonAccess(key) + genXorend(xorend);
 }
 
-std::string IJsonAccesor::genGetUInt()
+std::string IJsonAccesor::genGetUInt(const std::string& key, uint32_t xorend)
 {
-    return genJsonAccess() + genXorend();
+    return genJsonAccess(key) + genXorend(xorend);
 }
 
-std::string IJsonAccesor::genJsonAccess()
+std::string IJsonAccesor::genJsonAccess(const std::string& key)
 {
-    return mJsonObjName + "[\"" + mKey + "\"]";
+    return mJsonObjName + "[\"" + key + "\"]";
 }
 
 void IJsonAccesor::setJsonObjectName(const std::string& jsonObjName)
@@ -20,17 +20,12 @@ void IJsonAccesor::setJsonObjectName(const std::string& jsonObjName)
     mJsonObjName = jsonObjName;
 }
 
-void IJsonAccesor::setXorend(uint32_t xorend)
+std::string IJsonAccesor::genXorend(uint32_t xorend)
 {
-    mXorend = xorend;
+    return xorend != 0 ? (" ^ " + std::to_string(xorend)) : "";
 }
 
-void IJsonAccesor::setKey(const std::string& key)
+std::string IJsonAccesor::getGlobalInclude()
 {
-    mKey = key;
-}
-
-std::string IJsonAccesor::genXorend()
-{
-    return mXorend != 0 ? (" ^ " + std::to_string(mXorend)) : "";
+    return "";
 }

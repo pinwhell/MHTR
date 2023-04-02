@@ -6,21 +6,19 @@ class IJsonAccesor {
 
 private:
     std::string mJsonObjName;
-    std::string mKey;
 
 protected:
-    uint32_t mXorend;
 
 public:
-    virtual std::string genGetInt();
-    virtual std::string genGetUInt();
+    virtual std::string genGetInt(const std::string& key, uint32_t xorend = 0x0);
+    virtual std::string genGetUInt(const std::string& key, uint32_t xorend = 0x0);
 
-    std::string genJsonAccess();
+    std::string genJsonAccess(const std::string& key);
 
-    void setXorend(uint32_t xorend);
     void setJsonObjectName(const std::string& jsonObjName);
-    void setKey(const std::string& key);
 
-    std::string genXorend();
+    std::string genXorend(uint32_t xorend = 0x0);
+
+    virtual std::string getGlobalInclude();
 };
 
