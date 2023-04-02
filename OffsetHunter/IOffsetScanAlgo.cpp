@@ -31,11 +31,6 @@ void IOffsetScanAlgo::setAlgoMetadata(const JsonValueWrapper& metadata)
 	mAlgoMetadata = metadata;
 }
 
-void IOffsetScanAlgo::setParent(FutureOffset* parent)
-{
-	mParent = parent;
-}
-
 void IOffsetScanAlgo::HandleAllDisp()
 {
 	ContainerDisplacer::Displace<std::vector<uintptr_t>, int64_t>(mResults.begin(), mResults.end(), mMainDisp);

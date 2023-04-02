@@ -1,4 +1,5 @@
 #include "OffsetInfo.h"
+#include "StaticHasher.h"
 
 OffsetInfo::OffsetInfo()
 {
@@ -59,4 +60,24 @@ void OffsetInfo::setMetadata(const JsonValueWrapper& metadata)
 const JsonValueWrapper& OffsetInfo::getMetadata()
 {
 	return mMetadata;
+}
+
+void OffsetInfo::setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor)
+{
+	mJsonAccesor = std::move(accesor);
+}
+
+IJsonAccesor* OffsetInfo::getJsonAccesor()
+{
+	return mJsonAccesor.get();
+}
+
+uint32_t OffsetInfo::getNameHash()
+{
+	return fnv1a_32(mName.c_str(), mName.size());
+}
+
+std::string OffsetInfo::getNameHashStr()
+{
+	return std::to_string(getNameHash());
 }

@@ -1,6 +1,14 @@
 #include "TargetManager.h"
 #include "FileHelper.h"
 #include "DumpTargetGroup.h"
+#include <iostream>
+
+TargetManager::TargetManager()
+{
+	mHppWriter = std::make_unique<HeaderFileManager>();
+
+	mHppWriter->SetTraits(&std::cout);
+}
 
 bool TargetManager::Init()
 {
@@ -19,6 +27,18 @@ bool TargetManager::Init()
 	if (InitAllTargets() == false)
 		return false;
 
+	if (mHppOutputPath.empty() == false)
+	{
+		std::unique_ptr<std::ofstream> mHppOutputFile = std::make_unique<std::ofstream>(mHppOutputPath);
+
+		if (mHppOutputFile->is_open() == false)
+		{
+			printf("Unable to open/create \"%s\"\n", mHppOutputPath.c_str());
+			return false;
+		}
+
+		mHppWriter->SetOwnFStream(mHppOutputFile);
+	}
 
 	return true;
 }
@@ -38,6 +58,69 @@ void TargetManager::ComputeAll()
 {
 	for (const auto& kv : mAllTargets)
 		kv.second->ComputeAll();
+}
+
+bool TargetManager::SaveResults()
+{
+	if (SaveHpp() == false)
+		return false;
+	
+	if (NeedSaveJson())
+	{
+		if (SaveJson() == false)
+			return false;
+	}
+
+	return true;
+}
+
+bool TargetManager::NeedSaveJson()
+{
+	return false;
+}
+
+bool TargetManager::SaveJson()
+{
+	return true;
+}
+
+bool TargetManager::SaveHpp()
+{
+	mHppWriter->AppendPragmaOnce();
+	mHppWriter->AppendGlobalInclude("cstdint");
+
+	if (mDumpDynamic)
+		mHppWriter->AppendGlobalInclude(mJsonGlobalInclude);
+
+	mHppWriter->BeginStruct(mMainCategoryName);
+
+	/*Inside the struct*/
+	
+	mHppWriter->AppendMacroIfDefined("STATIC_OFFS");
+
+
+
+	if (mDumpDynamic)
+	{
+		mHppWriter->AppendMacroElse();
+
+
+	}
+
+
+	mHppWriter->AppendMacroEndIf();
+	/*Outside the struct*/
+	
+	std::vector<StructDeclarationInfo> decls;
+
+	if (mDeclareDumpObject)
+		decls.push_back(StructDeclarationInfo(mGlobalDumpObjName, true, true));
+
+	mHppWriter->EndStruct(mMainCategoryName, decls);
+
+	
+
+	return true;
 }
 
 void TargetManager::RemoveTarget(IDumpTarget* target)
@@ -61,6 +144,16 @@ void TargetManager::AddTarget(std::unique_ptr<IDumpTarget>& target)
 void TargetManager::setDumpTargetPath(const std::string& path)
 {
 	mDumpTargetsPath = path;
+}
+
+void TargetManager::setMainCategoryName(const std::string& mainCategoryName)
+{
+	mMainCategoryName = mainCategoryName;
+}
+
+void TargetManager::setHppOutputPath(const std::string& outputPath)
+{
+	mHppOutputPath = outputPath;
 }
 
 bool TargetManager::ReadAllTargets()
@@ -93,4 +186,29 @@ bool TargetManager::HandleTargetGroupJson(const JsonValueWrapper& targetGroupRoo
 	AddTarget(targetGroup);
 
 	return true;
+}
+
+HeaderFileManager* TargetManager::getHppWriter()
+{
+	return mHppWriter.get();
+}
+
+void TargetManager::setDumpDynamic(bool b)
+{
+	mDumpDynamic = b;
+}
+
+void TargetManager::setJsonGlobalInclude(const std::string& jsonGlobInc)
+{
+	mJsonGlobalInclude = jsonGlobInc;
+}
+
+void TargetManager::setDeclareGlobalDumpObj(bool b)
+{
+	mDeclareDumpObject = b;
+}
+
+void TargetManager::setGlobalDumpObjectName(const std::string& globalObjName)
+{
+	mGlobalDumpObjName = globalObjName;
 }

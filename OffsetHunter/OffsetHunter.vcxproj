@@ -158,11 +158,15 @@
     <ClCompile Include="DumpTargetGroup.cpp" />
     <ClCompile Include="FileHelper.cpp" />
     <ClCompile Include="FutureOffset.cpp" />
+    <ClCompile Include="HPPManager.cpp" />
+    <ClCompile Include="IChild.cpp" />
     <ClCompile Include="IDumpTarget.cpp" />
     <ClCompile Include="HardcodedOffsetInfo.cpp" />
     <ClCompile Include="ICapstoneHelper.cpp" />
     <ClCompile Include="ICapstoneHelperFactory.cpp" />
+    <ClCompile Include="IJsonAccesor.cpp" />
     <ClCompile Include="IOffset.cpp" />
+    <ClCompile Include="JsonCppAcessor.cpp" />
     <ClCompile Include="NestedPatternScanAlgo.cpp" />
     <ClCompile Include="OffsetClassifier.cpp" />
     <ClCompile Include="OffsetInfo.cpp" />
@@ -177,6 +181,7 @@
     <ClCompile Include="PlainPatternScanAlgo.cpp" />
     <ClCompile Include="ScanAlgoClassifier.cpp" />
     <ClCompile Include="SingleDumpTarget.cpp" />
+    <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TargetManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,11 +191,15 @@
     <ClInclude Include="DumpTargetGroup.h" />
     <ClInclude Include="FileHelper.h" />
     <ClInclude Include="FutureOffset.h" />
+    <ClInclude Include="HPPManager.h" />
+    <ClInclude Include="IChild.h" />
     <ClInclude Include="IDumpTarget.h" />
     <ClInclude Include="HardcodedOffsetInfo.h" />
     <ClInclude Include="ICapstoneHelper.h" />
     <ClInclude Include="ICapstoneHelperFactory.h" />
+    <ClInclude Include="IJsonAccesor.h" />
     <ClInclude Include="IOffset.h" />
+    <ClInclude Include="JsonCppAcessor.h" />
     <ClInclude Include="NestedPatternScanAlgo.h" />
     <ClInclude Include="OffsetClassifier.h" />
     <ClInclude Include="JsonHelper.h" />
@@ -204,6 +213,8 @@
     <ClInclude Include="PlainPatternScanAlgo.h" />
     <ClInclude Include="ScanAlgoClassifier.h" />
     <ClInclude Include="SingleDumpTarget.h" />
+    <ClInclude Include="StaticHasher.h" />
+    <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TargetManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

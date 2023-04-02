@@ -1,9 +1,16 @@
 #include "IOffset.h"
+#include "JsonCppAcessor.h"
 
 bool IOffset::Init()
 {
 	if (mOffsetInfo.Init() == false)
 		return false;
+
+	// For now defualt use is JsonCpp Accesor
+
+	mOffsetInfo.setJsonAccesor(std::make_unique<JsonCppAcessor>());
+	mOffsetInfo.getJsonAccesor()->setJsonObjectName("obj"); // Default "obj", obj["xyz"].asXyz();
+	mOffsetInfo.getJsonAccesor()->setKey(mOffsetInfo.getNameHashStr());
 
 	return true;
 }
@@ -11,11 +18,6 @@ bool IOffset::Init()
 void IOffset::setMetadata(const JsonValueWrapper& metadata)
 {
 	mOffsetInfo.setMetadata(metadata);
-}
-
-void IOffset::setParent(SingleDumpTarget* parent)
-{
-	mParent = parent;
 }
 
 std::string IOffset::getName()

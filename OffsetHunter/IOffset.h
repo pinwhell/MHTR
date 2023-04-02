@@ -2,14 +2,14 @@
 
 #include "OffsetInfo.h"
 #include "JsonValueWrapper.h"
+#include "IChild.h"
 
 class SingleDumpTarget;
 
-class IOffset
+class IOffset : public IChild<SingleDumpTarget>
 {
 protected:
 	OffsetInfo mOffsetInfo;
-	SingleDumpTarget* mParent;
 
 	// the buffer info i will be finded on
 	const char* mBuffer;
@@ -20,7 +20,6 @@ public:
 	virtual void ComputeOffset() = 0;
 
 	void setMetadata(const JsonValueWrapper& metadata);
-	void setParent(SingleDumpTarget* parent);
 
 	std::string getName();
 

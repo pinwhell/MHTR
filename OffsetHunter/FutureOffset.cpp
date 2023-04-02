@@ -9,7 +9,7 @@ FutureOffset::FutureOffset()
 
 void FutureOffset::OnFound()
 {
-
+	mOffsetInfo.setFinalOffset(mScanAlgo->getResults()[0]); // Guaranteed to be one
 }
 
 void FutureOffset::OnNotFound()

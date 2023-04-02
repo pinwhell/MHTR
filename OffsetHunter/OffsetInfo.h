@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdint>
 #include "JsonValueWrapper.h"
+#include "IJsonAccesor.h"
 
 #define ERR_INVALID_OFFSET ((uint64_t)0xFFFFFFFFFFFFFFFF)
 
@@ -11,8 +12,10 @@ class OffsetInfo
 private:
 	std::string mName;
 	std::string mComment; // If there is no comment available then this will be empty
-	uint64_t mFinalOffset; // this denotes the Actual Result, if there is no offset, this will
+	uint64_t mFinalOffset; // this denotes the Actual Result, if there is no offset
 	JsonValueWrapper mMetadata;
+	std::unique_ptr<IJsonAccesor> mJsonAccesor;
+	uint32_t mObfKey;
 
 public:
 	OffsetInfo();
@@ -28,5 +31,12 @@ public:
 	uint64_t getFinalOffset();
 	void setMetadata(const JsonValueWrapper& metadata);
 	const JsonValueWrapper& getMetadata();
+
+	void setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor);
+	IJsonAccesor* getJsonAccesor();
+
+	uint32_t getNameHash();
+	std::string getNameHashStr();
+	
 };
 

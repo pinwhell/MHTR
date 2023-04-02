@@ -13,13 +13,14 @@ public:
 	std::string mMainCategory;
 	std::string mOutputName;
 	std::string mDumpTargetPath;
+	std::string mHppOutputPath;
 
 public:
 	void setConfigPath(const std::string& path);
 
 	std::string getDumpTargetPath();
 	std::string getMainCategoryName();
-	std::string getOutputName();
+	std::string getHppOutputPath();
 
 	bool Init();
 };

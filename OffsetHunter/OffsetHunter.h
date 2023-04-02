@@ -25,5 +25,6 @@ public:
 	void setConfigPath(const std::string& path);
 
 	CapstoneHelperProvider* getCapstoneHelperProvider();
+	ConfigManager* getConfigManager();
 };
 

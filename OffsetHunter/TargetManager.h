@@ -4,26 +4,56 @@
 #include "IDumpTarget.h"
 #include <string>
 #include "JsonValueWrapper.h"
+#include "HPPManager.h"
+#include "IChild.h"
 
-class TargetManager
+class OffsetHunter;
+
+class TargetManager : public IChild<OffsetHunter>
 {
 private:
 	std::unordered_map<IDumpTarget*, std::unique_ptr<IDumpTarget>> mAllTargets;
 	std::string mDumpTargetsPath;
+	std::string mMainCategoryName;
+	std::string mJsonGlobalInclude;
+	std::string mHppOutputPath;
+	std::string mGlobalDumpObjName;
+
 	JsonValueWrapper mDumpTargetsRoot;
+	std::unique_ptr<HeaderFileManager> mHppWriter;
+
+	bool mDumpDynamic;
+	bool mDeclareDumpObject;
+
+	bool NeedSaveJson();
+	bool SaveJson();
+	bool SaveHpp();
+
 public:
+
+	TargetManager();
 
 	bool Init();
 	bool InitAllTargets();
 	void ComputeAll();
+	bool SaveResults();
 
 	void RemoveTarget(IDumpTarget* target);
 	void AddTarget(std::unique_ptr<IDumpTarget>& target);
 
 	void setDumpTargetPath(const std::string& path);
+	void setMainCategoryName(const std::string& mainCategoryName);
+	void setHppOutputPath(const std::string& outputPath);
 
 	bool ReadAllTargets();
 
 	bool HandleTargetGroupJson(const JsonValueWrapper& targetGroupRoot);
+
+	HeaderFileManager* getHppWriter();
+
+	void setDumpDynamic(bool b);
+	void setJsonGlobalInclude(const std::string& jsonGlobInc);
+	void setDeclareGlobalDumpObj(bool b);
+	void setGlobalDumpObjectName(const std::string& globalObjName);
 };
 

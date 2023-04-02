@@ -4,16 +4,16 @@
 #include <vector>
 #include "JsonValueWrapper.h"
 #include "ContainerDisplacer.h"
+#include "IChild.h"
 
 class FutureOffset;
 
-class IOffsetScanAlgo : public IScanListener
+class IOffsetScanAlgo : public IScanListener, public IChild<FutureOffset>
 {
 protected:
 	const char* mBuffer;
 	size_t mBuffSize;
 
-	FutureOffset* mParent;
 	std::vector<uintptr_t> mResults;
 	JsonValueWrapper mAlgoMetadata;
 
@@ -27,7 +27,6 @@ public:
 	virtual void OnScanFinished();
 	const std::vector<uintptr_t>& getResults();
 	void setAlgoMetadata(const JsonValueWrapper& metadata);
-	void setParent(FutureOffset* parent);
 
 	void HandleAllDisp();
 

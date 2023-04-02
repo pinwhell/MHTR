@@ -11,33 +11,17 @@ void ConfigManager::setConfigPath(const std::string& path)
 
 std::string ConfigManager::getDumpTargetPath()
 {
-	if (mDumpTargetPath.empty())
-	{
-		std::string path = mConfigRoot.get<std::string>("dump_targets_path", "");
-
-		if (path.empty())
-			abort();
-
-		mDumpTargetPath = path;
-	}
-
 	return mDumpTargetPath;
 }
 
 std::string ConfigManager::getMainCategoryName()
 {
-	if (mMainCategory.empty())
-		mMainCategory = mConfigRoot.get<std::string>("main_category", "Main");
-
 	return  mMainCategory;
 }
 
-std::string ConfigManager::getOutputName()
+std::string ConfigManager::getHppOutputPath()
 {
-	if (mOutputName.empty())
-		mOutputName = mConfigRoot.get<std::string>("output_name", "Output");
-
-	return  mOutputName;
+	return mHppOutputPath;
 }
 
 bool ConfigManager::Init()
@@ -47,6 +31,21 @@ bool ConfigManager::Init()
 
 	if (JsonHelper::File2Json(mConfigPath, mConfigRoot) == false)
 		return false;
+
+	if (JSON_ASSERT_STR_EMPTY(mConfigRoot, "dump_targets_path") == false)
+	{
+		printf("\"%s\", Invalid \"dump_targets_path\" or empty\n", mConfigPath.c_str());
+		return false;
+	}
+
+	mDumpTargetPath = mConfigRoot.get<std::string>("dump_targets_path", "");
+
+	if (FileHelper::IsValidFilePath(mDumpTargetPath, true, true) == false)
+		return false;
+
+	mOutputName = mConfigRoot.get<std::string>("output_name", "Output");
+	mMainCategory = mConfigRoot.get<std::string>("main_category", "Main");
+	mHppOutputPath = mConfigRoot.get<std::string>("hpp_output_path", mOutputName + ".hpp");
 
 	return true;
 }
