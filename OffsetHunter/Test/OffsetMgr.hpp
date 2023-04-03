@@ -7,6 +7,8 @@ struct OffMgr {
 #if defined(STATIC_OFFS)
 #else
 
+	void Set(Json::Value) {
+	}
 #endif
 
 } ;

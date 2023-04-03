@@ -196,7 +196,7 @@ void HeaderFileManager::EndFunction()
 {
 	std::ostream& traits = *m_Traits;
 
-	traits << "}"; AppendNextLine();
+	AppendTab(m_TabLevel);  traits << "}"; AppendNextLine();
 }
 
 void HeaderFileManager::Reset()

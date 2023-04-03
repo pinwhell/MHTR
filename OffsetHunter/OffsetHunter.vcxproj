@@ -155,6 +155,7 @@
     <ClCompile Include="CapstoneHelperProvider.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="ContainerDisplacer.cpp" />
+    <ClCompile Include="CppLValueRValueWrapper.cpp" />
     <ClCompile Include="DumpTargetGroup.cpp" />
     <ClCompile Include="FileHelper.cpp" />
     <ClCompile Include="FutureOffset.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="ICapstoneHelper.cpp" />
     <ClCompile Include="ICapstoneHelperFactory.cpp" />
     <ClCompile Include="IJsonAccesor.cpp" />
+    <ClCompile Include="ILValueRValueWrapper.cpp" />
     <ClCompile Include="IOffset.cpp" />
     <ClCompile Include="JsonAccesorClassifier.cpp" />
     <ClCompile Include="JsonCppAcessor.cpp" />
@@ -189,6 +191,7 @@
     <ClInclude Include="CapstoneHelperProvider.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="ContainerDisplacer.h" />
+    <ClInclude Include="CppLValueRValueWrapper.h" />
     <ClInclude Include="DumpTargetGroup.h" />
     <ClInclude Include="FileHelper.h" />
     <ClInclude Include="FutureOffset.h" />
@@ -199,6 +202,7 @@
     <ClInclude Include="ICapstoneHelper.h" />
     <ClInclude Include="ICapstoneHelperFactory.h" />
     <ClInclude Include="IJsonAccesor.h" />
+    <ClInclude Include="ILValueRValueWrapper.h" />
     <ClInclude Include="IOffset.h" />
     <ClInclude Include="JsonAccesorClassifier.h" />
     <ClInclude Include="JsonCppAcessor.h" />

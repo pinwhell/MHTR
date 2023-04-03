@@ -67,6 +67,7 @@ bool SingleDumpTarget::LoadMetadata()
 
 		currOff->setParent(this);
 		currOff->setBufferInfo((const char*)mTargetBinary.data(), mTargetBinary.size());
+		currOff->setTargetManager(mTargetMgr);
 
 		AddOffset(currOff);
 	}
@@ -114,4 +115,9 @@ void SingleDumpTarget::ComputeAll()
 			}, kv.second.get());
 	}
 		
+}
+
+std::string SingleDumpTarget::getCategoryName()
+{
+	return mCategoryName;
 }

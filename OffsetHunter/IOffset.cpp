@@ -1,5 +1,10 @@
 #include "IOffset.h"
-#include "JsonCppAcessor.h"
+#include "TargetManager.h"
+
+IOffset::IOffset()
+{
+	mOffsetInfo.setParent(this);
+}
 
 bool IOffset::Init()
 {
@@ -7,6 +12,26 @@ bool IOffset::Init()
 		return false;
 
 	return true;
+}
+
+void IOffset::setTargetManager(TargetManager* pTarget)
+{
+	mTargetMgr = pTarget;
+}
+
+TargetManager* IOffset::getTargetManager()
+{
+	return mTargetMgr;
+}
+
+IJsonAccesor* IOffset::getJsonAccesor()
+{
+	return mTargetMgr->getJsonAccesor();
+}
+
+bool IOffset::getDumpDynamic()
+{
+	return mTargetMgr->getDumpDynamic();
 }
 
 void IOffset::setMetadata(const JsonValueWrapper& metadata)

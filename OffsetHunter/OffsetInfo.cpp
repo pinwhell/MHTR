@@ -1,11 +1,17 @@
 #include "OffsetInfo.h"
 #include "StaticHasher.h"
+#include "CppLValueRValueWrapper.h"
+#include "IOffset.h"
+#include "SingleDumpTarget.h"
 
 OffsetInfo::OffsetInfo()
 {
 	mFinalOffset = ERR_INVALID_OFFSET;
 	mName = "";
 	mComment = "";
+
+	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
+	mDynamicResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
 }
 
 bool OffsetInfo::Init()
@@ -17,8 +23,23 @@ bool OffsetInfo::Init()
 	}
 
 	mName = mMetadata.get<std::string>("name", "");
+	mUIdentifier = mParent->getParent()->getCategoryName() + "." + mName;
 	mComment = mMetadata.get<std::string>("comment", "");
-	mNameHash = std::to_string(fnv1a_32(mName.c_str(), mName.size()));
+	mUIDHash = std::to_string(fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
+
+
+
+	mStaticResult->setType("uintptr_t");	// For now, in the future, it will polomorifcly 
+											// select between example std::string, or any other
+	mStaticResult->setName(mName);
+	mStaticResult->setValue("0");
+
+	if (mParent->getDumpDynamic())
+	{
+		mDynamicResult->setType("uintptr_t");
+		mDynamicResult->setName(mName);
+		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mObfKey));
+	}
 
 	return true;
 }
@@ -63,7 +84,7 @@ const JsonValueWrapper& OffsetInfo::getMetadata()
 	return mMetadata;
 }
 
-std::string OffsetInfo::getNameHashStr()
+std::string OffsetInfo::getUIDHashStr()
 {
-	return mNameHash;
+	return mUIDHash;
 }

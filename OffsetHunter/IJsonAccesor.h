@@ -20,5 +20,8 @@ public:
     std::string genXorend(uint32_t xorend = 0x0);
 
     virtual std::string getGlobalInclude();
+
+    virtual std::string getJsonObjFullType(); // for example in the scenario of JsonCPP library
+                                              // it will return "Json::Value"
 };
 

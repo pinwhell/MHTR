@@ -5,8 +5,11 @@
 #include <string>
 #include <unordered_map>
 #include "JsonValueWrapper.h"
+#include "IChild.h"
 
-class SingleDumpTarget : public IDumpTarget
+class DumpTargetGroup;
+
+class SingleDumpTarget : public IDumpTarget, public IChild<DumpTargetGroup>
 {
 private:
 
@@ -31,5 +34,7 @@ public:
 	void RemoveOffset(IOffset* offset);
 
 	void ComputeAll();
+
+	std::string getCategoryName();
 };
 

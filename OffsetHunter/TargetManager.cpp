@@ -9,6 +9,9 @@ TargetManager::TargetManager()
 	mHppWriter = std::make_unique<HeaderFileManager>();
 
 	mHppWriter->SetTraits(&std::cout);
+
+	mDynamicJsonObjName = "obj"; // By default
+	mDynamicOffsetSetterFuncName = "Set"; // By default
 }
 
 bool TargetManager::Init()
@@ -20,6 +23,17 @@ bool TargetManager::Init()
 	{
 		printf("Unable to parse DUmp Targets\n");
 		return false;
+	}
+
+	if (mDumpDynamic)
+	{
+		if (JsonAccesorClassifier::Classify(mDumpJsonLibName, mJsonAccesor) == false)
+		{
+			printf("\"%s\" Library mistyped or not supported\n", mDumpJsonLibName.c_str());
+			return false;
+		}
+
+		mJsonAccesor->setJsonObjectName(mDynamicJsonObjName);
 	}
 
 	if (ReadAllTargets() == false)
@@ -39,12 +53,6 @@ bool TargetManager::Init()
 		}
 
 		mHppWriter->SetOwnFStream(mHppOutputFile);
-	}
-
-	if (JsonAccesorClassifier::Classify(mDumpJsonLibName, mJsonAccesor) == false)
-	{
-		printf("\"%s\" Library mistyped or not supported\n", mDumpJsonLibName.c_str());
-		return false;
 	}
 
 	return true;
@@ -111,6 +119,13 @@ bool TargetManager::SaveHpp()
 	if (mDumpDynamic)
 	{
 		mHppWriter->AppendMacroElse();
+		/*Here Write the Dynamic*/
+
+		mHppWriter->BeginFunction("void", mDynamicOffsetSetterFuncName, { mJsonAccesor->getJsonObjFullType() });
+
+
+
+		mHppWriter->EndFunction();
 
 	}
 
@@ -180,12 +195,23 @@ bool TargetManager::ReadAllTargets()
 
 bool TargetManager::HandleTargetGroupJson(const JsonValueWrapper& targetGroupRoot)
 {
-	if (JSON_IS_MEMBER(targetGroupRoot, "macro") == false || JSON_IS_MEMBER(targetGroupRoot, "targets") == false)
+
+	if (JSON_ASSERT(targetGroupRoot, "targets") == false)
 		return false;
+
+	if (JSON_ASSERT_STR_EMPTY(targetGroupRoot, "macro") == false)
+	{
+		printf("\"macro\" Not present or empty in \"%s\" Targets config\n", mDumpTargetsPath.c_str());
+		return false;
+	}
 
 	std::unique_ptr<IDumpTarget> targetGroup = std::make_unique<DumpTargetGroup>();
 
+	targetGroup->setTargetManager(this);
+
 	((DumpTargetGroup*)targetGroup.get())->setDumpTargetDescJson(targetGroupRoot);
+	((DumpTargetGroup*)targetGroup.get())->setParent(this);
+	((DumpTargetGroup*)targetGroup.get())->setTargetJsonPath(mDumpTargetsPath);
 
 	AddTarget(targetGroup);
 
@@ -225,4 +251,14 @@ IJsonAccesor* TargetManager::getJsonAccesor()
 void TargetManager::setDumpJsonLibName(const std::string& dumpJsonLibName)
 {
 	mDumpJsonLibName = dumpJsonLibName;
+}
+
+bool TargetManager::getDumpDynamic()
+{
+	return mDumpDynamic;
+}
+
+void TargetManager::setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName)
+{
+	mDynamicOffsetSetterFuncName = dynamicOffsetSetterFuncName;
 }

@@ -14,3 +14,8 @@ std::string JsonCppAcessor::getGlobalInclude()
 {
     return "json/json.h";
 }
+
+std::string JsonCppAcessor::getJsonObjFullType()
+{
+    return "Json::Value";
+}

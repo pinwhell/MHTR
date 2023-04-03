@@ -3,18 +3,25 @@
 #include <string>
 #include <cstdint>
 #include "JsonValueWrapper.h"
+#include "ILValueRValueWrapper.h"
+#include "IChild.h"
 
 #define ERR_INVALID_OFFSET ((uint64_t)0xFFFFFFFFFFFFFFFF)
 
-class OffsetInfo
-{
+class IOffset;
+
+class OffsetInfo : public IChild<IOffset>
+{ 
 private:
 	std::string mName;
-	std::string mNameHash;
+	std::string mUIdentifier;
+	std::string mUIDHash;
 	std::string mComment; // If there is no comment available then this will be empty
 	uint64_t mFinalOffset; // this denotes the Actual Result, if there is no offset
 	JsonValueWrapper mMetadata;
 	uint32_t mObfKey;
+	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
+	std::unique_ptr<ILValueRValueWrapper> mDynamicResult;
 
 public:
 	OffsetInfo();
@@ -30,7 +37,6 @@ public:
 	uint64_t getFinalOffset();
 	void setMetadata(const JsonValueWrapper& metadata);
 	const JsonValueWrapper& getMetadata();
-	std::string getNameHashStr();
-	
+	std::string getUIDHashStr();
 };
 

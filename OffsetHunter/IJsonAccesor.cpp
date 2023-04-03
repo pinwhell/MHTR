@@ -29,3 +29,8 @@ std::string IJsonAccesor::getGlobalInclude()
 {
     return "";
 }
+
+std::string IJsonAccesor::getJsonObjFullType()
+{
+    return "";
+}

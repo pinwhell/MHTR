@@ -20,6 +20,8 @@ private:
 	std::string mHppOutputPath;
 	std::string mGlobalDumpObjName;
 	std::string mDumpJsonLibName;
+	std::string mDynamicJsonObjName; // by default "obj"
+	std::string mDynamicOffsetSetterFuncName; // by default "Set"
 
 	JsonValueWrapper mDumpTargetsRoot;
 	std::unique_ptr<HeaderFileManager> mHppWriter;
@@ -63,5 +65,8 @@ public:
 	IJsonAccesor* getJsonAccesor();
 
 	void setDumpJsonLibName(const std::string& dumpJsonLibName);
+	bool getDumpDynamic();
+
+	void setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName);
 };
 

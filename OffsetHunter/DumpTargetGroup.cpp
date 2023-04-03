@@ -4,8 +4,7 @@ bool DumpTargetGroup::InitAllTargets()
 {
     for (auto& kv : mTargets)
     {
-        if (kv.first->Init() == false)
-            return false;
+        kv.first->Init(); 
     }
 
     return true;
@@ -13,8 +12,17 @@ bool DumpTargetGroup::InitAllTargets()
 
 bool DumpTargetGroup::Init()
 {
-    if (JSON_IS_MEMBER(mDumpTargetDesc, "targets") == false)
+    if (JSON_ASSERT(mDumpTargetDesc, "targets") == false)
         return false;
+
+    if (JSON_ASSERT_STR_EMPTY(mDumpTargetDesc, "macro") == false)
+    {
+        printf("\"macro\" Not present or empty in \"%s\" Targets config\n", mTargetJsonPath.c_str());
+        return false;
+    }
+
+    mMacro = mDumpTargetDesc.get<std::string>("macro", "");
+    mOutputJsonName = mDumpTargetDesc.get<std::string>("output_json_name", mMacro + "_Offs.json");
 
     if (ReadAllTarget() == false)
         return false;
@@ -49,6 +57,11 @@ void DumpTargetGroup::RemoveTarget(SingleDumpTarget* target)
     mTargets.erase(target);
 }
 
+void DumpTargetGroup::setTargetJsonPath(const std::string& path)
+{
+    mTargetJsonPath = path;
+}
+
 bool DumpTargetGroup::ReadAllTarget()
 {
     JsonValueWrapper targets = mDumpTargetDesc["targets"];
@@ -66,6 +79,8 @@ bool DumpTargetGroup::ReadAllTarget()
         std::unique_ptr<SingleDumpTarget> dumpTarget = std::make_unique<SingleDumpTarget>();
 
         dumpTarget->setDumpTargetDescJson(curr);
+        dumpTarget->setTargetManager(mTargetMgr);
+        ((SingleDumpTarget*)dumpTarget.get())->setParent(this);
 
         AddTarget(dumpTarget);
     }

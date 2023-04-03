@@ -4,12 +4,15 @@
 #include "JsonValueWrapper.h"
 #include <string>
 #include <unordered_map>
+#include "IChild.h"
 
-class DumpTargetGroup : public IDumpTarget
+class DumpTargetGroup : public IDumpTarget, public IChild<TargetManager>
 {
 private:
 	std::string mMacro;
+	std::string mTargetJsonPath;
 	std::unordered_map<SingleDumpTarget*, std::unique_ptr<SingleDumpTarget>> mTargets;
+	std::string mOutputJsonName;
 
 public:
 
@@ -19,6 +22,7 @@ public:
 
 	void AddTarget(std::unique_ptr<SingleDumpTarget>& target);
 	void RemoveTarget(SingleDumpTarget* target);
+	void setTargetJsonPath(const std::string& path);
 
 	bool ReadAllTarget();
 };
