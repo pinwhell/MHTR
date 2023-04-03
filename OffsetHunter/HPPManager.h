@@ -18,6 +18,7 @@ struct StructDeclarationInfo {
 struct HeaderFileManager {
 	std::ostream* m_Traits;
 	uintptr_t	m_TabLevel;
+	uintptr_t	m_MacroTabLevel;
 	std::unique_ptr<std::ofstream> m_FTraits;
 
 	HeaderFileManager();
@@ -43,6 +44,7 @@ struct HeaderFileManager {
 	void AppendUintVar(const std::string& varName, bool bApplyTabs = true, bool bApplyVal = false, uintptr_t val = 0, bool bNewLine = true);
 	void BeginFunction(const std::string& retType, const std::string& functionName, const std::vector<std::string>& params);
 	void EndFunction();
+	void AppendLineOfCode(const std::string& loc, bool bApplyTabs = true, bool bNewLine = true);
 
 	void SetTraits(std::ostream* newTrait);
 	void Reset();

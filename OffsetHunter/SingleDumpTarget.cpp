@@ -2,6 +2,8 @@
 #include "FileHelper.h"
 #include "OffsetClassifier.h"
 #include <ThreadPool.h>
+#include "DumpTargetGroup.h"
+#include "HPPManager.h"
 
 bool SingleDumpTarget::Init()
 {
@@ -12,6 +14,7 @@ bool SingleDumpTarget::Init()
 	}
 
 	mCategoryName = mDumpTargetDesc.get("name", "");
+	mCategoryObjName = "m" + mCategoryName; // By default
 
 	if (JSON_ASSERT_STR_EMPTY(mDumpTargetDesc, "dataset_path") == false)
 	{
@@ -120,4 +123,50 @@ void SingleDumpTarget::ComputeAll()
 std::string SingleDumpTarget::getCategoryName()
 {
 	return mCategoryName;
+}
+
+std::string SingleDumpTarget::getCategoryObjectName()
+{
+	return mCategoryObjName;
+}
+
+void SingleDumpTarget::WriteHppStaticDeclsDefs()
+{
+	BeginStruct();
+
+	for (auto& currOff : mOffsets)
+		currOff.first->WriteHppStaticDeclsDefs();
+
+	EndStruct();
+}
+
+void SingleDumpTarget::WriteHppDynDecls()
+{
+	BeginStruct();
+
+	for (auto& currOff : mOffsets)
+		currOff.first->WriteHppDynDecls();
+	
+	EndStruct();
+}
+
+void SingleDumpTarget::WriteHppDynDefs()
+{
+	for (auto& currOff : mOffsets)
+		currOff.first->WriteHppDynDefs();
+}
+
+void SingleDumpTarget::BeginStruct()
+{
+	mParent->getHppWriter()->BeginStruct(mCategoryName);
+}
+
+void SingleDumpTarget::EndStruct()
+{
+	mParent->getHppWriter()->EndStruct(mCategoryName, { mCategoryObjName }); // by default mCategoryObjName = "m" + mCategoryName
+}
+
+HeaderFileManager* SingleDumpTarget::getHppWriter()
+{
+	return mParent->getHppWriter();
 }

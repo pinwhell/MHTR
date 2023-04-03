@@ -49,3 +49,23 @@ void IOffset::setBufferInfo(const char* buff, size_t buffSz)
 	mBuffer = buff;
 	mBuffSize = buffSz;
 }
+
+void IOffset::WriteHppStaticDeclsDefs()
+{
+	mOffsetInfo.WriteHppStaticDeclsDefs();
+}
+
+void IOffset::WriteHppDynDecls()
+{
+	mOffsetInfo.WriteHppDynDecls();
+}
+
+void IOffset::WriteHppDynDefs()
+{
+	mOffsetInfo.WriteHppDynDefs();
+}
+
+HeaderFileManager* IOffset::getHppWriter()
+{
+	return mParent->getHppWriter();
+}

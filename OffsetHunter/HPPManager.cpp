@@ -199,6 +199,15 @@ void HeaderFileManager::EndFunction()
 	AppendTab(m_TabLevel);  traits << "}"; AppendNextLine();
 }
 
+void HeaderFileManager::AppendLineOfCode(const std::string& loc, bool bApplyTabs, bool bNewLine)
+{
+	std::ostream& traits = *m_Traits;
+
+	if(bApplyTabs) AppendTab(m_TabLevel);
+	traits << loc;
+	if(bNewLine) AppendNextLine();
+}
+
 void HeaderFileManager::Reset()
 {
 	m_TabLevel = 0x0;

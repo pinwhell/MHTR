@@ -4,6 +4,7 @@
 #include <cstdint>
 #include "JsonValueWrapper.h"
 #include "ILValueRValueWrapper.h"
+#include "INestedLValueRValueWrapper.h"
 #include "IChild.h"
 
 #define ERR_INVALID_OFFSET ((uint64_t)0xFFFFFFFFFFFFFFFF)
@@ -21,7 +22,9 @@ private:
 	JsonValueWrapper mMetadata;
 	uint32_t mObfKey;
 	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
-	std::unique_ptr<ILValueRValueWrapper> mDynamicResult;
+	std::unique_ptr<INestedLValueRValueWrapper> mDynamicResult; // Why nested? well, basicly we need to do, chainig struct
+																// objects to be able to modify/acess the desired offset
+																// for ex. mA.mB.mC = 0xXYZ;
 
 public:
 	OffsetInfo();
@@ -38,5 +41,9 @@ public:
 	void setMetadata(const JsonValueWrapper& metadata);
 	const JsonValueWrapper& getMetadata();
 	std::string getUIDHashStr();
+
+	void WriteHppStaticDeclsDefs();
+	void WriteHppDynDecls();
+	void WriteHppDynDefs();
 };
 

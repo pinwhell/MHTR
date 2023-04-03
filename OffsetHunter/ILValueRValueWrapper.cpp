@@ -5,6 +5,11 @@ ILValueRValueWrapper::ILValueRValueWrapper()
     mAddTerminator = true;
 }
 
+std::string ILValueRValueWrapper::getFullName()
+{
+    return mName;
+}
+
 void ILValueRValueWrapper::setType(const std::string& type)
 {
     mType = type;
@@ -25,7 +30,7 @@ std::string ILValueRValueWrapper::ComputeDeclaration() {
 }
 
 std::string ILValueRValueWrapper::ComputeDefinition() {
-    return mName + " = " + mValue + getTermninator();
+    return  getFullName() + " = " + mValue + getTermninator();
 }
 
 std::string ILValueRValueWrapper::ComputeDefinitionAndDeclaration() {

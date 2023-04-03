@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include "IDumpTarget.h"
+#include "DumpTargetGroup.h"
 #include <string>
 #include "JsonValueWrapper.h"
 #include "HPPManager.h"
@@ -13,7 +13,7 @@ class OffsetHunter;
 class TargetManager : public IChild<OffsetHunter>
 {
 private:
-	std::unordered_map<IDumpTarget*, std::unique_ptr<IDumpTarget>> mAllTargets;
+	std::unordered_map<DumpTargetGroup*, std::unique_ptr<DumpTargetGroup>> mAllTargets; // For now just supporting DumpTargetGroup
 
 	std::string mDumpTargetsPath;
 	std::string mMainCategoryName;
@@ -44,8 +44,8 @@ public:
 	void ComputeAll();
 	bool SaveResults();
 
-	void RemoveTarget(IDumpTarget* target);
-	void AddTarget(std::unique_ptr<IDumpTarget>& target);
+	void RemoveTarget(DumpTargetGroup* target);
+	void AddTarget(std::unique_ptr<DumpTargetGroup>& target);
 
 	void setDumpTargetPath(const std::string& path);
 	void setMainCategoryName(const std::string& mainCategoryName);
@@ -68,5 +68,9 @@ public:
 	bool getDumpDynamic();
 
 	void setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName);
+
+	void WriteHppStaticDeclsDefs();
+	void WriteHppDynDecls();
+	void WriteHppDynDefs();
 };
 

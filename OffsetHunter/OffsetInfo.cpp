@@ -1,8 +1,10 @@
 #include "OffsetInfo.h"
 #include "StaticHasher.h"
 #include "CppLValueRValueWrapper.h"
+#include "CppNestedLValueRValueWrapper.h"
 #include "IOffset.h"
 #include "SingleDumpTarget.h"
+#include "HPPManager.h"
 
 OffsetInfo::OffsetInfo()
 {
@@ -11,7 +13,7 @@ OffsetInfo::OffsetInfo()
 	mComment = "";
 
 	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
-	mDynamicResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
+	mDynamicResult = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
 }
 
 bool OffsetInfo::Init()
@@ -25,9 +27,6 @@ bool OffsetInfo::Init()
 	mName = mMetadata.get<std::string>("name", "");
 	mUIdentifier = mParent->getParent()->getCategoryName() + "." + mName;
 	mComment = mMetadata.get<std::string>("comment", "");
-	mUIDHash = std::to_string(fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
-
-
 
 	mStaticResult->setType("uintptr_t");	// For now, in the future, it will polomorifcly 
 											// select between example std::string, or any other
@@ -37,7 +36,15 @@ bool OffsetInfo::Init()
 	if (mParent->getDumpDynamic())
 	{
 		mDynamicResult->setType("uintptr_t");
+		mDynamicResult->PushParentName(mParent->getParent()->getCategoryObjectName());
 		mDynamicResult->setName(mName);
+
+		mUIdentifier = mDynamicResult->getFullName();   // This will chain all, and will get the full name
+														// for example: mA.mB.mC.mD
+														// so this way can get a unique identifier for this variable
+
+		mUIDHash = std::to_string(fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
+
 		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mObfKey));
 	}
 
@@ -87,4 +94,19 @@ const JsonValueWrapper& OffsetInfo::getMetadata()
 std::string OffsetInfo::getUIDHashStr()
 {
 	return mUIDHash;
+}
+
+void OffsetInfo::WriteHppStaticDeclsDefs()
+{
+	mParent->getHppWriter()->AppendLineOfCode(mStaticResult->ComputeDefinitionAndDeclaration());
+}
+
+void OffsetInfo::WriteHppDynDecls()
+{
+	mParent->getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDeclaration());
+}
+
+void OffsetInfo::WriteHppDynDefs()
+{
+	mParent->getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDefinition());
 }

@@ -7,6 +7,7 @@
 
 class SingleDumpTarget;
 class TargetManager;
+struct HeaderFileManager;
 
 class IOffset : public IChild<SingleDumpTarget>
 {
@@ -36,5 +37,11 @@ public:
 	std::string getName();
 
 	void setBufferInfo(const char* buff, size_t buffSz);
+
+	void WriteHppStaticDeclsDefs(); // This structs arround need to be refactored to handle general stuffs, not just offsets,
+	void WriteHppDynDecls(); // Code structure is done, just refactoring names, and key specific structures
+	void WriteHppDynDefs();
+
+	HeaderFileManager* getHppWriter();
 };
 

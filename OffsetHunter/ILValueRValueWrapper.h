@@ -14,6 +14,7 @@ private:
 public:
     ILValueRValueWrapper();
 
+    virtual std::string getFullName();
     void setType(const std::string& type);
     void setName(const std::string& name);
     void setValue(const std::string& value);

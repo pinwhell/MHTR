@@ -115,15 +115,21 @@ bool TargetManager::SaveHpp()
 	
 	mHppWriter->AppendMacroIfDefined("STATIC_OFFS");
 
+	WriteHppStaticDeclsDefs();
+
+	// Generate Declaration-Definition here staticly 
 
 	if (mDumpDynamic)
 	{
 		mHppWriter->AppendMacroElse();
-		/*Here Write the Dynamic*/
+		/*Generate Declaration-only here*/
 
-		mHppWriter->BeginFunction("void", mDynamicOffsetSetterFuncName, { mJsonAccesor->getJsonObjFullType() });
+		WriteHppDynDecls();
 
-
+		mHppWriter->BeginFunction("void", mDynamicOffsetSetterFuncName, { "const " + mJsonAccesor->getJsonObjFullType() + "& " + mDynamicJsonObjName });
+		/*Generate Definition-only here*/
+		
+		WriteHppDynDefs();
 
 		mHppWriter->EndFunction();
 
@@ -142,7 +148,7 @@ bool TargetManager::SaveHpp()
 	return true;
 }
 
-void TargetManager::RemoveTarget(IDumpTarget* target)
+void TargetManager::RemoveTarget(DumpTargetGroup* target)
 {
 	if (mAllTargets.find(target) == mAllTargets.end())
 		return;
@@ -150,9 +156,9 @@ void TargetManager::RemoveTarget(IDumpTarget* target)
 	mAllTargets.erase(target);
 }
 
-void TargetManager::AddTarget(std::unique_ptr<IDumpTarget>& target)
+void TargetManager::AddTarget(std::unique_ptr<DumpTargetGroup>& target)
 {
-	IDumpTarget* pDumpTarget = target.get();
+	DumpTargetGroup* pDumpTarget = target.get();
 
 	if (mAllTargets.find(pDumpTarget) != mAllTargets.end())
 		return;
@@ -205,13 +211,12 @@ bool TargetManager::HandleTargetGroupJson(const JsonValueWrapper& targetGroupRoo
 		return false;
 	}
 
-	std::unique_ptr<IDumpTarget> targetGroup = std::make_unique<DumpTargetGroup>();
+	std::unique_ptr<DumpTargetGroup> targetGroup = std::make_unique<DumpTargetGroup>();
 
 	targetGroup->setTargetManager(this);
-
-	((DumpTargetGroup*)targetGroup.get())->setDumpTargetDescJson(targetGroupRoot);
-	((DumpTargetGroup*)targetGroup.get())->setParent(this);
-	((DumpTargetGroup*)targetGroup.get())->setTargetJsonPath(mDumpTargetsPath);
+	targetGroup->setDumpTargetDescJson(targetGroupRoot);
+	targetGroup->setParent(this);
+	targetGroup->setTargetJsonPath(mDumpTargetsPath);
 
 	AddTarget(targetGroup);
 
@@ -261,4 +266,22 @@ bool TargetManager::getDumpDynamic()
 void TargetManager::setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName)
 {
 	mDynamicOffsetSetterFuncName = dynamicOffsetSetterFuncName;
+}
+
+void TargetManager::WriteHppStaticDeclsDefs()
+{
+	for (const auto& kv : mAllTargets)
+		kv.second->WriteHppStaticDeclsDefs();
+}
+
+void TargetManager::WriteHppDynDecls()
+{
+	for (const auto& kv : mAllTargets)
+		kv.second->WriteHppDynDecls();
+}
+
+void TargetManager::WriteHppDynDefs()
+{
+	for (const auto& kv : mAllTargets)
+		kv.second->WriteHppDynDefs();
 }

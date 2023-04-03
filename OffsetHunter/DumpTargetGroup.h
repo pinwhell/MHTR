@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include "IChild.h"
 
+struct HeaderFileManager;
+
 class DumpTargetGroup : public IDumpTarget, public IChild<TargetManager>
 {
 private:
@@ -25,5 +27,12 @@ public:
 	void setTargetJsonPath(const std::string& path);
 
 	bool ReadAllTarget();
+
+	void WriteHppStaticDeclsDefs();
+	void WriteHppDynDecls();
+	void WriteHppDynDefs();
+	void MacroBegin();
+	void MacroEnd();
+	HeaderFileManager* getHppWriter();
 };
 

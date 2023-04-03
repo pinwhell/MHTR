@@ -8,12 +8,14 @@
 #include "IChild.h"
 
 class DumpTargetGroup;
+struct HeaderFileManager;
 
 class SingleDumpTarget : public IDumpTarget, public IChild<DumpTargetGroup>
 {
 private:
 
 	std::string mCategoryName;
+	std::string mCategoryObjName; // by default "m" + mCategoryName
 	std::unordered_map<IOffset*, std::unique_ptr<IOffset>> mOffsets;
 	CapstoneHelperProvider* mCapstoneHelperProvider;
 	std::unique_ptr<ICapstoneHelper> mCapstoneHelper;
@@ -36,5 +38,15 @@ public:
 	void ComputeAll();
 
 	std::string getCategoryName();
+
+	std::string getCategoryObjectName();
+
+	void WriteHppStaticDeclsDefs();
+	void WriteHppDynDecls();
+	void WriteHppDynDefs();
+	void BeginStruct();
+	void EndStruct();
+
+	HeaderFileManager* getHppWriter();
 };
 

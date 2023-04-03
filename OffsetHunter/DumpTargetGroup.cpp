@@ -1,4 +1,5 @@
 #include "DumpTargetGroup.h"
+#include "TargetManager.h"
 
 bool DumpTargetGroup::InitAllTargets()
 {
@@ -86,4 +87,58 @@ bool DumpTargetGroup::ReadAllTarget()
     }
 
     return true;
+}
+
+void DumpTargetGroup::WriteHppStaticDeclsDefs()
+{
+    if (mTargets.size() < 1)
+        return;
+
+    MacroBegin();
+
+    for (auto& kv : mTargets)
+        kv.first->WriteHppStaticDeclsDefs();
+
+    MacroEnd();
+}
+
+void DumpTargetGroup::WriteHppDynDecls()
+{
+    if (mTargets.size() < 1)
+        return;
+
+    MacroBegin();
+
+    for (auto& kv : mTargets)
+        kv.first->WriteHppDynDecls();
+
+    MacroEnd();
+}
+
+void DumpTargetGroup::WriteHppDynDefs()
+{
+    if (mTargets.size() < 1)
+        return;
+
+    MacroBegin();
+
+    for (auto& kv : mTargets)
+        kv.first->WriteHppDynDefs();
+
+    MacroEnd();
+}
+
+void DumpTargetGroup::MacroBegin()
+{
+    mParent->getHppWriter()->AppendMacroIfDefined(mMacro);
+}
+
+void DumpTargetGroup::MacroEnd()
+{
+    mParent->getHppWriter()->AppendMacroEndIf();
+}
+
+HeaderFileManager* DumpTargetGroup::getHppWriter()
+{
+    return mParent->getHppWriter();
 }

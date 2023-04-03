@@ -28,12 +28,12 @@
 		"macro" : "ARM64",
 		"targets" : [
 			{ // Single Dump Target
-				"name" : "BinArm32A",
+				"name" : "BinArm64A",
 				"bin_path" : "BinArm64A.bin",
 				"dataset_path" : "BinArm64A.json"
 			},
 			{ // Single Dump Target
-				"name" : "BinArm32B",
+				"name" : "BinArm64B",
 				"bin_path" : "BinArm64B.bin",
 				"dataset_path" : "BinArm64B.json"
 			}
