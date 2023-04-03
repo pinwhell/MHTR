@@ -5,7 +5,7 @@
 			"name" : "name1",
 			"pattern" : "? ? ? E5 1E FF 2F E1", // [0x0] == 0x4
 			"disp" : 0,
-			"comment" : "This is a commnet!"
+			"comment" : "Should be 0x4"
 	},
 	{ // Single Offset
 	// Offset Finder  Test with Nested Pattern Finder Strategy
@@ -15,12 +15,12 @@
 			"cdisp" : 4, // Disp to the call
 			"pattern" : "? ? ? E5 1E FF 2F E1", // Func Boundaries => { 0x0 - 0x8 }, [0x0] == 0x4
 			"pdisp" : 0, // Disp to the Pattern
-			"comment" : "This is a commnet!"
+			"comment" : "Should be 0x4"
 	},
 	{// Single Offset
 	// Hardcoded Offset Example
 			"name" : "name3",
 			"value" : 4, // => 4
-			"comment" : "This is a commnet!"
+			"comment" : "Should be 0x4"
 	}
 ]

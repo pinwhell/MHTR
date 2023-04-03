@@ -1,5 +1,7 @@
 #include "StringHelper.h"
 
+#include <sstream>
+
 std::vector<std::string> StringHelper::Tokenize(std::string str, char delim)
 {
     std::vector<std::string> tokens;
@@ -37,4 +39,13 @@ std::string StringHelper::Unify(const std::vector<std::string>& vecStrs)
         result += currStr;
 
     return result;
+}
+
+std::string StringHelper::ToHexString(uint64_t v)
+{
+    std::stringstream sstream;
+
+    sstream  << "0x"  << std::hex << v;
+
+    return sstream.str();
 }

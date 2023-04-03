@@ -13,12 +13,6 @@ int OffsetHunterCLI::Run(int argc, const char** argv)
     options.add_options()
         ("h,help", "Print usage")
         ("c,config", "Input Config Json path", cxxopts::value<std::string>())
-        /* ("b,bar", "Param bar", cxxopts::value<std::string>()->default_value("This is the default"))
-         ("d,debug", "Enable debugging", cxxopts::value<bool>()->default_value("false"))
-         ("f,foo", "Param foo", cxxopts::value<int>()->default_value("10"))
-         */
-
-         // Brief so easily reference to add anything in the future
         ;
 
     cxxopts::ParseResult args = options.parse(argc, argv);
@@ -34,7 +28,10 @@ int OffsetHunterCLI::Run(int argc, const char** argv)
     dumper->setConfigPath(configPath);
 
     if (dumper->Init())
+    {
         dumper->Run();
+        std::cout << "Dumper Finished!\n";
+    }
 
     return 0;
 }

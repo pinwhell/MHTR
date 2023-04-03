@@ -10,6 +10,7 @@
 #define ERR_INVALID_OFFSET ((uint64_t)0xFFFFFFFFFFFFFFFF)
 
 class IOffset;
+struct HeaderFileManager;
 
 class OffsetInfo : public IChild<IOffset>
 { 
@@ -45,5 +46,11 @@ public:
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
 	void WriteHppDynDefs();
+
+	HeaderFileManager* getHppWriter();
+
+	bool getNeedShowComment();
+
+	std::string getUidentifier();
 };
 

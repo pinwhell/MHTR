@@ -5,15 +5,17 @@
 #include "IOffset.h"
 #include "SingleDumpTarget.h"
 #include "HPPManager.h"
+#include "StringHelper.h"
 
 OffsetInfo::OffsetInfo()
 {
+	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
+	mDynamicResult = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
+
+	setFinalOffset(0x0);
 	mFinalOffset = ERR_INVALID_OFFSET;
 	mName = "";
 	mComment = "";
-
-	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
-	mDynamicResult = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
 }
 
 bool OffsetInfo::Init()
@@ -25,13 +27,13 @@ bool OffsetInfo::Init()
 	}
 
 	mName = mMetadata.get<std::string>("name", "");
-	mUIdentifier = mParent->getParent()->getCategoryName() + "." + mName;
+	mUIdentifier = mParent->getParent()->getCategoryName() + "::" + mName;
 	mComment = mMetadata.get<std::string>("comment", "");
 
 	mStaticResult->setType("uintptr_t");	// For now, in the future, it will polomorifcly 
 											// select between example std::string, or any other
 	mStaticResult->setName(mName);
-	mStaticResult->setValue("0");
+	mStaticResult->setValue("0x0");
 
 	if (mParent->getDumpDynamic())
 	{
@@ -64,6 +66,7 @@ void OffsetInfo::setComment(const std::string& comment)
 void OffsetInfo::setFinalOffset(uint64_t off)
 {
 	mFinalOffset = off;
+	mStaticResult->setValue(StringHelper::ToHexString(mFinalOffset));
 }
 
 const std::string& OffsetInfo::getName()
@@ -98,15 +101,57 @@ std::string OffsetInfo::getUIDHashStr()
 
 void OffsetInfo::WriteHppStaticDeclsDefs()
 {
-	mParent->getHppWriter()->AppendLineOfCode(mStaticResult->ComputeDefinitionAndDeclaration());
+	if (mFinalOffset == ERR_INVALID_OFFSET)
+		return;
+
+	getHppWriter()->AppendLineOfCode(mStaticResult->ComputeDefinitionAndDeclaration(), true, getNeedShowComment() == false);
+
+	if (getNeedShowComment())
+	{
+		getHppWriter()->AppendTab();
+		getHppWriter()->AppendComment(mComment);
+	}
 }
 
 void OffsetInfo::WriteHppDynDecls()
 {
-	mParent->getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDeclaration());
+	if (mFinalOffset == ERR_INVALID_OFFSET)
+		return;
+
+	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDeclaration(), true, getNeedShowComment() == false);
+
+	if (getNeedShowComment())
+	{
+		getHppWriter()->AppendTab();
+		getHppWriter()->AppendComment(mComment);
+	}
 }
 
 void OffsetInfo::WriteHppDynDefs()
 {
-	mParent->getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDefinition());
+	if (mFinalOffset == ERR_INVALID_OFFSET)
+		return;
+
+	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDefinition(), true, getNeedShowComment() == false);
+
+	if (getNeedShowComment())
+	{
+		getHppWriter()->AppendTab();
+		getHppWriter()->AppendComment(mComment);
+	}
+}
+
+HeaderFileManager* OffsetInfo::getHppWriter()
+{
+	return mParent->getHppWriter();
+}
+
+bool OffsetInfo::getNeedShowComment()
+{
+	return mComment.empty() == false;
+}
+
+std::string OffsetInfo::getUidentifier()
+{
+	return mUIdentifier;
 }
