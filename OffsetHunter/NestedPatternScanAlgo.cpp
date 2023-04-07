@@ -2,6 +2,11 @@
 #include "FutureOffset.h"
 #include <ThunderByteScan.hpp>
 
+NestedPatternScanAlgo::NestedPatternScanAlgo()
+{
+    mNeedCapstone = true;
+}
+
 bool NestedPatternScanAlgo::Init()
 {
     if (IOffsetScanAlgo::Init() == false)

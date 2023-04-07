@@ -4,6 +4,7 @@
 IOffset::IOffset()
 {
 	mOffsetInfo.setParent(this);
+	mNeedCapstone = false;
 }
 
 bool IOffset::Init()

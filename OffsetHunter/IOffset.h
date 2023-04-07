@@ -18,6 +18,7 @@ protected:
 	const char* mBuffer;
 	size_t mBuffSize;
 	TargetManager* mTargetMgr;
+	bool mNeedCapstone;
 
 public:
 
@@ -43,5 +44,7 @@ public:
 	void WriteHppDynDefs();
 
 	HeaderFileManager* getHppWriter();
+
+	bool getNeedCapstoneHelper();
 };
 

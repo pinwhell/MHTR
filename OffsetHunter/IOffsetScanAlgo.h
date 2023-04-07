@@ -16,12 +16,13 @@ protected:
 
 	std::vector<uintptr_t> mResults;
 	JsonValueWrapper mAlgoMetadata;
-
-
 	int64_t mMainDisp;
+	bool mNeedCapstone;
 
 
 public:
+	IOffsetScanAlgo();
+
 	virtual bool Init();
 	virtual void IgniteScan();
 	virtual void OnScanFinished();
@@ -31,5 +32,6 @@ public:
 	void HandleAllDisp();
 
 	void setBufferInfo(const char* buff, size_t buffSz);
+	bool getNeedCapstone();
 };
 

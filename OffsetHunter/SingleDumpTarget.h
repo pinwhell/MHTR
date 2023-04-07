@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "JsonValueWrapper.h"
 #include "IChild.h"
+#include "IBinaryFormat.h"
 
 class DumpTargetGroup;
 struct HeaderFileManager;
@@ -17,13 +18,13 @@ private:
 	std::string mCategoryName;
 	std::string mCategoryObjName; // by default "m" + mCategoryName
 	std::unordered_map<IOffset*, std::unique_ptr<IOffset>> mOffsets;
-	CapstoneHelperProvider* mCapstoneHelperProvider;
-	std::unique_ptr<ICapstoneHelper> mCapstoneHelper;
+	ICapstoneHelper* mCapstoneHelper;
 	std::string mTargetMetadataPath;
 	JsonValueWrapper mTargetMetadataRoot;
 	std::string mTargetBinaryPath;
 
 	std::vector<unsigned char> mTargetBinary;
+	std::unique_ptr<IBinaryFormat> mBinFormat;
 
 public:
 

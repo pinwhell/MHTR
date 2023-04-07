@@ -152,15 +152,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\JSONCPP\dist\jsoncpp.cpp" />
+    <ClCompile Include="Arm32CapstoneHelperFactory.cpp" />
     <ClCompile Include="CapstoneHelperProvider.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="ContainerDisplacer.cpp" />
     <ClCompile Include="CppLValueRValueWrapper.cpp" />
     <ClCompile Include="CppNestedLValueRValueWrapper.cpp" />
     <ClCompile Include="DumpTargetGroup.cpp" />
+    <ClCompile Include="ELF32BinaryFormat.cpp" />
     <ClCompile Include="FileHelper.cpp" />
     <ClCompile Include="FutureOffset.cpp" />
     <ClCompile Include="HPPManager.cpp" />
+    <ClCompile Include="IBinaryFormat.cpp" />
     <ClCompile Include="IChild.cpp" />
     <ClCompile Include="IDumpTarget.cpp" />
     <ClCompile Include="HardcodedOffsetInfo.cpp" />
@@ -169,6 +172,7 @@
     <ClCompile Include="IJsonAccesor.cpp" />
     <ClCompile Include="ILValueRValueWrapper.cpp" />
     <ClCompile Include="INestedLValueRValueWrapper.cpp" />
+    <ClCompile Include="InterpPlainPatternScanAlgo.cpp" />
     <ClCompile Include="IOffset.cpp" />
     <ClCompile Include="JsonAccesorClassifier.cpp" />
     <ClCompile Include="JsonCppAcessor.cpp" />
@@ -188,17 +192,22 @@
     <ClCompile Include="SingleDumpTarget.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TargetManager.cpp" />
+    <ClCompile Include="UnknownBinaryFormat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arm32CapstoneHelperFactory.h" />
     <ClInclude Include="CapstoneHelperProvider.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="ContainerDisplacer.h" />
     <ClInclude Include="CppLValueRValueWrapper.h" />
     <ClInclude Include="CppNestedLValueRValueWrapper.h" />
     <ClInclude Include="DumpTargetGroup.h" />
+    <ClInclude Include="ELF.h" />
+    <ClInclude Include="ELF32BinaryFormat.h" />
     <ClInclude Include="FileHelper.h" />
     <ClInclude Include="FutureOffset.h" />
     <ClInclude Include="HPPManager.h" />
+    <ClInclude Include="IBinaryFormat.h" />
     <ClInclude Include="IChild.h" />
     <ClInclude Include="IDumpTarget.h" />
     <ClInclude Include="HardcodedOffsetInfo.h" />
@@ -207,6 +216,7 @@
     <ClInclude Include="IJsonAccesor.h" />
     <ClInclude Include="ILValueRValueWrapper.h" />
     <ClInclude Include="INestedLValueRValueWrapper.h" />
+    <ClInclude Include="InterpPlainPatternScanAlgo.h" />
     <ClInclude Include="IOffset.h" />
     <ClInclude Include="JsonAccesorClassifier.h" />
     <ClInclude Include="JsonCppAcessor.h" />
@@ -226,6 +236,7 @@
     <ClInclude Include="StaticHasher.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TargetManager.h" />
+    <ClInclude Include="UnknownBinaryFormat.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

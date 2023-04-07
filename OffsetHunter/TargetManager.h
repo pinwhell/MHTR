@@ -72,5 +72,6 @@ public:
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
 	void WriteHppDynDefs();
+	CapstoneHelperProvider* getCapstoneHelperProvider();
 };
 

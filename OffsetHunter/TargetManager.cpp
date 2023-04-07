@@ -3,6 +3,7 @@
 #include "DumpTargetGroup.h"
 #include <iostream>
 #include "JsonAccesorClassifier.h"
+#include "OffsetHunter.h"
 
 TargetManager::TargetManager()
 {
@@ -284,4 +285,9 @@ void TargetManager::WriteHppDynDefs()
 {
 	for (const auto& kv : mAllTargets)
 		kv.second->WriteHppDynDefs();
+}
+
+CapstoneHelperProvider* TargetManager::getCapstoneHelperProvider()
+{
+	return mParent->getCapstoneHelperProvider();
 }

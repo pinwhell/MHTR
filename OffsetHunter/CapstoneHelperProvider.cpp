@@ -10,3 +10,11 @@ ICapstoneHelper* CapstoneHelperProvider::getInstance(std::unique_ptr<ICapstoneHe
 
 	return pinstance;
 }
+
+bool CapstoneHelperProvider::CreateHelperFromBinary(const unsigned char* pBin, ICapstoneHelper** pOutHelper)
+{
+
+
+
+	return false;
+}

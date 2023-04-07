@@ -12,4 +12,5 @@ private:
 public:
 
 	ICapstoneHelper* getInstance(std::unique_ptr<ICapstoneHelperFactory>&& helperFactory);
+	bool CreateHelperFromBinary(const unsigned char* pBin, ICapstoneHelper** pOutHelper);
 };
