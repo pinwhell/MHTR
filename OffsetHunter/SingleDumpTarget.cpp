@@ -80,6 +80,7 @@ bool SingleDumpTarget::Init()
 		}
 
 		mCapstoneHelper->setBaseAddress((unsigned char*)mTargetBinary.data());
+		mCapstoneHelper->setBaseSize(mTargetBinary.size());
 	}
 
 	//printf("%s Need Capstone: %s\n\n", mCategoryName.c_str(), mNeedCapstone ? "Yes" : "No");

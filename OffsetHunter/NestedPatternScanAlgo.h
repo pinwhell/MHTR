@@ -4,6 +4,7 @@ class NestedPatternScanAlgo : public IOffsetScanAlgo
 {
 private:
 	std::vector<uintptr_t> mFunctionsCallResult;
+	std::vector<uintptr_t> mFunctionCallsDsts;
 	std::string mCallPattern;
 	int64_t mCallDisp;
 	std::string mPattern;
@@ -13,5 +14,6 @@ public:
 
 	bool Init() override;
 	void IgniteScan() override;
+	void InterpretAllCalls();
 };
 

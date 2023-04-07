@@ -94,3 +94,25 @@ bool Arm32CapstoneHelper::InterpretDispPCRelativeInst(cs_insn* pInstBegin, cs_in
 
     return false;
 }
+
+bool Arm32CapstoneHelper::GetCallDestinationInst(cs_insn* pInst, uintptr_t& outDest)
+{
+    switch (pInst->id)
+    {
+    case ARM_INS_BL:
+    case ARM_INS_B:
+    {
+        outDest = pInst->detail->arm.operands[0].imm;
+        return true;
+    }
+
+    }
+    return pInst->address;
+
+    return false;
+}
+
+bool Arm32CapstoneHelper::IsIntructionReturnRelated(cs_insn* pInst)
+{
+    return ArmCapstoneAux::HeuristicReturn(pInst);
+}

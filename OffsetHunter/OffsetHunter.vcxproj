@@ -166,6 +166,7 @@
     <ClCompile Include="ELFHelper.cpp" />
     <ClCompile Include="FileHelper.cpp" />
     <ClCompile Include="FutureOffset.cpp" />
+    <ClCompile Include="GeneralHelpers.cpp" />
     <ClCompile Include="HPPManager.cpp" />
     <ClCompile Include="IBinaryFormat.cpp" />
     <ClCompile Include="IChild.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="ELFHelper.h" />
     <ClInclude Include="FileHelper.h" />
     <ClInclude Include="FutureOffset.h" />
+    <ClInclude Include="GeneralHelpers.h" />
     <ClInclude Include="HPPManager.h" />
     <ClInclude Include="IBinaryFormat.h" />
     <ClInclude Include="IChild.h" />

@@ -12,10 +12,10 @@
 			"method" : "npf",
 			"name" : "name2",
 			"call" : "? ? 80 E5 00 00 91 E5 ? ? ? EB",
-			"cdisp" : 8,
-			"fsize" : 20, // Function size (if not provided, an attempt will be made to calculate it automatically)
+			"cdisp" : 8, // Call Disp
+			//"fsize" : 20, // Function size (if not provided, an attempt will be made to calculate it automatically)
 			"pattern" : "? ? 90 E5 ? ? ? E5",
-			"pdisp" : 4, 
+			"pdisp" : 0, // Main Pattern Disp
 			"comment" : "Should be 0x8"
 	},
 	{// Single Offset (HardcodedOffset)

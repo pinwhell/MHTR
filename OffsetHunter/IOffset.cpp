@@ -45,6 +45,11 @@ std::string IOffset::getName()
 	return mOffsetInfo.getName();
 }
 
+std::string IOffset::getSignature()
+{
+	return mOffsetInfo.getUidentifier();
+}
+
 void IOffset::setBufferInfo(const char* buff, size_t buffSz)
 {
 	mBuffer = buff;

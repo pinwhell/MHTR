@@ -79,8 +79,8 @@ void IOffsetScanAlgo::HandleInterpretation()
 
 		if (getCapstoneHelper()->TryInterpretDisp(c, disp) == false)
 		{
-			auto name = mParent->getName();
-			printf("Unable to resolve \"%s\" candidate \"0x%08X\" result Interpretation\n", name.c_str(), c - (unsigned char*)mBuffer);
+			auto sig = mParent->getSignature();
+			printf("Unable to resolve \"%s\" candidate \"0x%08X\" result Interpretation\n", sig.c_str(), c - (unsigned char*)mBuffer);
 			continue;
 		}
 

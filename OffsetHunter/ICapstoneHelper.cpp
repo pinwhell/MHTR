@@ -26,6 +26,22 @@ void ICapstoneHelper::setMode(cs_mode mode)
     mMode = mode;
 }
 
+bool ICapstoneHelper::TryGetCallDestination(const unsigned char* pInst, uintptr_t& outDest)
+{
+    cs_insn* pDisasmdInst = nullptr;
+    uintptr_t count = 0;
+    bool result = false;
+
+    if ((count = cs_disasm(mHandle, pInst, 0x4, (uint64_t)(pInst), 0, &pDisasmdInst)) != 0 && pDisasmdInst) // Refactor code size in the future
+    {
+        result = GetCallDestinationInst(pDisasmdInst, outDest);
+        cs_free(pDisasmdInst, count);
+    }
+
+    return result;
+}
+
+
 bool ICapstoneHelper::TryInterpretDisp(const unsigned char* pInst, uintptr_t& outDisp)
 {
     cs_insn* pDisasmdInst = nullptr;
@@ -56,7 +72,35 @@ bool ICapstoneHelper::TryInterpretDispPCRelative(cs_insn* pInst, uintptr_t& outD
     return result;
 }
 
+bool ICapstoneHelper::TryComputeParagraphSize(const unsigned char* pInst, uintptr_t& outSize)
+{
+    cs_insn pDisasmdInst{ 0 };
+    cs_detail pDisasmdDetail{ 0 };
+    pDisasmdInst.detail = &pDisasmdDetail;
+    uintptr_t count = 0;
+    bool result = false;
+    uint64_t addr = (uint64_t)pInst;
+    const unsigned char* pCurrInst = pInst;
+    size_t szRem = ((size_t)mpBase + mBaseSize) - addr;
+
+    while (cs_disasm_iter(mHandle, (const uint8_t**)&pCurrInst, &szRem, (uint64_t*)&addr, &pDisasmdInst))
+    {
+        result = true;
+        outSize = (pDisasmdInst.address + pDisasmdInst.size) - (uint64_t)pInst;
+
+        if (IsIntructionReturnRelated(&pDisasmdInst))
+            break;
+    }
+
+    return result;
+}
+
 void ICapstoneHelper::setBaseAddress(unsigned char* base)
 {
     mpBase = base;
+}
+
+void ICapstoneHelper::setBaseSize(size_t sz)
+{
+    mBaseSize = sz;
 }

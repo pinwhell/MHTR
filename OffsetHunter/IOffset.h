@@ -37,6 +37,7 @@ public:
 	void setMetadata(const JsonValueWrapper& metadata);
 
 	std::string getName();
+	std::string getSignature();
 
 	void setBufferInfo(const char* buff, size_t buffSz);
 
