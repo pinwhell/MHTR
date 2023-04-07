@@ -152,7 +152,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\JSONCPP\dist\jsoncpp.cpp" />
+    <ClCompile Include="Arm32CapstoneHelper.cpp" />
     <ClCompile Include="Arm32CapstoneHelperFactory.cpp" />
+    <ClCompile Include="BinaryFormatClassifier.cpp" />
+    <ClCompile Include="CapstoneAux.cpp" />
     <ClCompile Include="CapstoneHelperProvider.cpp" />
     <ClCompile Include="ConfigManager.cpp" />
     <ClCompile Include="ContainerDisplacer.cpp" />
@@ -160,6 +163,7 @@
     <ClCompile Include="CppNestedLValueRValueWrapper.cpp" />
     <ClCompile Include="DumpTargetGroup.cpp" />
     <ClCompile Include="ELF32BinaryFormat.cpp" />
+    <ClCompile Include="ELFHelper.cpp" />
     <ClCompile Include="FileHelper.cpp" />
     <ClCompile Include="FutureOffset.cpp" />
     <ClCompile Include="HPPManager.cpp" />
@@ -194,7 +198,10 @@
     <ClCompile Include="UnknownBinaryFormat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arm32CapstoneHelper.h" />
     <ClInclude Include="Arm32CapstoneHelperFactory.h" />
+    <ClInclude Include="BinaryFormatClassifier.h" />
+    <ClInclude Include="CapstoneAux.h" />
     <ClInclude Include="CapstoneHelperProvider.h" />
     <ClInclude Include="ConfigManager.h" />
     <ClInclude Include="ContainerDisplacer.h" />
@@ -203,6 +210,7 @@
     <ClInclude Include="DumpTargetGroup.h" />
     <ClInclude Include="ELF.h" />
     <ClInclude Include="ELF32BinaryFormat.h" />
+    <ClInclude Include="ELFHelper.h" />
     <ClInclude Include="FileHelper.h" />
     <ClInclude Include="FutureOffset.h" />
     <ClInclude Include="HPPManager.h" />

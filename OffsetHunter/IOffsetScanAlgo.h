@@ -5,7 +5,9 @@
 #include "JsonValueWrapper.h"
 #include "ContainerDisplacer.h"
 #include "IChild.h"
+#include <unordered_set>
 
+class ICapstoneHelper;
 class FutureOffset;
 
 class IOffsetScanAlgo : public IScanListener, public IChild<FutureOffset>
@@ -15,6 +17,7 @@ protected:
 	size_t mBuffSize;
 
 	std::vector<uintptr_t> mResults;
+	std::unordered_set<uintptr_t> mFilteredResults;
 	JsonValueWrapper mAlgoMetadata;
 	int64_t mMainDisp;
 	bool mTryInterpret;
@@ -24,12 +27,15 @@ public:
 	virtual bool Init();
 	virtual void IgniteScan();
 	virtual void OnScanFinished();
-	const std::vector<uintptr_t>& getResults();
+	void SyncFilteredResults();
+	const std::unordered_set<uintptr_t>& getResults();
 	void setAlgoMetadata(const JsonValueWrapper& metadata);
 
 	void HandleAllDisp();
+	void HandleInterpretation();
 
 	void setBufferInfo(const char* buff, size_t buffSz);
 	bool getNeedCapstone();
+	ICapstoneHelper* getCapstoneHelper();
 };
 

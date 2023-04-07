@@ -8,6 +8,7 @@
 class SingleDumpTarget;
 class TargetManager;
 struct HeaderFileManager;
+class ICapstoneHelper;
 
 class IOffset : public IChild<SingleDumpTarget>
 {
@@ -46,5 +47,6 @@ public:
 	HeaderFileManager* getHppWriter();
 
 	bool getNeedCapstoneHelper();
+	ICapstoneHelper* getCapstoneHelper();
 };
 

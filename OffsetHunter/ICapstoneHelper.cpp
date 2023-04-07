@@ -25,3 +25,38 @@ void ICapstoneHelper::setMode(cs_mode mode)
 {
     mMode = mode;
 }
+
+bool ICapstoneHelper::TryInterpretDisp(const unsigned char* pInst, uintptr_t& outDisp)
+{
+    cs_insn* pDisasmdInst = nullptr;
+    uintptr_t count = 0;
+    bool result = false;
+
+    if ((count = cs_disasm(mHandle, pInst, 0x4, (uint64_t)(pInst), 0, &pDisasmdInst)) != 0 && pDisasmdInst)
+    {
+        result = InterpretDispInst(pDisasmdInst, outDisp);
+        cs_free(pDisasmdInst, count);
+    }
+
+    return result;
+}
+
+bool ICapstoneHelper::TryInterpretDispPCRelative(cs_insn* pInst, uintptr_t& outDisp)
+{
+    cs_insn* pDisasmdInst = nullptr;
+    uintptr_t count = 0;
+    bool result = false;
+
+    if ((count = cs_disasm(mHandle, (uint8_t*)pInst->address, 0x50, PCRelInstAddrRebaseRoot() ? (pInst->address - uintptr_t(mpBase)) : pInst->address, 0, &pDisasmdInst)) != 0 && pDisasmdInst)
+    {
+        result = InterpretDispPCRelativeInst(pDisasmdInst, pDisasmdInst + count, outDisp);
+        cs_free(pDisasmdInst, count);
+    }
+
+    return result;
+}
+
+void ICapstoneHelper::setBaseAddress(unsigned char* base)
+{
+    mpBase = base;
+}

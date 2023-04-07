@@ -4,6 +4,8 @@
 #include <ThreadPool.h>
 #include "DumpTargetGroup.h"
 #include "HPPManager.h"
+#include "BinaryFormatClassifier.h"
+#include "TargetManager.h"
 
 SingleDumpTarget::SingleDumpTarget()
 {
@@ -35,11 +37,15 @@ bool SingleDumpTarget::Init()
 
 	mTargetMetadataPath = mDumpTargetDesc.get<std::string>("dataset_path", "");
 	mTargetBinaryPath = mDumpTargetDesc.get<std::string>("bin_path", "");
+	mBinFormatStr = mDumpTargetDesc.get<std::string>("bin_format", "");
 
 	if (FileHelper::IsValidFilePath(mTargetMetadataPath, true, true) == false)
 		return false;
 
 	if (FileHelper::IsValidFilePath(mTargetBinaryPath, true, true) == false)
+		return false;
+
+	if (JsonHelper::File2Json(mTargetMetadataPath, mTargetMetadataRoot) == false)
 		return false;
 
 	if (FileHelper::ReadFileBinary(mTargetBinaryPath, mTargetBinary) == false)
@@ -48,8 +54,7 @@ bool SingleDumpTarget::Init()
 		return false;
 	}
 
-	if (JsonHelper::File2Json(mTargetMetadataPath, mTargetMetadataRoot) == false)
-		return false;
+	BinaryFormatClassifier::Classify(mBinFormatStr, mBinFormat, mTargetBinary.data());
 
 	if (LoadMetadata() == false)
 	{
@@ -60,7 +65,24 @@ bool SingleDumpTarget::Init()
 	if (InitAllMetadata() == false)
 		return false;
 
-	printf("%s Need Capstone: %s\n", mCategoryName.c_str(), mNeedCapstone ? "Yes" : "No");
+	if (getNeedCapstone() == true)
+	{
+		if (mBinFormat->MakeCapstoneHelper(mTargetMgr->getCapstoneHelperProvider(), &mCapstoneHelper) == false)
+		{
+			printf("\"%s\" Needs a capstone helper, but it fail to create one, maybe the file format is incorrect\n", mTargetBinaryPath.c_str());
+			return false;
+		}
+
+		if (mCapstoneHelper->Init() == false)
+		{
+			printf("\"%s\" Needs a capstone helper, but it fail to initialize one\n", mTargetBinaryPath.c_str());
+			return false;
+		}
+
+		mCapstoneHelper->setBaseAddress((unsigned char*)mTargetBinary.data());
+	}
+
+	//printf("%s Need Capstone: %s\n\n", mCategoryName.c_str(), mNeedCapstone ? "Yes" : "No");
 
 	return true;
 }
@@ -183,4 +205,9 @@ bool SingleDumpTarget::getNeedCapstone()
 HeaderFileManager* SingleDumpTarget::getHppWriter()
 {
 	return mParent->getHppWriter();
+}
+
+ICapstoneHelper* SingleDumpTarget::getCapstoneHelper()
+{
+	return mCapstoneHelper;
 }

@@ -22,6 +22,7 @@ private:
 	std::string mTargetMetadataPath;
 	JsonValueWrapper mTargetMetadataRoot;
 	std::string mTargetBinaryPath;
+	std::string mBinFormatStr;
 
 	std::vector<unsigned char> mTargetBinary;
 	std::unique_ptr<IBinaryFormat> mBinFormat;
@@ -53,5 +54,6 @@ public:
 	bool getNeedCapstone();
 
 	HeaderFileManager* getHppWriter();
+	ICapstoneHelper* getCapstoneHelper();
 };
 

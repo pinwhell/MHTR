@@ -26,6 +26,8 @@ bool NestedPatternScanAlgo::Init()
     mCallDisp = mAlgoMetadata.get<int64_t>("cdisp", 0);
     mMainDisp = mAlgoMetadata.get<int64_t>("pdisp", 0);
 
+    mTryInterpret = true; // Need to interpret by default the call instruction 
+
     return true;
 }
 

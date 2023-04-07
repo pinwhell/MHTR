@@ -9,7 +9,7 @@ FutureOffset::FutureOffset()
 
 void FutureOffset::OnFound()
 {
-	mOffsetInfo.setFinalOffset(mScanAlgo->getResults()[0]); // Guaranteed to be one
+	mOffsetInfo.setFinalOffset(*(mScanAlgo->getResults().begin())); // Guaranteed to be one
 }
 
 void FutureOffset::OnNotFound()
@@ -40,7 +40,7 @@ bool FutureOffset::Init()
 
 	mNeedCapstone = mScanAlgo->getNeedCapstone();
 
-	printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
+	//printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
 
 	return true;
 }

@@ -4,3 +4,13 @@ bool IBinaryFormat::MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapst
 {
 	return false;
 }
+
+void IBinaryFormat::setBase(uintptr_t base)
+{
+	mBase = base;
+}
+
+void IBinaryFormat::setBase(void* base)
+{
+	mVBase = base;
+}

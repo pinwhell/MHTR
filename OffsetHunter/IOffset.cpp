@@ -75,3 +75,8 @@ bool IOffset::getNeedCapstoneHelper()
 {
 	return mNeedCapstone;
 }
+
+ICapstoneHelper* IOffset::getCapstoneHelper()
+{
+	return mParent->getCapstoneHelper();
+}
