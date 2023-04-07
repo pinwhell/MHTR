@@ -1,14 +1,11 @@
 #include "IOffsetScanAlgo.h"
 #include "FutureOffset.h"
 
-IOffsetScanAlgo::IOffsetScanAlgo()
-{
-	mNeedCapstone = false;
-}
-
 bool IOffsetScanAlgo::Init()
 {
 	mMainDisp = mAlgoMetadata.get<int64_t>("disp", 0);
+
+	mTryInterpret = mAlgoMetadata.get<bool>("interpret", true);
 
 	return true;
 }
@@ -50,5 +47,5 @@ void IOffsetScanAlgo::setBufferInfo(const char* buff, size_t buffSz)
 
 bool IOffsetScanAlgo::getNeedCapstone()
 {
-	return mNeedCapstone;
+	return mTryInterpret == true;
 }

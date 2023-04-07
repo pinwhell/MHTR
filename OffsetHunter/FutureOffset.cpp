@@ -35,12 +35,12 @@ bool FutureOffset::Init()
 	mScanAlgo->setParent(this);
 	mScanAlgo->setBufferInfo(mBuffer, mBuffSize);
 
-	mNeedCapstone = mScanAlgo->getNeedCapstone();
-
-	printf("%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
-
 	if (mScanAlgo->Init() == false)
 		return false;
+
+	mNeedCapstone = mScanAlgo->getNeedCapstone();
+
+	printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
 
 	return true;
 }

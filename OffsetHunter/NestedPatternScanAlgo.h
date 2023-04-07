@@ -11,8 +11,6 @@ private:
 	size_t mFuncSize;
 public:
 
-	NestedPatternScanAlgo();
-
 	bool Init() override;
 	void IgniteScan() override;
 };

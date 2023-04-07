@@ -25,8 +25,11 @@ private:
 
 	std::vector<unsigned char> mTargetBinary;
 	std::unique_ptr<IBinaryFormat> mBinFormat;
+	bool mNeedCapstone;
 
 public:
+
+	SingleDumpTarget();
 
 	bool Init() override;
 
@@ -47,6 +50,7 @@ public:
 	void WriteHppDynDefs();
 	void BeginStruct();
 	void EndStruct();
+	bool getNeedCapstone();
 
 	HeaderFileManager* getHppWriter();
 };

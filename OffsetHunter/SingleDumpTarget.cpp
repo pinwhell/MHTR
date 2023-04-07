@@ -5,6 +5,11 @@
 #include "DumpTargetGroup.h"
 #include "HPPManager.h"
 
+SingleDumpTarget::SingleDumpTarget()
+{
+	mNeedCapstone = false;
+}
+
 bool SingleDumpTarget::Init()
 {
 	if (JSON_ASSERT_STR_EMPTY(mDumpTargetDesc, "name") == false)
@@ -55,6 +60,8 @@ bool SingleDumpTarget::Init()
 	if (InitAllMetadata() == false)
 		return false;
 
+	printf("%s Need Capstone: %s\n", mCategoryName.c_str(), mNeedCapstone ? "Yes" : "No");
+
 	return true;
 }
 
@@ -84,6 +91,8 @@ bool SingleDumpTarget::InitAllMetadata()
 	{
 		if (currOff.first->Init() == false)
 			return false;
+
+		mNeedCapstone = currOff.first->getNeedCapstoneHelper() || mNeedCapstone;
 	}
 
 	return true;
@@ -164,6 +173,11 @@ void SingleDumpTarget::BeginStruct()
 void SingleDumpTarget::EndStruct()
 {
 	mParent->getHppWriter()->EndStruct(mCategoryName, { mCategoryObjName }); // by default mCategoryObjName = "m" + mCategoryName
+}
+
+bool SingleDumpTarget::getNeedCapstone()
+{
+	return mNeedCapstone;
 }
 
 HeaderFileManager* SingleDumpTarget::getHppWriter()

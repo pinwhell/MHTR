@@ -70,3 +70,8 @@ HeaderFileManager* IOffset::getHppWriter()
 {
 	return mParent->getHppWriter();
 }
+
+bool IOffset::getNeedCapstoneHelper()
+{
+	return mNeedCapstone;
+}

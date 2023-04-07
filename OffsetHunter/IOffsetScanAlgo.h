@@ -17,11 +17,9 @@ protected:
 	std::vector<uintptr_t> mResults;
 	JsonValueWrapper mAlgoMetadata;
 	int64_t mMainDisp;
-	bool mNeedCapstone;
-
+	bool mTryInterpret;
 
 public:
-	IOffsetScanAlgo();
 
 	virtual bool Init();
 	virtual void IgniteScan();

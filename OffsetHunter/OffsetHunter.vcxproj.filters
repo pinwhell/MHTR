@@ -138,9 +138,6 @@
     <ClCompile Include="UnknownBinaryFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InterpPlainPatternScanAlgo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigManager.h">
@@ -264,9 +261,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UnknownBinaryFormat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InterpPlainPatternScanAlgo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

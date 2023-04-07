@@ -172,7 +172,6 @@
     <ClCompile Include="IJsonAccesor.cpp" />
     <ClCompile Include="ILValueRValueWrapper.cpp" />
     <ClCompile Include="INestedLValueRValueWrapper.cpp" />
-    <ClCompile Include="InterpPlainPatternScanAlgo.cpp" />
     <ClCompile Include="IOffset.cpp" />
     <ClCompile Include="JsonAccesorClassifier.cpp" />
     <ClCompile Include="JsonCppAcessor.cpp" />
@@ -216,7 +215,6 @@
     <ClInclude Include="IJsonAccesor.h" />
     <ClInclude Include="ILValueRValueWrapper.h" />
     <ClInclude Include="INestedLValueRValueWrapper.h" />
-    <ClInclude Include="InterpPlainPatternScanAlgo.h" />
     <ClInclude Include="IOffset.h" />
     <ClInclude Include="JsonAccesorClassifier.h" />
     <ClInclude Include="JsonCppAcessor.h" />
