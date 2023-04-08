@@ -9,7 +9,7 @@ FutureOffset::FutureOffset()
 
 void FutureOffset::OnFound()
 {
-	mOffsetInfo.setFinalOffset(*(mScanAlgo->getResults().begin())); // Guaranteed to be one
+	mOffsetInfo.setFinalOffset(getSingleResult()); // Guaranteed to be one
 }
 
 void FutureOffset::OnNotFound()
@@ -22,6 +22,14 @@ void FutureOffset::OnMultipleFound()
 {
 	auto name = mOffsetInfo.getUidentifier();
 	printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
+}
+
+uintptr_t FutureOffset::getSingleResult()
+{
+	if (mScanAlgo->getResults().size() != 1)
+		return 0;
+
+	return *(mScanAlgo->getResults().begin());
 }
 
 bool FutureOffset::Init()
@@ -65,4 +73,10 @@ void FutureOffset::IgniteScan()
 void FutureOffset::ComputeOffset()
 {
 	IgniteScan();
+}
+
+void FutureOffset::ComputeJsonResult()
+{
+	if (getDumpDynamic())
+		getResultJson()->set<uint64_t>(mOffsetInfo.getUIDHashStr(), mOffsetInfo.getFinalObfOffset());
 }

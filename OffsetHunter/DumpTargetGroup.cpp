@@ -24,7 +24,7 @@ bool DumpTargetGroup::Init()
     }
 
     mMacro = mDumpTargetDesc.get<std::string>("macro", "");
-    mOutputJsonName = mDumpTargetDesc.get<std::string>("output_json_name", mMacro + "_Offs.json");
+    mResultJsonName = mDumpTargetDesc.get<std::string>("output_json_name", "offsets_" + mMacro + ".json");
 
     if (ReadAllTarget() == false)
         return false;
@@ -41,10 +41,18 @@ void DumpTargetGroup::ComputeAll()
 
     for (auto& kv : mTargets)
     {
+        printf("Computing %s\n", kv.second->getCategoryName().c_str());
+
         tp.enqueue([&](SingleDumpTarget* pSingDumpTarg) {
             pSingDumpTarg->ComputeAll();
             }, kv.second.get());
     }
+}
+
+void DumpTargetGroup::ComputeJsonResult()
+{
+    for (auto& kv : mTargets)
+        kv.second->ComputeJsonResult();
 }
 
 void DumpTargetGroup::AddTarget(std::unique_ptr<SingleDumpTarget>& target)
@@ -148,4 +156,22 @@ void DumpTargetGroup::MacroEnd()
 HeaderFileManager* DumpTargetGroup::getHppWriter()
 {
     return mParent->getHppWriter();
+}
+
+JsonValueWrapper* DumpTargetGroup::getResultJson()
+{
+    return &mResultJson;
+}
+
+bool DumpTargetGroup::SaveResultJsonToFile()
+{
+    if (mResultJsonName.empty())
+        return false;
+
+    return JsonHelper::Json2File(mResultJson, mResultJsonName);
+}
+
+std::string DumpTargetGroup::getMacro()
+{
+    return mMacro;
 }

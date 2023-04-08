@@ -141,7 +141,7 @@ void SingleDumpTarget::RemoveOffset(IOffset* offset)
 void SingleDumpTarget::ComputeAll()
 {
 	for (auto& kv : mOffsets)
-		kv.second->ComputeOffset();		
+		kv.second->ComputeOffset();
 }
 
 std::string SingleDumpTarget::getCategoryName()
@@ -203,4 +203,15 @@ HeaderFileManager* SingleDumpTarget::getHppWriter()
 ICapstoneHelper* SingleDumpTarget::getCapstoneHelper()
 {
 	return mCapstoneHelper;
+}
+
+JsonValueWrapper* SingleDumpTarget::getResultJson()
+{
+	return mParent->getResultJson();
+}
+
+void SingleDumpTarget::ComputeJsonResult()
+{
+	for (auto& currOff : mOffsets)
+		currOff.first->ComputeJsonResult();
 }

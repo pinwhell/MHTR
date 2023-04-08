@@ -55,5 +55,8 @@ public:
 
 	HeaderFileManager* getHppWriter();
 	ICapstoneHelper* getCapstoneHelper();
+	JsonValueWrapper* getResultJson();
+
+	void ComputeJsonResult();
 };
 

@@ -45,7 +45,7 @@ bool OffsetInfo::Init()
 														// for example: mA.mB.mC.mD
 														// so this way can get a unique identifier for this variable
 
-		mUIDHash = std::to_string(fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
+		mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
 
 		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mObfKey));
 	}
@@ -66,6 +66,7 @@ void OffsetInfo::setComment(const std::string& comment)
 void OffsetInfo::setFinalOffset(uint64_t off)
 {
 	mFinalOffset = off;
+	mFinalObfOffset = mFinalOffset ^ mObfKey;
 	mStaticResult->setValue(StringHelper::ToHexString(mFinalOffset));
 }
 
@@ -82,6 +83,11 @@ const std::string& OffsetInfo::getComment()
 uint64_t OffsetInfo::getFinalOffset()
 {
 	return mFinalOffset;
+}
+
+uint64_t OffsetInfo::getFinalObfOffset()
+{
+	return mFinalObfOffset;
 }
 
 void OffsetInfo::setMetadata(const JsonValueWrapper& metadata)

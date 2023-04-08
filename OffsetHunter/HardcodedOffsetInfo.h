@@ -6,5 +6,6 @@ class HardcodedOffsetInfo : public IOffset
 public:
 	bool Init() override;
 	void ComputeOffset() override;
+	void ComputeJsonResult() override;
 };
 

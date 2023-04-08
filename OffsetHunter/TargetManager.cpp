@@ -81,7 +81,7 @@ bool TargetManager::SaveResults()
 	if (SaveHpp() == false)
 		return false;
 	
-	if (NeedSaveJson())
+	if (getDumpDynamic())
 	{
 		if (SaveJson() == false)
 			return false;
@@ -90,14 +90,23 @@ bool TargetManager::SaveResults()
 	return true;
 }
 
-bool TargetManager::NeedSaveJson()
-{
-	return false;
-}
-
 bool TargetManager::SaveJson()
 {
-	return true;
+	bool bSucess = false;
+
+	for (const auto& kv : mAllTargets)
+	{
+		bool bCurrentResult = false;
+
+		kv.second->ComputeJsonResult();
+
+		if ((bCurrentResult = kv.second->SaveResultJsonToFile()) == false)
+			printf("Unable to save json offsets result for %s\n", kv.second->getMacro().c_str());
+
+		bSucess = bSucess || bCurrentResult;
+	}
+
+	return bSucess;
 }
 
 bool TargetManager::SaveHpp()

@@ -2,9 +2,12 @@
 
 #include <json/json.h>
 #include "JsonHelper.h"
+#include <mutex>
 
 class JsonValueWrapper : public Json::Value
 {
+private:
+	static std::mutex mOpMtx;
 public:
 
 	JsonValueWrapper();
@@ -13,11 +16,8 @@ public:
 	template<typename T>
 	T get(const std::string& key, T def) const;
 
-	/*template<>
-	std::string get(const std::string& key, std::string def);
-
-	template<>
-	int get(const std::string& key, int def);*/
+	template<typename T>
+	void set(const std::string& key, T val); 
 
 	const Json::Value& getJsonValue() const;
 
@@ -27,10 +27,20 @@ public:
 template<typename T>
 inline T JsonValueWrapper::get(const std::string& key, T def) const
 {
+	std::lock_guard lck(mOpMtx);
+
 	if (JSON_ASSERT(*this, key) == false)
 		return def;
 
 	return (*this)[key].as<T>();
+}
+
+template<typename T>
+inline void JsonValueWrapper::set(const std::string& key, T val)
+{
+	std::lock_guard lck(mOpMtx);
+
+	(*this)[key] = val;
 }
 
 /*template<>

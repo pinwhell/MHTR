@@ -19,8 +19,10 @@ public:
 	void OnFound();
 	void OnNotFound();
 	void OnMultipleFound();
+	uintptr_t getSingleResult();
 
 	void IgniteScan();
 	void ComputeOffset() override;
+	void ComputeJsonResult() override;
 };
 

@@ -14,13 +14,15 @@ private:
 	std::string mMacro;
 	std::string mTargetJsonPath;
 	std::unordered_map<SingleDumpTarget*, std::unique_ptr<SingleDumpTarget>> mTargets;
-	std::string mOutputJsonName;
+	std::string mResultJsonName;
+	JsonValueWrapper mResultJson;
 
 public:
 
 	bool InitAllTargets();
 	bool Init() override;
 	void ComputeAll() override;
+	void ComputeJsonResult();
 
 	void AddTarget(std::unique_ptr<SingleDumpTarget>& target);
 	void RemoveTarget(SingleDumpTarget* target);
@@ -34,5 +36,10 @@ public:
 	void MacroBegin();
 	void MacroEnd();
 	HeaderFileManager* getHppWriter();
+	JsonValueWrapper* getResultJson();
+
+	bool SaveResultJsonToFile();
+
+	std::string getMacro();
 };
 

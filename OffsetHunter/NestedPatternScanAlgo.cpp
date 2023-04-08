@@ -49,7 +49,7 @@ void NestedPatternScanAlgo::InterpretAllCalls()
         if (isBetween((unsigned char*)c,(unsigned char*)mBuffer, (unsigned char*)mBuffer + mBuffSize) == false)
         {
             auto sig = mParent->getSignature();
-            printf("\"%s\" call candidate \"%08X\" resolves to out of bounds function base\n", sig.c_str(), (unsigned char*)c);
+            printf("\"%s\" call candidate \"%p\" resolves to out of bounds function base\n", sig.c_str(), c);
             continue;
         }
 

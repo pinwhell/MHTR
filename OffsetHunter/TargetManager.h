@@ -31,7 +31,6 @@ private:
 	bool mDumpDynamic;
 	bool mDeclareDumpObject;
 
-	bool NeedSaveJson();
 	bool SaveJson();
 	bool SaveHpp();
 

@@ -19,7 +19,8 @@ private:
 	std::string mUIdentifier;
 	std::string mUIDHash;
 	std::string mComment; // If there is no comment available then this will be empty
-	uint64_t mFinalOffset; // this denotes the Actual Result, if there is no offset
+	uint64_t mFinalOffset; // this denotes the Actual Result, if there is no offset it will contain ERR_INVALID_OFFSET
+	uint64_t mFinalObfOffset; // this denotes the Actual Result obfuscated
 	JsonValueWrapper mMetadata;
 	uint32_t mObfKey;
 	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
@@ -39,6 +40,7 @@ public:
 	const std::string& getName();
 	const std::string& getComment();
 	uint64_t getFinalOffset();
+	uint64_t getFinalObfOffset();
 	void setMetadata(const JsonValueWrapper& metadata);
 	const JsonValueWrapper& getMetadata();
 	std::string getUIDHashStr();

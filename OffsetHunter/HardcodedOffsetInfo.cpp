@@ -19,3 +19,9 @@ void HardcodedOffsetInfo::ComputeOffset()
 
     return;
 }
+
+void HardcodedOffsetInfo::ComputeJsonResult()
+{
+    if (getDumpDynamic())
+        getResultJson()->set<uint64_t>(mOffsetInfo.getUIDHashStr(), mOffsetInfo.getFinalObfOffset());
+}

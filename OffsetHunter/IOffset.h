@@ -49,5 +49,8 @@ public:
 
 	bool getNeedCapstoneHelper();
 	ICapstoneHelper* getCapstoneHelper();
+	JsonValueWrapper* getResultJson();
+	
+	virtual void ComputeJsonResult();
 };
 

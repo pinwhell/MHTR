@@ -85,3 +85,11 @@ ICapstoneHelper* IOffset::getCapstoneHelper()
 {
 	return mParent->getCapstoneHelper();
 }
+
+JsonValueWrapper* IOffset::getResultJson()
+{
+	return mParent->getResultJson();
+}
+
+void IOffset::ComputeJsonResult()
+{}
