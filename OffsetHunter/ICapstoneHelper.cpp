@@ -5,6 +5,12 @@ ICapstoneHelper::ICapstoneHelper()
     setMode(CS_MODE_LITTLE_ENDIAN);
 }
 
+ICapstoneHelper::~ICapstoneHelper()
+{
+    if (mHandle != 0x0)
+        cs_close(&mHandle);
+}
+
 bool ICapstoneHelper::Init()
 {
     if (cs_open(mArch, mMode, &mHandle) != CS_ERR_OK)

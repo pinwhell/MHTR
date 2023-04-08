@@ -1,7 +1,6 @@
 #include "SingleDumpTarget.h"
 #include "FileHelper.h"
 #include "OffsetClassifier.h"
-#include <ThreadPool.h>
 #include "DumpTargetGroup.h"
 #include "HPPManager.h"
 #include "BinaryFormatClassifier.h"
@@ -141,15 +140,8 @@ void SingleDumpTarget::RemoveOffset(IOffset* offset)
 
 void SingleDumpTarget::ComputeAll()
 {
-	ThreadPool tp;
-
 	for (auto& kv : mOffsets)
-	{
-		tp.enqueue([&](IOffset* pOff) {
-			pOff->ComputeOffset();
-			}, kv.second.get());
-	}
-		
+		kv.second->ComputeOffset();		
 }
 
 std::string SingleDumpTarget::getCategoryName()

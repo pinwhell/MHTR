@@ -1,5 +1,6 @@
 #include "DumpTargetGroup.h"
 #include "TargetManager.h"
+#include <ThreadPool.h>
 
 bool DumpTargetGroup::InitAllTargets()
 {
@@ -36,8 +37,14 @@ bool DumpTargetGroup::Init()
 
 void DumpTargetGroup::ComputeAll()
 {
+    ThreadPool tp;
+
     for (auto& kv : mTargets)
-        kv.first->ComputeAll();
+    {
+        tp.enqueue([&](SingleDumpTarget* pSingDumpTarg) {
+            pSingDumpTarg->ComputeAll();
+            }, kv.second.get());
+    }
 }
 
 void DumpTargetGroup::AddTarget(std::unique_ptr<SingleDumpTarget>& target)

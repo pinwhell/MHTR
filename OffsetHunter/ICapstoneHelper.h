@@ -5,7 +5,7 @@
 class ICapstoneHelper
 {
 private:
-	csh mHandle;
+	csh mHandle = 0x0;
 
 	cs_arch mArch;
 	cs_mode mMode;
@@ -17,6 +17,7 @@ protected:
 
 public:
 	ICapstoneHelper();
+	virtual ~ICapstoneHelper();
 
 	virtual bool Init();
 
