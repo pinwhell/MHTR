@@ -59,7 +59,7 @@ bool Arm32CapstoneHelper::InterpretDispInst(cs_insn* pInst, uintptr_t& outDisp)
 bool Arm32CapstoneHelper::InterpretDispPCRelativeInst(cs_insn* pInstBegin, cs_insn* pInstEnd, uintptr_t& outDisp)
 {
     uint16_t regPcRelOffHolderType = ArmCapstoneAux::GetLValueRegType(pInstBegin);
-    uintptr_t targetPcRelOff = ArmCapstoneAux::ResolvePCRelative((unsigned char*)pInstBegin->address, pInstBegin->detail->arm.operands[pInstBegin->detail->arm.op_count].mem.disp);
+    uintptr_t targetPcRelOff = ArmCapstoneAux::ResolvePCRelative((unsigned char*)pInstBegin->address, pInstBegin->detail->arm.operands[pInstBegin->detail->arm.op_count - 1].mem.disp);
 
     for (auto* pCurrInst = pInstBegin + 1; pCurrInst < pInstEnd; pCurrInst++)
     {
@@ -73,6 +73,7 @@ bool Arm32CapstoneHelper::InterpretDispPCRelativeInst(cs_insn* pInstBegin, cs_in
                 pCurrInst->detail->arm.operands[1].mem.index == regPcRelOffHolderType)
             {
                 outDisp = (uintptr_t(pCurrInst->address) + 0x8 + targetPcRelOff) - uintptr_t(mpBase);
+
                 return true;
             }
         }break;
@@ -85,6 +86,7 @@ bool Arm32CapstoneHelper::InterpretDispPCRelativeInst(cs_insn* pInstBegin, cs_in
                     pCurrInst->detail->arm.operands[1].reg == regPcRelOffHolderType))
             {
                 outDisp = (uintptr_t(pCurrInst->address) + 0x8 + targetPcRelOff) - uintptr_t(mpBase);
+
                 return true;
             }
         }break;
