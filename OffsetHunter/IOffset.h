@@ -53,7 +53,11 @@ public:
 	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
 	ObfuscationManager* getObfuscationManager();
-	
+	OffsetInfo* getOffsetInfo();
+
+	virtual void OnParentTargetFinish();
 	virtual void ComputeJsonResult();
+
+	bool WasComputed();
 };
 

@@ -58,5 +58,7 @@ public:
 
 	std::string getUidentifier();
 	ObfuscationManager* getObfuscationManager();
+	void OnParentTargetFinish();
+	bool WasComputed();
 };
 

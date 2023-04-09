@@ -9,8 +9,11 @@ void OffsetClassifier::Classify(JsonValueWrapper& metadata, std::unique_ptr<IOff
     std::unordered_map<std::string, std::vector<std::string>> signatureTypes;
 
     bool bContainsValue = JSON_ASSERT(metadata, "value");
+    bool bContainsCombine = JSON_ASSERT(metadata, "combine");
+    bool bContainsPattern = JSON_ASSERT(metadata, "pattern");
 
-    if (bContainsValue == true)
+    if (bContainsValue == true ||
+        bContainsCombine && bContainsPattern == false)
         outOffset = std::move(std::make_unique<HardcodedOffsetInfo>());
     else 
         outOffset = std::move(std::make_unique<FutureOffset>());

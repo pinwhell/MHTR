@@ -18,6 +18,7 @@ private:
 	std::string mCategoryName;
 	std::string mCategoryObjName; // by default "m" + mCategoryName
 	std::unordered_map<IOffset*, std::unique_ptr<IOffset>> mOffsets;
+	std::unordered_map<std::string, IOffset*> mOffsetsByName;
 	ICapstoneHelper* mCapstoneHelper;
 	std::string mTargetMetadataPath;
 	JsonValueWrapper mTargetMetadataRoot;
@@ -41,6 +42,7 @@ public:
 	void RemoveOffset(IOffset* offset);
 
 	void ComputeAll();
+	void DispatchFinishEventAll();
 
 	std::string getCategoryName();
 
@@ -56,6 +58,8 @@ public:
 	HeaderFileManager* getHppWriter();
 	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
+	IOffset* getOffsetByName(const std::string& name);
+	void LinkOffsetWithName(const std::string& name, IOffset* off);
 
 	void ComputeJsonResult();
 };

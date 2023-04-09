@@ -12,6 +12,8 @@ bool IOffset::Init()
 	if (mOffsetInfo.Init() == false)
 		return false;
 
+	mParent->LinkOffsetWithName(mOffsetInfo.getName(), this);
+
 	return true;
 }
 
@@ -96,5 +98,20 @@ ObfuscationManager* IOffset::getObfuscationManager()
 	return mTargetMgr->getObfuscationManager();
 }
 
+OffsetInfo* IOffset::getOffsetInfo()
+{
+	return &mOffsetInfo;
+}
+
+void IOffset::OnParentTargetFinish()
+{
+	mOffsetInfo.OnParentTargetFinish();
+}
+
 void IOffset::ComputeJsonResult()
 {}
+
+bool IOffset::WasComputed()
+{
+	return mOffsetInfo.WasComputed();
+}

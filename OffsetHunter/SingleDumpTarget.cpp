@@ -142,6 +142,14 @@ void SingleDumpTarget::ComputeAll()
 {
 	for (auto& kv : mOffsets)
 		kv.second->ComputeOffset();
+
+	DispatchFinishEventAll();
+}
+
+void SingleDumpTarget::DispatchFinishEventAll()
+{
+	for (auto& kv : mOffsets)
+		kv.second->OnParentTargetFinish();
 }
 
 std::string SingleDumpTarget::getCategoryName()
@@ -208,6 +216,22 @@ ICapstoneHelper* SingleDumpTarget::getCapstoneHelper()
 JsonValueWrapper* SingleDumpTarget::getResultJson()
 {
 	return mParent->getResultJson();
+}
+
+IOffset* SingleDumpTarget::getOffsetByName(const std::string& name)
+{
+	for (auto& kv : mOffsetsByName)
+	{
+		if (kv.first == name)
+			return kv.second;
+	}
+
+	return nullptr;
+}
+
+void SingleDumpTarget::LinkOffsetWithName(const std::string& name, IOffset* off)
+{
+	mOffsetsByName[name] = off;
 }
 
 void SingleDumpTarget::ComputeJsonResult()

@@ -90,7 +90,7 @@ const std::string& OffsetInfo::getComment()
 
 uint64_t OffsetInfo::getFinalOffset()
 {
-	return mFinalOffset;
+	return mFinalOffset == ERR_INVALID_OFFSET ? 0 : mFinalOffset;
 }
 
 uint64_t OffsetInfo::getFinalObfOffset()
@@ -173,4 +173,40 @@ std::string OffsetInfo::getUidentifier()
 ObfuscationManager* OffsetInfo::getObfuscationManager()
 {
 	return mParent->getObfuscationManager();
+}
+
+void OffsetInfo::OnParentTargetFinish()
+{
+	if (JSON_ASSERT(mMetadata, "combine") == false)
+		return;
+
+	JsonValueWrapper combineWithNames = mMetadata["combine"];
+
+	if (combineWithNames.isArray() == false)
+		return;
+
+	for (uint32_t i = 0; i < combineWithNames.size(); i++)
+	{
+		std::string combiningWith = combineWithNames[i].asString();
+		IOffset* curr = mParent->getParent()->getOffsetByName(combiningWith);
+
+		if (curr == nullptr)
+		{
+			printf("\"%s\" trying to combine with a non existing offset \"%s\"\n", mUIdentifier.c_str(), combiningWith.c_str());
+			continue;
+		}
+
+		if (curr->WasComputed() == false)
+		{
+			printf("\"%s\" trying to combine with a non computed offset \"%s\"\n", mUIdentifier.c_str(), combiningWith.c_str());
+			continue;
+		}
+
+		setFinalOffset(getFinalOffset() + curr->getOffsetInfo()->getFinalOffset());
+	}
+}
+
+bool OffsetInfo::WasComputed()
+{
+	return mFinalOffset != ERR_INVALID_OFFSET;
 }
