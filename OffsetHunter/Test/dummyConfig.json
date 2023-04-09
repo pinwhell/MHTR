@@ -1,10 +1,18 @@
 {
 	"output_name" : "DummyOffsetMgr",
+
 	"main_category" : "OffMgr",
+
 	"dump_targets_path" : "dummyTargets.json",
+
 	"enable_extern" : true,
 	"extern_name" : "g_Offs",
+
 	"dump_dynamic" : true,
 	"dump_json_lib_name" : "jsoncpp",
-	"declare_dump_global_obj": true
+
+	"declare_dump_global_obj": true,
+
+	"obf_book_mut_enabled" : true,
+	"obf_book_path" : "dummyObfBook.json",
 }

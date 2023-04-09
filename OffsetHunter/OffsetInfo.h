@@ -11,18 +11,21 @@
 
 class IOffset;
 struct HeaderFileManager;
+class ObfuscationManager;
 
 class OffsetInfo : public IChild<IOffset>
 { 
 private:
 	std::string mName;
 	std::string mUIdentifier;
+	std::string mUIdentifierDynamic;
 	std::string mUIDHash;
 	std::string mComment; // If there is no comment available then this will be empty
 	uint64_t mFinalOffset; // this denotes the Actual Result, if there is no offset it will contain ERR_INVALID_OFFSET
 	uint64_t mFinalObfOffset; // this denotes the Actual Result obfuscated
 	JsonValueWrapper mMetadata;
 	uint32_t mObfKey;
+	uint32_t mSaltKey;
 	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
 	std::unique_ptr<INestedLValueRValueWrapper> mDynamicResult; // Why nested? well, basicly we need to do, chainig struct
 																// objects to be able to modify/acess the desired offset
@@ -54,5 +57,6 @@ public:
 	bool getNeedShowComment();
 
 	std::string getUidentifier();
+	ObfuscationManager* getObfuscationManager();
 };
 

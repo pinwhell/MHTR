@@ -7,6 +7,7 @@
 
 TargetManager::TargetManager()
 {
+	mObfucationManager = std::make_unique<ObfuscationManager>();
 	mHppWriter = std::make_unique<HeaderFileManager>();
 
 	mHppWriter->SetTraits(&std::cout);
@@ -35,6 +36,16 @@ bool TargetManager::Init()
 		}
 
 		mJsonAccesor->setJsonObjectName(mDynamicJsonObjName);
+	}
+
+	if (getDumpDynamic())
+	{
+		mObfucationManager->setPath(mObfuscationBookPath);
+		mObfucationManager->setParent(this);
+		mObfucationManager->setObfInfoMutationEnabled(mObfuscationBookMutationEnabled);
+
+		if (mObfucationManager->Init() == false)
+			return false;
 	}
 
 	if (ReadAllTargets() == false)
@@ -86,6 +97,8 @@ bool TargetManager::SaveResults()
 		if (SaveJson() == false)
 			return false;
 	}
+
+	mObfucationManager->Export();
 
 	return true;
 }
@@ -238,6 +251,11 @@ HeaderFileManager* TargetManager::getHppWriter()
 	return mHppWriter.get();
 }
 
+void TargetManager::setObfuscationBookMutationEnabled(bool b)
+{
+	mObfuscationBookMutationEnabled = b;
+}
+
 void TargetManager::setDumpDynamic(bool b)
 {
 	mDumpDynamic = b;
@@ -278,6 +296,11 @@ void TargetManager::setDynamicOffsetSetterFuncName(const std::string& dynamicOff
 	mDynamicOffsetSetterFuncName = dynamicOffsetSetterFuncName;
 }
 
+void TargetManager::setObfuscationBookPath(const std::string& obfuscationBookPath)
+{
+	mObfuscationBookPath = obfuscationBookPath;
+}
+
 void TargetManager::WriteHppStaticDeclsDefs()
 {
 	for (const auto& kv : mAllTargets)
@@ -299,4 +322,9 @@ void TargetManager::WriteHppDynDefs()
 CapstoneHelperProvider* TargetManager::getCapstoneHelperProvider()
 {
 	return mParent->getCapstoneHelperProvider();
+}
+
+ObfuscationManager* TargetManager::getObfuscationManager()
+{
+	return mObfucationManager.get();
 }

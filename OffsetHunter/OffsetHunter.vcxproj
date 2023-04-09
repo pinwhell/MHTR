@@ -181,6 +181,7 @@
     <ClCompile Include="JsonAccesorClassifier.cpp" />
     <ClCompile Include="JsonCppAcessor.cpp" />
     <ClCompile Include="NestedPatternScanAlgo.cpp" />
+    <ClCompile Include="ObfuscationManager.cpp" />
     <ClCompile Include="OffsetClassifier.cpp" />
     <ClCompile Include="OffsetInfo.cpp" />
     <ClCompile Include="IOffsetScanAlgo.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="OffsetHunterCLI.cpp" />
     <ClCompile Include="OffsetManager.cpp" />
     <ClCompile Include="PlainPatternScanAlgo.cpp" />
+    <ClCompile Include="RandManager.cpp" />
     <ClCompile Include="ScanAlgoClassifier.cpp" />
     <ClCompile Include="SingleDumpTarget.cpp" />
     <ClCompile Include="StringHelper.cpp" />
@@ -229,6 +231,7 @@
     <ClInclude Include="JsonAccesorClassifier.h" />
     <ClInclude Include="JsonCppAcessor.h" />
     <ClInclude Include="NestedPatternScanAlgo.h" />
+    <ClInclude Include="ObfuscationManager.h" />
     <ClInclude Include="OffsetClassifier.h" />
     <ClInclude Include="JsonHelper.h" />
     <ClInclude Include="JsonValueWrapper.h" />
@@ -239,6 +242,7 @@
     <ClInclude Include="OffsetHunterCLI.h" />
     <ClInclude Include="OffsetManager.h" />
     <ClInclude Include="PlainPatternScanAlgo.h" />
+    <ClInclude Include="RandManager.h" />
     <ClInclude Include="ScanAlgoClassifier.h" />
     <ClInclude Include="SingleDumpTarget.h" />
     <ClInclude Include="StaticHasher.h" />

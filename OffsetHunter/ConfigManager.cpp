@@ -34,6 +34,11 @@ std::string ConfigManager::getGlobalDumpObjectName()
 	return mGlobalDumpObjName;
 }
 
+std::string ConfigManager::getObfuscationBookPath()
+{
+	return mObfuscationBookPath;
+}
+
 bool ConfigManager::Init()
 {
 	if (FileHelper::IsValidFilePath(mConfigPath, true, true) == false)
@@ -71,6 +76,11 @@ bool ConfigManager::InitDynamicDumpInfo()
 		}
 
 		mDumpJsonLibName = mConfigRoot.get<std::string>("dump_json_lib_name", "jsoncpp");
+
+		mObfuscationBookMutationEnabled = mConfigRoot.get<bool>("obf_book_mut_enabled", false);
+
+		if(mObfuscationBookMutationEnabled)
+			mObfuscationBookPath = mConfigRoot.get<std::string>("obf_book_path", mMainCategory + "_obf_book.json");
 	}
 
 	return true;
@@ -90,6 +100,11 @@ bool ConfigManager::InitDumpInfo()
 	mGlobalDumpObjName = mConfigRoot.get<std::string>("global_dump_obj_name", "g" + mMainCategory + "Offs");
 
 	return true;
+}
+
+bool ConfigManager::getObfuscationBookMutationEnabled()
+{
+	return mObfuscationBookMutationEnabled;
 }
 
 bool ConfigManager::getDumpDynamic()

@@ -1,6 +1,8 @@
 #include "OffsetHunter.h"
 #include <iostream>
 #include <cxxopts.hpp>
+#include <stdlib.h>
+#include "RandManager.h"
 
 OffsetHunter::OffsetHunter()
 {
@@ -13,6 +15,8 @@ OffsetHunter::OffsetHunter()
 
 bool OffsetHunter::Init()
 {
+    RandManager::InitRand();
+
     if (mConfigManager->Init() == false)
         return false;
 
@@ -23,6 +27,8 @@ bool OffsetHunter::Init()
     mTargetManager->setDumpJsonLibName(mConfigManager->getDumpJsonLibName());
     mTargetManager->setDeclareGlobalDumpObj(mConfigManager->getDeclareGlobalDumpObj());
     mTargetManager->setGlobalDumpObjectName(mConfigManager->getGlobalDumpObjectName());
+    mTargetManager->setObfuscationBookPath(mConfigManager->getObfuscationBookPath());
+    mTargetManager->setObfuscationBookMutationEnabled(mConfigManager->getObfuscationBookMutationEnabled());
 
     if (mTargetManager->Init() == false)
         return false;

@@ -16,7 +16,6 @@ private:
 	std::unordered_map<SingleDumpTarget*, std::unique_ptr<SingleDumpTarget>> mTargets;
 	std::string mResultJsonName;
 	JsonValueWrapper mResultJson;
-
 public:
 
 	bool InitAllTargets();

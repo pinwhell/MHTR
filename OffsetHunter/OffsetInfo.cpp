@@ -6,6 +6,7 @@
 #include "SingleDumpTarget.h"
 #include "HPPManager.h"
 #include "StringHelper.h"
+#include "ObfuscationManager.h"
 
 OffsetInfo::OffsetInfo()
 {
@@ -41,14 +42,21 @@ bool OffsetInfo::Init()
 		mDynamicResult->PushParentName(mParent->getParent()->getCategoryObjectName());
 		mDynamicResult->setName(mName);
 
-		mUIdentifier = mDynamicResult->getFullName();   // This will chain all, and will get the full name
+		mUIdentifierDynamic = mDynamicResult->getFullName();   // This will chain all, and will get the full name
 														// for example: mA.mB.mC.mD
 														// so this way can get a unique identifier for this variable
 
-		mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
+
+		mObfKey = getObfuscationManager()->getObfKey(mUIdentifierDynamic);
+		mSaltKey = getObfuscationManager()->getSaltKey(mUIdentifierDynamic);
+
+		if (mSaltKey != 0)
+			mUIdentifierDynamic += "_" + std::to_string(mSaltKey);
+
+		mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifierDynamic.c_str(), mUIdentifierDynamic.size()));
 
 		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mObfKey));
-	}
+	} else mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
 
 	return true;
 }
@@ -160,4 +168,9 @@ bool OffsetInfo::getNeedShowComment()
 std::string OffsetInfo::getUidentifier()
 {
 	return mUIdentifier;
+}
+
+ObfuscationManager* OffsetInfo::getObfuscationManager()
+{
+	return mParent->getObfuscationManager();
 }

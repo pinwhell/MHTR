@@ -18,8 +18,10 @@ public:
 	std::string mHppOutputPath;
 	std::string mDumpJsonLibName;
 	std::string mGlobalDumpObjName;
+	std::string mObfuscationBookPath;
 
 	bool mDeclareGlobalDumpObj;
+	bool mObfuscationBookMutationEnabled;
 
 public:
 	void setConfigPath(const std::string& path);
@@ -29,11 +31,13 @@ public:
 	std::string getHppOutputPath();
 	std::string getDumpJsonLibName();
 	std::string getGlobalDumpObjectName();
+	std::string getObfuscationBookPath();
 
 	bool Init();
 	bool InitDynamicDumpInfo();
 	bool InitDumpInfo();
 
+	bool getObfuscationBookMutationEnabled();
 	bool getDumpDynamic();
 	bool getDeclareGlobalDumpObj();
 };

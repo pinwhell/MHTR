@@ -7,6 +7,7 @@
 #include "HPPManager.h"
 #include "IChild.h"
 #include "IJsonAccesor.h"
+#include "ObfuscationManager.h"
 
 class OffsetHunter;
 
@@ -17,6 +18,7 @@ private:
 
 	std::string mDumpTargetsPath;
 	std::string mMainCategoryName;
+	std::string mObfuscationBookPath;
 	std::string mHppOutputPath;
 	std::string mGlobalDumpObjName;
 	std::string mDumpJsonLibName;
@@ -24,12 +26,14 @@ private:
 	std::string mDynamicOffsetSetterFuncName; // by default "Set"
 
 	JsonValueWrapper mDumpTargetsRoot;
-	std::unique_ptr<HeaderFileManager> mHppWriter;
 
+	std::unique_ptr<HeaderFileManager> mHppWriter;
 	std::unique_ptr<IJsonAccesor> mJsonAccesor;
+	std::unique_ptr<ObfuscationManager> mObfucationManager;
 
 	bool mDumpDynamic;
 	bool mDeclareDumpObject;
+	bool mObfuscationBookMutationEnabled;
 
 	bool SaveJson();
 	bool SaveHpp();
@@ -56,6 +60,8 @@ public:
 
 	HeaderFileManager* getHppWriter();
 
+	void setObfuscationBookMutationEnabled(bool b);
+
 	void setDumpDynamic(bool b);
 	void setDeclareGlobalDumpObj(bool b);
 	void setGlobalDumpObjectName(const std::string& globalObjName);
@@ -67,10 +73,12 @@ public:
 	bool getDumpDynamic();
 
 	void setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName);
+	void setObfuscationBookPath(const std::string& obfuscationBookPath);
 
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
 	void WriteHppDynDefs();
 	CapstoneHelperProvider* getCapstoneHelperProvider();
+	ObfuscationManager* getObfuscationManager();
 };
 

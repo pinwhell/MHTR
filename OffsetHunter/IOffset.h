@@ -9,6 +9,7 @@ class SingleDumpTarget;
 class TargetManager;
 struct HeaderFileManager;
 class ICapstoneHelper;
+class ObfuscationManager;
 
 class IOffset : public IChild<SingleDumpTarget>
 {
@@ -20,6 +21,7 @@ protected:
 	size_t mBuffSize;
 	TargetManager* mTargetMgr;
 	bool mNeedCapstone;
+	JsonValueWrapper mObfuscationData;
 
 public:
 
@@ -50,6 +52,7 @@ public:
 	bool getNeedCapstoneHelper();
 	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
+	ObfuscationManager* getObfuscationManager();
 	
 	virtual void ComputeJsonResult();
 };

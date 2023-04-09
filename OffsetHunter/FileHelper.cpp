@@ -6,6 +6,11 @@
 
 namespace fs = std::filesystem;
 
+bool FileHelper::FileExist(const std::string& filePath)
+{
+	return fs::exists(filePath);
+}
+
 bool FileHelper::IsValidFilePath(const std::string& filePath, bool logPathUnacesible, bool logPathIsNotRegularFile)
 {
 	if (filePath.empty() == true)

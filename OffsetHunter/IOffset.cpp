@@ -91,5 +91,10 @@ JsonValueWrapper* IOffset::getResultJson()
 	return mParent->getResultJson();
 }
 
+ObfuscationManager* IOffset::getObfuscationManager()
+{
+	return mTargetMgr->getObfuscationManager();
+}
+
 void IOffset::ComputeJsonResult()
 {}
