@@ -21,8 +21,8 @@ struct OffMgr {
 #if defined(ARM64)
 	struct BinArm64A {
 		uintptr_t name1 = 0x8;	 // Should be 0x8
-		uintptr_t name2 = 0x8;	 // Should be 0x8
 		uintptr_t name3 = 0x8;	 // Should be 0x8
+		uintptr_t name2 = 0x8;	 // Should be 0x8
 	} mBinArm64A;
 	struct BinArm64B {
 		uintptr_t name1 = 0x8;	 // Should be 0x8
@@ -49,8 +49,8 @@ struct OffMgr {
 #if defined(ARM64)
 	struct BinArm64A {
 		uintptr_t name1;	 // Should be 0x8
-		uintptr_t name2;	 // Should be 0x8
 		uintptr_t name3;	 // Should be 0x8
+		uintptr_t name2;	 // Should be 0x8
 	} mBinArm64A;
 	struct BinArm64B {
 		uintptr_t name1;	 // Should be 0x8
@@ -71,8 +71,8 @@ struct OffMgr {
 
 #if defined(ARM64)
 	mBinArm64A.name1 = obj["1353524362"].asUInt() ^ 2105391926;	 // Should be 0x8
-	mBinArm64A.name2 = obj["2417577301"].asUInt() ^ 4261248991;	 // Should be 0x8
 	mBinArm64A.name3 = obj["3612997897"].asUInt() ^ 3609688011;	 // Should be 0x8
+	mBinArm64A.name2 = obj["2417577301"].asUInt() ^ 4261248991;	 // Should be 0x8
 	mBinArm64B.name1 = obj["2913580123"].asUInt() ^ 257130281;	 // Should be 0x8
 	mBinArm64B.name2 = obj["315769873"].asUInt() ^ 4134368048;	 // Should be 0x8
 	mBinArm64B.name3 = obj["4130067440"].asUInt() ^ 4287559064;	 // Should be 0x8

@@ -4,10 +4,16 @@
 
 bool DumpTargetGroup::InitAllTargets()
 {
+    std::unordered_set<SingleDumpTarget*> toRemove;
+
     for (auto& kv : mTargets)
     {
-        kv.first->Init(); 
+        if (kv.first->Init() == false)
+            toRemove.insert(kv.first);
     }
+
+    for (SingleDumpTarget* r : toRemove)
+        RemoveTarget(r);
 
     return true;
 }
