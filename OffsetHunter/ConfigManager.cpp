@@ -79,8 +79,7 @@ bool ConfigManager::InitDynamicDumpInfo()
 
 		mObfuscationBookMutationEnabled = mConfigRoot.get<bool>("obf_book_mut_enabled", false);
 
-		if(mObfuscationBookMutationEnabled)
-			mObfuscationBookPath = mConfigRoot.get<std::string>("obf_book_path", mMainCategory + "_obf_book.json");
+		mObfuscationBookPath = mConfigRoot.get<std::string>("obf_book_path", mMainCategory + "_obf_book.json");
 	}
 
 	return true;

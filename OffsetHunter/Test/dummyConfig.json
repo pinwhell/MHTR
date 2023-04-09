@@ -13,6 +13,6 @@
 
 	"declare_dump_global_obj": true,
 
-	"obf_book_mut_enabled" : true,
+	"obf_book_mut_enabled" : false,
 	"obf_book_path" : "dummyObfBook.json",
 }
