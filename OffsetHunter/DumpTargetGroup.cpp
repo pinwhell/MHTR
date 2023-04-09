@@ -85,7 +85,7 @@ bool DumpTargetGroup::ReadAllTarget()
     if (targets.isArray() == false)
         return false;
 
-    for (size_t i = 0; i < targets.size(); i++)
+    for (uint32_t i = 0; i < targets.size(); i++)
     {
         JsonValueWrapper curr(targets[i]);
 

@@ -92,7 +92,7 @@ bool SingleDumpTarget::LoadMetadata()
 	if (mTargetMetadataRoot.isArray() == false)
 		return false;
 
-	for (size_t i = 0; i < mTargetMetadataRoot.size(); i++)
+	for (uint32_t i = 0; i < mTargetMetadataRoot.size(); i++)
 	{
 		JsonValueWrapper curr = mTargetMetadataRoot[i];
 		std::unique_ptr<IOffset> currOff; OffsetClassifier::Classify(curr, currOff);

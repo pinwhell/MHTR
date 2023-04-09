@@ -212,7 +212,7 @@ bool TargetManager::ReadAllTargets()
 		return false;
 	}
 
-	for (size_t i = 0; i < mDumpTargetsRoot.size(); i++) // All Targets
+	for (uint32_t i = 0; i < mDumpTargetsRoot.size(); i++) // All Targets
 	{
 		JsonValueWrapper curr(mDumpTargetsRoot[i]);
 

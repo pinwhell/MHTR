@@ -12,8 +12,8 @@ struct OffMgr {
 		uintptr_t name3 = 0x8;	 // Should be 0x8
 	} mBinArm32A;
 	struct BinArm32B {
-		uintptr_t name2 = 0x8;	 // Should be 0x8
 		uintptr_t name1 = 0x8;	 // Should be 0x8
+		uintptr_t name2 = 0x8;	 // Should be 0x8
 		uintptr_t name3 = 0x8;	 // Should be 0x8
 	} mBinArm32B;
 #endif
@@ -40,8 +40,8 @@ struct OffMgr {
 		uintptr_t name3;	 // Should be 0x8
 	} mBinArm32A;
 	struct BinArm32B {
-		uintptr_t name2;	 // Should be 0x8
 		uintptr_t name1;	 // Should be 0x8
+		uintptr_t name2;	 // Should be 0x8
 		uintptr_t name3;	 // Should be 0x8
 	} mBinArm32B;
 #endif
@@ -64,8 +64,8 @@ struct OffMgr {
 	mBinArm32A.name1 = obj["1613443683"].asUInt() ^ 1985833994;	 // Should be 0x8
 	mBinArm32A.name2 = obj["2135897944"].asUInt() ^ 1610241857;	 // Should be 0x8
 	mBinArm32A.name3 = obj["4125678665"].asUInt() ^ 3214868459;	 // Should be 0x8
-	mBinArm32B.name2 = obj["133037476"].asUInt() ^ 2608821920;	 // Should be 0x8
 	mBinArm32B.name1 = obj["1558618447"].asUInt() ^ 2130704125;	 // Should be 0x8
+	mBinArm32B.name2 = obj["133037476"].asUInt() ^ 2608821920;	 // Should be 0x8
 	mBinArm32B.name3 = obj["3426461397"].asUInt() ^ 2142748451;	 // Should be 0x8
 #endif
 
