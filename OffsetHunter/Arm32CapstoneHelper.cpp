@@ -118,3 +118,8 @@ bool Arm32CapstoneHelper::IsIntructionReturnRelated(cs_insn* pInst)
 {
     return ArmCapstoneAux::HeuristicReturn(pInst);
 }
+
+bool Arm32CapstoneHelper::IsIntructionPrologRelated(cs_insn* pInst)
+{
+    return ArmCapstoneAux::HeuristicProlog(pInst);
+}

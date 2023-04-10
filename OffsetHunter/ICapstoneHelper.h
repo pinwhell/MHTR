@@ -29,6 +29,7 @@ public:
 	bool TryGetCallDestination(const unsigned char* pInst, uintptr_t& outDest);
 	virtual bool GetCallDestinationInst(cs_insn* pInst, uintptr_t& outDest) = 0;
 	virtual bool IsIntructionReturnRelated(cs_insn* pInst) = 0;
+	virtual bool IsIntructionPrologRelated(cs_insn* pInst) = 0;
 
 	bool TryInterpretDisp(const unsigned char* pInst, uintptr_t& outDisp);
 	bool TryInterpretDispPCRelative(cs_insn* pInst, uintptr_t& outDisp);

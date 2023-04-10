@@ -11,6 +11,7 @@ public:
 	static uint16_t GetRValueRegType(cs_insn* pInst);
 	static uint16_t GetRegTypeById(cs_insn* pInst, uint16_t opId);
 	static bool RegisterPresent(cs_insn* pInst, uint16_t reg);
+	static bool HeuristicProlog(cs_insn* pInst);
 	static bool HeuristicReturn(cs_insn* pInst);
 	static uintptr_t ResolvePCRelative(unsigned char* pInst, uintptr_t pcOffset);
 };

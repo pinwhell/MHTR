@@ -89,10 +89,23 @@ bool ICapstoneHelper::TryComputeParagraphSize(const unsigned char* pInst, uintpt
     const unsigned char* pCurrInst = pInst;
     size_t szRem = ((size_t)mpBase + mBaseSize) - addr;
 
+    bool bIsFirstProlog = true;
+
     while (cs_disasm_iter(mHandle, (const uint8_t**)&pCurrInst, &szRem, (uint64_t*)&addr, &pDisasmdInst))
     {
         result = true;
+
         outSize = (pDisasmdInst.address + pDisasmdInst.size) - (uint64_t)pInst;
+
+        if (IsIntructionPrologRelated(&pDisasmdInst))
+        {
+            // if is not the first prolog it means a new one is starting
+            // Maybe the function we are evaluating somehow got control out but without any return instructiuno signs
+            if(bIsFirstProlog == false)
+                break;
+
+            bIsFirstProlog = false;
+        }
 
         if (IsIntructionReturnRelated(&pDisasmdInst))
             break;

@@ -12,5 +12,6 @@ public:
 	bool InterpretDispPCRelativeInst(cs_insn* pInst, cs_insn* pInstEnd, uintptr_t& outDisp) override;
 	bool GetCallDestinationInst(cs_insn* pInst, uintptr_t& outDest) override;
 	bool IsIntructionReturnRelated(cs_insn* pInst) override;
+	bool IsIntructionPrologRelated(cs_insn* pInst) override;
 };
 

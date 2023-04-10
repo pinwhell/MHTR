@@ -28,6 +28,17 @@ bool ArmCapstoneAux::RegisterPresent(cs_insn* pInst, uint16_t reg)
     return false;
 }
 
+bool ArmCapstoneAux::HeuristicProlog(cs_insn* pInst)
+{
+    if (pInst->id == ARM_INS_PUSH)
+    {
+        if (RegisterPresent(pInst, ARM_REG_LR))
+            return true;
+    }
+
+    return false;
+}
+
 bool ArmCapstoneAux::HeuristicReturn(cs_insn* pInst)
 {
     if (pInst->id == ARM_INS_BX)
@@ -40,6 +51,9 @@ bool ArmCapstoneAux::HeuristicReturn(cs_insn* pInst)
     {
         if (RegisterPresent(pInst, ARM_REG_PC))
             return true;
+
+        /*if (RegisterPresent(pInst, ARM_REG_LR))
+            return true;*/
     }
 
     return false;
