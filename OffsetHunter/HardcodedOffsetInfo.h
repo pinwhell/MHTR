@@ -1,7 +1,7 @@
 #pragma once
-#include "IOffset.h"
+#include "IFutureResult.h"
 
-class HardcodedOffsetInfo : public IOffset
+class HardcodedResultInfo : public IFutureResult
 {
 public:
 	bool Init() override;

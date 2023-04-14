@@ -1,14 +1,14 @@
-#include "OffsetInfo.h"
+#include "IFutureResultInfo.h"
 #include "StaticHasher.h"
 #include "CppLValueRValueWrapper.h"
 #include "CppNestedLValueRValueWrapper.h"
-#include "IOffset.h"
+#include "IFutureResult.h"
 #include "SingleDumpTarget.h"
 #include "HPPManager.h"
 #include "StringHelper.h"
 #include "ObfuscationManager.h"
 
-OffsetInfo::OffsetInfo()
+IFutureResultInfo::IFutureResultInfo()
 {
 	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
 	mDynamicResult = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
@@ -19,7 +19,7 @@ OffsetInfo::OffsetInfo()
 	mComment = "";
 }
 
-bool OffsetInfo::Init()
+bool IFutureResultInfo::Init()
 {
 	if (JSON_ASSERT_STR_EMPTY(mMetadata, "name") == false)
 	{
@@ -61,59 +61,59 @@ bool OffsetInfo::Init()
 	return true;
 }
 
-void OffsetInfo::setName(const std::string& name)
+void IFutureResultInfo::setName(const std::string& name)
 {
 	mName = name;
 }
 
-void OffsetInfo::setComment(const std::string& comment)
+void IFutureResultInfo::setComment(const std::string& comment)
 {
 	mComment = comment;
 }
 
-void OffsetInfo::setFinalOffset(uint64_t off)
+void IFutureResultInfo::setFinalOffset(uint64_t off)
 {
 	mFinalOffset = off;
 	mFinalObfOffset = mFinalOffset ^ mObfKey;
 	mStaticResult->setValue(StringHelper::ToHexString(mFinalOffset));
 }
 
-const std::string& OffsetInfo::getName()
+const std::string& IFutureResultInfo::getName()
 {
 	return mName;
 }
 
-const std::string& OffsetInfo::getComment()
+const std::string& IFutureResultInfo::getComment()
 {
 	return mComment;
 }
 
-uint64_t OffsetInfo::getFinalOffset()
+uint64_t IFutureResultInfo::getFinalOffset()
 {
 	return mFinalOffset == ERR_INVALID_OFFSET ? 0 : mFinalOffset;
 }
 
-uint64_t OffsetInfo::getFinalObfOffset()
+uint64_t IFutureResultInfo::getFinalObfOffset()
 {
 	return mFinalObfOffset;
 }
 
-void OffsetInfo::setMetadata(const JsonValueWrapper& metadata)
+void IFutureResultInfo::setMetadata(const JsonValueWrapper& metadata)
 {
 	mMetadata = metadata;
 }
 
-const JsonValueWrapper& OffsetInfo::getMetadata()
+const JsonValueWrapper& IFutureResultInfo::getMetadata()
 {
 	return mMetadata;
 }
 
-std::string OffsetInfo::getUIDHashStr()
+std::string IFutureResultInfo::getUIDHashStr()
 {
 	return mUIDHash;
 }
 
-void OffsetInfo::WriteHppStaticDeclsDefs()
+void IFutureResultInfo::WriteHppStaticDeclsDefs()
 {
 	if (mFinalOffset == ERR_INVALID_OFFSET)
 		return;
@@ -127,7 +127,7 @@ void OffsetInfo::WriteHppStaticDeclsDefs()
 	}
 }
 
-void OffsetInfo::WriteHppDynDecls()
+void IFutureResultInfo::WriteHppDynDecls()
 {
 	if (mFinalOffset == ERR_INVALID_OFFSET)
 		return;
@@ -141,7 +141,7 @@ void OffsetInfo::WriteHppDynDecls()
 	}
 }
 
-void OffsetInfo::WriteHppDynDefs()
+void IFutureResultInfo::WriteHppDynDefs()
 {
 	if (mFinalOffset == ERR_INVALID_OFFSET)
 		return;
@@ -155,27 +155,27 @@ void OffsetInfo::WriteHppDynDefs()
 	}
 }
 
-HeaderFileManager* OffsetInfo::getHppWriter()
+HeaderFileManager* IFutureResultInfo::getHppWriter()
 {
 	return mParent->getHppWriter();
 }
 
-bool OffsetInfo::getNeedShowComment()
+bool IFutureResultInfo::getNeedShowComment()
 {
 	return mComment.empty() == false;
 }
 
-std::string OffsetInfo::getUidentifier()
+std::string IFutureResultInfo::getUidentifier()
 {
 	return mUIdentifier;
 }
 
-ObfuscationManager* OffsetInfo::getObfuscationManager()
+ObfuscationManager* IFutureResultInfo::getObfuscationManager()
 {
 	return mParent->getObfuscationManager();
 }
 
-void OffsetInfo::OnParentTargetFinish()
+void IFutureResultInfo::OnParentTargetFinish()
 {
 	if (JSON_ASSERT(mMetadata, "combine") == false)
 		return;
@@ -188,7 +188,7 @@ void OffsetInfo::OnParentTargetFinish()
 	for (uint32_t i = 0; i < combineWithNames.size(); i++)
 	{
 		std::string combiningWith = combineWithNames[i].asString();
-		IOffset* curr = mParent->getParent()->getOffsetByName(combiningWith);
+		IFutureResult* curr = mParent->getParent()->getFutureResultByName(combiningWith);
 
 		if (curr == nullptr)
 		{
@@ -202,11 +202,16 @@ void OffsetInfo::OnParentTargetFinish()
 			continue;
 		}
 
-		setFinalOffset(getFinalOffset() + curr->getOffsetInfo()->getFinalOffset());
+		setFinalOffset(getFinalOffset() + curr->getFutureResultInfo()->getFinalOffset());
 	}
 }
 
-bool OffsetInfo::WasComputed()
+bool IFutureResultInfo::WasComputed()
 {
 	return mFinalOffset != ERR_INVALID_OFFSET;
+}
+
+std::string IFutureResultInfo::getCppDataType()
+{
+	return "uintptr_t";
 }

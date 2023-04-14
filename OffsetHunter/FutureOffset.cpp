@@ -9,18 +9,18 @@ FutureOffset::FutureOffset()
 
 void FutureOffset::OnFound()
 {
-	mOffsetInfo.setFinalOffset(getSingleResult()); // Guaranteed to be one
+	mIFutureResultInfo.setFinalOffset(getSingleResult()); // Guaranteed to be one
 }
 
 void FutureOffset::OnNotFound()
 {
-	auto name = mOffsetInfo.getUidentifier();
+	auto name = mIFutureResultInfo.getUidentifier();
 	printf("\"%s\" Not found\n", name.c_str());
 }
 
 void FutureOffset::OnMultipleFound()
 {
-	auto name = mOffsetInfo.getUidentifier();
+	auto name = mIFutureResultInfo.getUidentifier();
 	printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
 }
 
@@ -34,10 +34,10 @@ uintptr_t FutureOffset::getSingleResult()
 
 bool FutureOffset::Init()
 {
-	if (IOffset::Init() == false)
+	if (IFutureResult::Init() == false)
 		return false;
 
-	if (ScanAlgoClassifier::Classify(mOffsetInfo.getMetadata(), mScanAlgo) == false)
+	if (ScanAlgoClassifier::Classify(mIFutureResultInfo.getMetadata(), mScanAlgo) == false)
 		return false;
 
 	mScanAlgo->setParent(this);
@@ -78,5 +78,5 @@ void FutureOffset::ComputeOffset()
 void FutureOffset::ComputeJsonResult()
 {
 	if (getDumpDynamic())
-		getResultJson()->set<uint64_t>(mOffsetInfo.getUIDHashStr(), mOffsetInfo.getFinalObfOffset());
+		getResultJson()->set<uint64_t>(mIFutureResultInfo.getUIDHashStr(), mIFutureResultInfo.getFinalObfOffset());
 }

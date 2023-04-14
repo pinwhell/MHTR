@@ -1,6 +1,6 @@
 #include "SingleDumpTarget.h"
 #include "FileHelper.h"
-#include "OffsetClassifier.h"
+#include "FutureResultClassifier.h"
 #include "DumpTargetGroup.h"
 #include "HPPManager.h"
 #include "BinaryFormatClassifier.h"
@@ -95,13 +95,13 @@ bool SingleDumpTarget::LoadMetadata()
 	for (uint32_t i = 0; i < mTargetMetadataRoot.size(); i++)
 	{
 		JsonValueWrapper curr = mTargetMetadataRoot[i];
-		std::unique_ptr<IOffset> currOff; OffsetClassifier::Classify(curr, currOff);
+		std::unique_ptr<IFutureResult> currFutResult; FutureResultClassifier::Classify(curr, currFutResult);
 
-		currOff->setParent(this);
-		currOff->setBufferInfo((const char*)mTargetBinary.data(), mTargetBinary.size());
-		currOff->setTargetManager(mTargetMgr);
+		currFutResult->setParent(this);
+		currFutResult->setBufferInfo((const char*)mTargetBinary.data(), mTargetBinary.size());
+		currFutResult->setTargetManager(mTargetMgr);
 
-		AddOffset(currOff);
+		AddFutureResult(currFutResult);
 	}
 
 	return true;
@@ -109,38 +109,38 @@ bool SingleDumpTarget::LoadMetadata()
 
 bool SingleDumpTarget::InitAllMetadata()
 {
-	for (auto& currOff : mOffsets)
+	for (auto& currFutRes : mFutureResults)
 	{
-		if (currOff.first->Init() == false)
+		if (currFutRes.first->Init() == false)
 			return false;
 
-		mNeedCapstone = currOff.first->getNeedCapstoneHelper() || mNeedCapstone;
+		mNeedCapstone = currFutRes.first->getNeedCapstoneHelper() || mNeedCapstone;
 	}
 
 	return true;
 }
 
-void SingleDumpTarget::AddOffset(std::unique_ptr<IOffset>& offset)
+void SingleDumpTarget::AddFutureResult(std::unique_ptr<IFutureResult>& offset)
 {
 	auto* pCurr = offset.get();
 
-	if (mOffsets.find(pCurr) != mOffsets.end())
+	if (mFutureResults.find(pCurr) != mFutureResults.end())
 		return;
 
-	mOffsets[pCurr] = std::move(offset);
+	mFutureResults[pCurr] = std::move(offset);
 }
 
-void SingleDumpTarget::RemoveOffset(IOffset* offset)
+void SingleDumpTarget::RemoveFutureResult(IFutureResult* offset)
 {
-	if (mOffsets.find(offset) != mOffsets.end())
+	if (mFutureResults.find(offset) != mFutureResults.end())
 		return;
 
-	mOffsets.erase(offset);
+	mFutureResults.erase(offset);
 }
 
 void SingleDumpTarget::ComputeAll()
 {
-	for (auto& kv : mOffsets)
+	for (auto& kv : mFutureResults)
 		kv.second->ComputeOffset();
 
 	DispatchFinishEventAll();
@@ -148,7 +148,7 @@ void SingleDumpTarget::ComputeAll()
 
 void SingleDumpTarget::DispatchFinishEventAll()
 {
-	for (auto& kv : mOffsets)
+	for (auto& kv : mFutureResults)
 		kv.second->OnParentTargetFinish();
 }
 
@@ -166,7 +166,7 @@ void SingleDumpTarget::WriteHppStaticDeclsDefs()
 {
 	BeginStruct();
 
-	for (auto& currOff : mOffsets)
+	for (auto& currOff : mFutureResults)
 		currOff.first->WriteHppStaticDeclsDefs();
 
 	EndStruct();
@@ -176,7 +176,7 @@ void SingleDumpTarget::WriteHppDynDecls()
 {
 	BeginStruct();
 
-	for (auto& currOff : mOffsets)
+	for (auto& currOff : mFutureResults)
 		currOff.first->WriteHppDynDecls();
 	
 	EndStruct();
@@ -184,7 +184,7 @@ void SingleDumpTarget::WriteHppDynDecls()
 
 void SingleDumpTarget::WriteHppDynDefs()
 {
-	for (auto& currOff : mOffsets)
+	for (auto& currOff : mFutureResults)
 		currOff.first->WriteHppDynDefs();
 }
 
@@ -218,9 +218,9 @@ JsonValueWrapper* SingleDumpTarget::getResultJson()
 	return mParent->getResultJson();
 }
 
-IOffset* SingleDumpTarget::getOffsetByName(const std::string& name)
+IFutureResult* SingleDumpTarget::getFutureResultByName(const std::string& name)
 {
-	for (auto& kv : mOffsetsByName)
+	for (auto& kv : mFutureResultsByName)
 	{
 		if (kv.first == name)
 			return kv.second;
@@ -229,13 +229,13 @@ IOffset* SingleDumpTarget::getOffsetByName(const std::string& name)
 	return nullptr;
 }
 
-void SingleDumpTarget::LinkOffsetWithName(const std::string& name, IOffset* off)
+void SingleDumpTarget::LinkFutureResultWithName(const std::string& name, IFutureResult* off)
 {
-	mOffsetsByName[name] = off;
+	mFutureResultsByName[name] = off;
 }
 
 void SingleDumpTarget::ComputeJsonResult()
 {
-	for (auto& currOff : mOffsets)
+	for (auto& currOff : mFutureResults)
 		currOff.first->ComputeJsonResult();
 }

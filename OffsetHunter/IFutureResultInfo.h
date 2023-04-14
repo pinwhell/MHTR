@@ -9,11 +9,11 @@
 
 #define ERR_INVALID_OFFSET ((uint64_t)0xFFFFFFFFFFFFFFFF)
 
-class IOffset;
+class IFutureResult;
 struct HeaderFileManager;
 class ObfuscationManager;
 
-class OffsetInfo : public IChild<IOffset>
+class IFutureResultInfo : public IChild<IFutureResult>
 { 
 private:
 	std::string mName;
@@ -32,7 +32,7 @@ private:
 																// for ex. mA.mB.mC = 0xXYZ;
 
 public:
-	OffsetInfo();
+	IFutureResultInfo();
 
 	bool Init();
 
@@ -60,5 +60,7 @@ public:
 	ObfuscationManager* getObfuscationManager();
 	void OnParentTargetFinish();
 	bool WasComputed();
+
+	virtual std::string getCppDataType();
 };
 

@@ -45,7 +45,7 @@
     <ClCompile Include="OffsetManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OffsetInfo.cpp">
+    <ClCompile Include="IFutureResultInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HardcodedOffsetInfo.cpp">
@@ -84,7 +84,7 @@
     <ClCompile Include="DumpTargetGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OffsetClassifier.cpp">
+    <ClCompile Include="FutureResultClassifier.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ScanAlgoClassifier.cpp">
@@ -185,7 +185,7 @@
     <ClInclude Include="OffsetManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OffsetInfo.h">
+    <ClInclude Include="IFutureResultInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HardcodedOffsetInfo.h">
@@ -212,7 +212,7 @@
     <ClInclude Include="FileHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IOffset.h">
+    <ClInclude Include="IFutureResult.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="JsonHelper.h">
@@ -224,7 +224,7 @@
     <ClInclude Include="DumpTargetGroup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OffsetClassifier.h">
+    <ClInclude Include="FutureResultClassifier.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ScanAlgoClassifier.h">

@@ -1,7 +1,7 @@
 #pragma once
 #include "IDumpTarget.h"
 #include "HardcodedOffsetInfo.h"
-#include "IOffset.h"
+#include "IFutureResult.h"
 #include <string>
 #include <unordered_map>
 #include "JsonValueWrapper.h"
@@ -17,8 +17,8 @@ private:
 
 	std::string mCategoryName;
 	std::string mCategoryObjName; // by default "m" + mCategoryName
-	std::unordered_map<IOffset*, std::unique_ptr<IOffset>> mOffsets;
-	std::unordered_map<std::string, IOffset*> mOffsetsByName;
+	std::unordered_map<IFutureResult*, std::unique_ptr<IFutureResult>> mFutureResults;
+	std::unordered_map<std::string, IFutureResult*> mFutureResultsByName;
 	ICapstoneHelper* mCapstoneHelper;
 	std::string mTargetMetadataPath;
 	JsonValueWrapper mTargetMetadataRoot;
@@ -38,8 +38,8 @@ public:
 	bool LoadMetadata();
 	bool InitAllMetadata();
 
-	void AddOffset(std::unique_ptr<IOffset>& offset);
-	void RemoveOffset(IOffset* offset);
+	void AddFutureResult(std::unique_ptr<IFutureResult>& futureResult);
+	void RemoveFutureResult(IFutureResult* offset);
 
 	void ComputeAll();
 	void DispatchFinishEventAll();
@@ -58,8 +58,8 @@ public:
 	HeaderFileManager* getHppWriter();
 	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
-	IOffset* getOffsetByName(const std::string& name);
-	void LinkOffsetWithName(const std::string& name, IOffset* off);
+	IFutureResult* getFutureResultByName(const std::string& name);
+	void LinkFutureResultWithName(const std::string& name, IFutureResult* futureResult);
 
 	void ComputeJsonResult();
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "OffsetInfo.h"
+#include "IFutureResultInfo.h"
 #include "JsonValueWrapper.h"
 #include "IChild.h"
 #include "IJsonAccesor.h"
@@ -11,10 +11,10 @@ struct HeaderFileManager;
 class ICapstoneHelper;
 class ObfuscationManager;
 
-class IOffset : public IChild<SingleDumpTarget>
+class IFutureResult : public IChild<SingleDumpTarget>
 {
 protected:
-	OffsetInfo mOffsetInfo;
+	IFutureResultInfo mIFutureResultInfo;
 
 	// the buffer info i will be finded on
 	const char* mBuffer;
@@ -25,7 +25,7 @@ protected:
 
 public:
 
-	IOffset();
+	IFutureResult();
 
 	virtual bool Init();
 	virtual void ComputeOffset() = 0;
@@ -53,7 +53,7 @@ public:
 	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
 	ObfuscationManager* getObfuscationManager();
-	OffsetInfo* getOffsetInfo();
+	IFutureResultInfo* getFutureResultInfo();
 
 	virtual void OnParentTargetFinish();
 	virtual void ComputeJsonResult();

@@ -1,25 +1,25 @@
 #include "HardcodedOffsetInfo.h"
 
-bool HardcodedOffsetInfo::Init()
+bool HardcodedResultInfo::Init()
 {
-    if (IOffset::Init() == false)
+    if (IFutureResult::Init() == false)
         return false;
 
     return true;
 }
 
-void HardcodedOffsetInfo::ComputeOffset()
+void HardcodedResultInfo::ComputeOffset()
 {
-    uintptr_t value = mOffsetInfo.getMetadata().get<uintptr_t>("value", 0);
-    size_t disp = mOffsetInfo.getMetadata().get<uintptr_t>("disp", 0);
+    uintptr_t value = mIFutureResultInfo.getMetadata().get<uintptr_t>("value", 0);
+    size_t disp = mIFutureResultInfo.getMetadata().get<uintptr_t>("disp", 0);
 
-    mOffsetInfo.setFinalOffset(value + disp);
+    mIFutureResultInfo.setFinalOffset(value + disp);
 
     return;
 }
 
-void HardcodedOffsetInfo::ComputeJsonResult()
+void HardcodedResultInfo::ComputeJsonResult()
 {
     if (getDumpDynamic())
-        getResultJson()->set<uint64_t>(mOffsetInfo.getUIDHashStr(), mOffsetInfo.getFinalObfOffset());
+        getResultJson()->set<uint64_t>(mIFutureResultInfo.getUIDHashStr(), mIFutureResultInfo.getFinalObfOffset());
 }

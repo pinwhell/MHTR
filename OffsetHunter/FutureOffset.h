@@ -1,10 +1,10 @@
 #pragma once
-#include "IOffset.h"
+#include "IFutureResult.h"
 #include "IOffsetScanAlgo.h"
 #include "IScanListener.h"
 #include <memory>
 
-class FutureOffset : public IOffset, public IScanListener
+class FutureOffset : public IFutureResult, public IScanListener
 {
 private:
 	std::unique_ptr<IOffsetScanAlgo> mScanAlgo;

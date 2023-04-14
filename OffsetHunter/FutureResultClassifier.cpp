@@ -1,10 +1,10 @@
-#include "OffsetClassifier.h"
+#include "FutureResultClassifier.h"
 #include <unordered_map>
 
 #include "FutureOffset.h"
 #include "HardcodedOffsetInfo.h"
 
-void OffsetClassifier::Classify(JsonValueWrapper& metadata, std::unique_ptr<IOffset>& outOffset)
+void FutureResultClassifier::Classify(JsonValueWrapper& metadata, std::unique_ptr<IFutureResult>& outOffset)
 {
     std::unordered_map<std::string, std::vector<std::string>> signatureTypes;
 
@@ -14,7 +14,7 @@ void OffsetClassifier::Classify(JsonValueWrapper& metadata, std::unique_ptr<IOff
 
     if (bContainsValue == true ||
         bContainsCombine && bContainsPattern == false)
-        outOffset = std::move(std::make_unique<HardcodedOffsetInfo>());
+        outOffset = std::move(std::make_unique<HardcodedResultInfo>());
     else 
         outOffset = std::move(std::make_unique<FutureOffset>());
 
