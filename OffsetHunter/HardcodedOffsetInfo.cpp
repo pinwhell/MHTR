@@ -13,14 +13,16 @@ bool HardcodedResultInfo::Init()
     return true;
 }
 
-void HardcodedResultInfo::ComputeOffset()
+void HardcodedResultInfo::Compute()
 {
+    IFutureResult::Compute();
+
     uintptr_t value = mMetadata.get<uintptr_t>("value", 0);
     size_t disp = mMetadata.get<uintptr_t>("disp", 0);
 
     mFutureResultInfo.setFinalOffset(value + disp);
 
-    return;
+    onSucessfullyComputed();
 }
 
 void HardcodedResultInfo::ComputeJsonResult()

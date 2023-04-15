@@ -10,16 +10,19 @@ FutureOffset::FutureOffset()
 void FutureOffset::OnFound()
 {
 	mFutureResultInfo.setFinalOffset(getSingleResult()); // Guaranteed to be one
+	onSucessfullyComputed();
 }
 
 void FutureOffset::OnNotFound()
 {
+	onNotSucessComputing();
 	auto name = mpFutureResultInfo->getUidentifier();
 	printf("\"%s\" Not found\n", name.c_str());
 }
 
 void FutureOffset::OnMultipleFound()
 {
+	onNotSucessComputing();
 	auto name = mpFutureResultInfo->getUidentifier();
 	printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
 }
@@ -48,7 +51,7 @@ bool FutureOffset::Init()
 
 	mNeedCapstone = mScanAlgo->getNeedCapstone();
 
-	printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
+	//printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
 
 	return true;
 }
@@ -70,8 +73,10 @@ void FutureOffset::IgniteScan()
 	mScanAlgo->IgniteScan();
 }
 
-void FutureOffset::ComputeOffset()
+void FutureOffset::Compute()
 {
+	IFutureResult::Compute();
+
 	IgniteScan();
 }
 

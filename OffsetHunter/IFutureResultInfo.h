@@ -21,7 +21,6 @@ private:
 	std::string mUIdentifierDynamic;
 	std::string mUIDHash;
 	std::string mComment; // If there is no comment available then this will be empty
-	JsonValueWrapper mMetadata;
 
 protected:
 	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
@@ -33,6 +32,7 @@ protected:
 	uint32_t mSaltKey;
 public:
 	IFutureResultInfo();
+	virtual ~IFutureResultInfo(){}
 
 	bool Init();
 
@@ -53,7 +53,10 @@ public:
 
 	std::string getUidentifier();
 	ObfuscationManager* getObfuscationManager();
-	void OnParentTargetFinish();
+	virtual void OnParentTargetFinish() {};
+
+	JsonValueWrapper& getMetadata();
 
 	virtual std::string getCppDataType() = 0;
+	virtual std::string getCppDefaultRvalue() = 0;
 };

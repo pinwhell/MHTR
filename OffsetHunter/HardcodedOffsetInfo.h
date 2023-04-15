@@ -7,7 +7,7 @@ class HardcodedResultInfo : public IFutureResultImpl<FutureOffsetResultInfo>
 public:
 	HardcodedResultInfo();
 	bool Init() override;
-	void ComputeOffset() override;
+	void Compute() override;
 	void ComputeJsonResult() override;
 };
 

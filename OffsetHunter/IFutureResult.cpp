@@ -20,9 +20,19 @@ std::string IFutureResult::getSignature()
 
 bool IFutureResult::Init()
 {
+	mpFutureResultInfo->setParent(this);
+
+	if (mpFutureResultInfo->Init() == false)
+		return false;
+
 	mParent->LinkFutureResultWithName(getName(), this);
 
 	return true;
+}
+
+void IFutureResult::Compute()
+{
+	onStartComputing();
 }
 
 void IFutureResult::setTargetManager(TargetManager* pTarget)
@@ -50,7 +60,7 @@ void IFutureResult::setMetadata(const JsonValueWrapper& metadata)
 	mMetadata = metadata;
 }
 
-const JsonValueWrapper& IFutureResult::getMetadata()
+JsonValueWrapper& IFutureResult::getMetadata()
 {
 	return mMetadata;
 }
@@ -79,6 +89,11 @@ ICapstoneHelper* IFutureResult::getCapstoneHelper()
 JsonValueWrapper* IFutureResult::getResultJson()
 {
 	return mParent->getResultJson();
+}
+
+IFutureResultInfo* IFutureResult::getFutureResultInfo()
+{
+	return mpFutureResultInfo;
 }
 
 ObfuscationManager* IFutureResult::getObfuscationManager()
@@ -110,6 +125,26 @@ void IFutureResult::WriteHppStaticDeclsDefs()
 void IFutureResult::ComputeJsonResult()
 {
 
+}
+
+void IFutureResult::setResultState(ResultState newState)
+{
+	mResultState = newState;
+}
+
+void IFutureResult::onStartComputing()
+{
+	setResultState(ResultState::IN_PROGRESS);
+}
+
+void IFutureResult::onSucessfullyComputed()
+{
+	setResultState(ResultState::FINISH_SUCESS);
+}
+
+void IFutureResult::onNotSucessComputing()
+{
+	setResultState(ResultState::FINISH_INVALID);
 }
 
 bool IFutureResult::ResultWasSucessfull()

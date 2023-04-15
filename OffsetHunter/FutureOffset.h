@@ -23,7 +23,7 @@ public:
 	uintptr_t getSingleResult();
 
 	void IgniteScan();
-	void ComputeOffset() override;
+	void Compute() override;
 	void ComputeJsonResult() override;
 };
 

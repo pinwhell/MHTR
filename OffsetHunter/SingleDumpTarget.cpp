@@ -141,7 +141,7 @@ void SingleDumpTarget::RemoveFutureResult(IFutureResult* offset)
 void SingleDumpTarget::ComputeAll()
 {
 	for (auto& kv : mFutureResults)
-		kv.second->ComputeOffset();
+		kv.second->Compute();
 
 	DispatchFinishEventAll();
 }

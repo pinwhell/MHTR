@@ -38,7 +38,7 @@ public:
 	IFutureResult();
 
 	virtual bool Init();
-	virtual void ComputeOffset() = 0;
+	virtual void Compute();
 	std::string getName();
 	std::string getSignature();
 	void WriteHppStaticDeclsDefs(); // This structs arround need to be refactored to handle general stuffs, not just offsets,
@@ -52,7 +52,7 @@ public:
 	bool getDumpDynamic();
 
 	void setMetadata(const JsonValueWrapper& metadata);
-	const JsonValueWrapper& getMetadata();
+	JsonValueWrapper& getMetadata();
 
 	void setBufferInfo(const char* buff, size_t buffSz);
 
@@ -63,8 +63,16 @@ public:
 	JsonValueWrapper* getResultJson();
 	ObfuscationManager* getObfuscationManager();
 
+	IFutureResultInfo* getFutureResultInfo();
+
 	virtual void OnParentTargetFinish();
 	virtual void ComputeJsonResult();
+
+	void setResultState(ResultState newState);
+
+	void onStartComputing();
+	void onSucessfullyComputed();
+	void onNotSucessComputing();
 
 	bool ResultWasSucessfull();
 };

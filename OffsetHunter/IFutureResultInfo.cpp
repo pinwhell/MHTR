@@ -20,24 +20,23 @@ IFutureResultInfo::IFutureResultInfo()
 
 bool IFutureResultInfo::Init()
 {
-	if (JSON_ASSERT_STR_EMPTY(mMetadata, "name") == false)
+	if (JSON_ASSERT_STR_EMPTY(getMetadata(), "name") == false)
 	{
 		printf("Cant find \"name\" field");
 		return false;
 	}
 
-	mName = mMetadata.get<std::string>("name", "");
+	mName = getMetadata().get<std::string>("name", "");
 	mUIdentifier = mParent->getParent()->getCategoryName() + "::" + mName;
-	mComment = mMetadata.get<std::string>("comment", "");
+	mComment = getMetadata().get<std::string>("comment", "");
 
-	mStaticResult->setType("uintptr_t");	// For now, in the future, it will polomorifcly 
-											// select between example std::string, or any other
+	mStaticResult->setType(getCppDataType());
 	mStaticResult->setName(mName);
-	mStaticResult->setValue("0x0");
+	mStaticResult->setValue(getCppDefaultRvalue());
 
 	if (mParent->getDumpDynamic())
 	{
-		mDynamicResult->setType("uintptr_t");
+		mDynamicResult->setType(getCppDataType());
 		mDynamicResult->PushParentName(mParent->getParent()->getCategoryObjectName());
 		mDynamicResult->setName(mName);
 
@@ -138,33 +137,7 @@ ObfuscationManager* IFutureResultInfo::getObfuscationManager()
 	return mParent->getObfuscationManager();
 }
 
-void IFutureResultInfo::OnParentTargetFinish()
+JsonValueWrapper& IFutureResultInfo::getMetadata()
 {
-	if (JSON_ASSERT(mMetadata, "combine") == false)
-		return;
-
-	JsonValueWrapper combineWithNames = mMetadata["combine"];
-
-	if (combineWithNames.isArray() == false)
-		return;
-
-	for (uint32_t i = 0; i < combineWithNames.size(); i++)
-	{
-		std::string combiningWith = combineWithNames[i].asString();
-		IFutureResult* curr = mParent->getParent()->getFutureResultByName(combiningWith);
-
-		if (curr == nullptr)
-		{
-			printf("\"%s\" trying to combine with a non existing offset \"%s\"\n", mUIdentifier.c_str(), combiningWith.c_str());
-			continue;
-		}
-
-		if (curr->ResultWasSucessfull() == false)
-		{
-			printf("\"%s\" trying to combine with a non computed offset \"%s\"\n", mUIdentifier.c_str(), combiningWith.c_str());
-			continue;
-		}
-
-		//setFinalOffset(getFinalOffset() + curr->getFutureResultInfo()->getFinalOffset());
-	}
+	return mParent->getMetadata();
 }

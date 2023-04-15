@@ -20,7 +20,10 @@ public:
 	void WriteHppDynDecls() override;
 	void WriteHppDynDefs() override;
 
+	void OnParentTargetFinish() override;
+
 	std::string getCppDataType() override;
+	std::string getCppDefaultRvalue() override;
 };
 
 
