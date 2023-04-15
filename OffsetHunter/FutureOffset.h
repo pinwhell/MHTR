@@ -2,9 +2,10 @@
 #include "IFutureResult.h"
 #include "IOffsetScanAlgo.h"
 #include "IScanListener.h"
+#include "FutureOffsetResultInfo.h"
 #include <memory>
 
-class FutureOffset : public IFutureResult, public IScanListener
+class FutureOffset : public IFutureResultImpl<FutureOffsetResultInfo>, public IScanListener
 {
 private:
 	std::unique_ptr<IOffsetScanAlgo> mScanAlgo;

@@ -7,14 +7,13 @@
 #include "HPPManager.h"
 #include "StringHelper.h"
 #include "ObfuscationManager.h"
+#include "FutureOffsetResultInfo.h"
 
 IFutureResultInfo::IFutureResultInfo()
 {
 	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
 	mDynamicResult = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
 
-	setFinalOffset(0x0);
-	mFinalOffset = ERR_INVALID_OFFSET;
 	mName = "";
 	mComment = "";
 }
@@ -71,13 +70,6 @@ void IFutureResultInfo::setComment(const std::string& comment)
 	mComment = comment;
 }
 
-void IFutureResultInfo::setFinalOffset(uint64_t off)
-{
-	mFinalOffset = off;
-	mFinalObfOffset = mFinalOffset ^ mObfKey;
-	mStaticResult->setValue(StringHelper::ToHexString(mFinalOffset));
-}
-
 const std::string& IFutureResultInfo::getName()
 {
 	return mName;
@@ -88,26 +80,6 @@ const std::string& IFutureResultInfo::getComment()
 	return mComment;
 }
 
-uint64_t IFutureResultInfo::getFinalOffset()
-{
-	return mFinalOffset == ERR_INVALID_OFFSET ? 0 : mFinalOffset;
-}
-
-uint64_t IFutureResultInfo::getFinalObfOffset()
-{
-	return mFinalObfOffset;
-}
-
-void IFutureResultInfo::setMetadata(const JsonValueWrapper& metadata)
-{
-	mMetadata = metadata;
-}
-
-const JsonValueWrapper& IFutureResultInfo::getMetadata()
-{
-	return mMetadata;
-}
-
 std::string IFutureResultInfo::getUIDHashStr()
 {
 	return mUIDHash;
@@ -115,9 +87,6 @@ std::string IFutureResultInfo::getUIDHashStr()
 
 void IFutureResultInfo::WriteHppStaticDeclsDefs()
 {
-	if (mFinalOffset == ERR_INVALID_OFFSET)
-		return;
-
 	getHppWriter()->AppendLineOfCode(mStaticResult->ComputeDefinitionAndDeclaration(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
@@ -129,9 +98,6 @@ void IFutureResultInfo::WriteHppStaticDeclsDefs()
 
 void IFutureResultInfo::WriteHppDynDecls()
 {
-	if (mFinalOffset == ERR_INVALID_OFFSET)
-		return;
-
 	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDeclaration(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
@@ -143,9 +109,6 @@ void IFutureResultInfo::WriteHppDynDecls()
 
 void IFutureResultInfo::WriteHppDynDefs()
 {
-	if (mFinalOffset == ERR_INVALID_OFFSET)
-		return;
-
 	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDefinition(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
@@ -196,22 +159,12 @@ void IFutureResultInfo::OnParentTargetFinish()
 			continue;
 		}
 
-		if (curr->WasComputed() == false)
+		if (curr->ResultWasSucessfull() == false)
 		{
 			printf("\"%s\" trying to combine with a non computed offset \"%s\"\n", mUIdentifier.c_str(), combiningWith.c_str());
 			continue;
 		}
 
-		setFinalOffset(getFinalOffset() + curr->getFutureResultInfo()->getFinalOffset());
+		//setFinalOffset(getFinalOffset() + curr->getFutureResultInfo()->getFinalOffset());
 	}
-}
-
-bool IFutureResultInfo::WasComputed()
-{
-	return mFinalOffset != ERR_INVALID_OFFSET;
-}
-
-std::string IFutureResultInfo::getCppDataType()
-{
-	return "uintptr_t";
 }

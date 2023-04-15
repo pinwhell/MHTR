@@ -72,7 +72,7 @@
     <ClCompile Include="FileHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IOffset.cpp">
+    <ClCompile Include="IFutureResult.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="JsonHelper.cpp">
@@ -157,6 +157,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RandManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FutureOffsetResultInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -303,6 +306,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RandManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FutureOffsetResultInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

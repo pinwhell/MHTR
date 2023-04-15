@@ -1,18 +1,26 @@
 #include "IFutureResult.h"
 #include "TargetManager.h"
+#include <atomic>
 
 IFutureResult::IFutureResult()
 {
-	mIFutureResultInfo.setParent(this);
 	mNeedCapstone = false;
+	mResultState = ResultState::NOT_STARTED;
+}
+
+std::string IFutureResult::getName()
+{
+	return mpFutureResultInfo->getName();
+}
+
+std::string IFutureResult::getSignature()
+{
+	return mpFutureResultInfo->getUidentifier();
 }
 
 bool IFutureResult::Init()
 {
-	if (mIFutureResultInfo.Init() == false)
-		return false;
-
-	mParent->LinkFutureResultWithName(mIFutureResultInfo.getName(), this);
+	mParent->LinkFutureResultWithName(getName(), this);
 
 	return true;
 }
@@ -39,38 +47,18 @@ bool IFutureResult::getDumpDynamic()
 
 void IFutureResult::setMetadata(const JsonValueWrapper& metadata)
 {
-	mIFutureResultInfo.setMetadata(metadata);
+	mMetadata = metadata;
 }
 
-std::string IFutureResult::getName()
+const JsonValueWrapper& IFutureResult::getMetadata()
 {
-	return mIFutureResultInfo.getName();
-}
-
-std::string IFutureResult::getSignature()
-{
-	return mIFutureResultInfo.getUidentifier();
+	return mMetadata;
 }
 
 void IFutureResult::setBufferInfo(const char* buff, size_t buffSz)
 {
 	mBuffer = buff;
 	mBuffSize = buffSz;
-}
-
-void IFutureResult::WriteHppStaticDeclsDefs()
-{
-	mIFutureResultInfo.WriteHppStaticDeclsDefs();
-}
-
-void IFutureResult::WriteHppDynDecls()
-{
-	mIFutureResultInfo.WriteHppDynDecls();
-}
-
-void IFutureResult::WriteHppDynDefs()
-{
-	mIFutureResultInfo.WriteHppDynDefs();
 }
 
 HeaderFileManager* IFutureResult::getHppWriter()
@@ -98,20 +86,33 @@ ObfuscationManager* IFutureResult::getObfuscationManager()
 	return mTargetMgr->getObfuscationManager();
 }
 
-IFutureResultInfo* IFutureResult::getFutureResultInfo()
-{
-	return &mIFutureResultInfo;
-}
-
 void IFutureResult::OnParentTargetFinish()
 {
-	mIFutureResultInfo.OnParentTargetFinish();
+	mpFutureResultInfo->OnParentTargetFinish();
 }
 
-void IFutureResult::ComputeJsonResult()
-{}
-
-bool IFutureResult::WasComputed()
+void IFutureResult::WriteHppDynDecls()
 {
-	return mIFutureResultInfo.WasComputed();
+	mpFutureResultInfo->WriteHppDynDecls();
+}
+
+void IFutureResult::WriteHppDynDefs()
+{
+	mpFutureResultInfo->WriteHppDynDefs();
+}
+
+void IFutureResult::WriteHppStaticDeclsDefs()
+{
+	mpFutureResultInfo->WriteHppStaticDeclsDefs();
+}
+
+
+void IFutureResult::ComputeJsonResult()
+{
+
+}
+
+bool IFutureResult::ResultWasSucessfull()
+{
+	return mResultState == ResultState::FINISH_SUCESS;
 }

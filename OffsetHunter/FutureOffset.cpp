@@ -4,23 +4,23 @@
 
 FutureOffset::FutureOffset()
 {
-	
+	mpFutureResultInfo = &mFutureResultInfo;
 }
 
 void FutureOffset::OnFound()
 {
-	mIFutureResultInfo.setFinalOffset(getSingleResult()); // Guaranteed to be one
+	mFutureResultInfo.setFinalOffset(getSingleResult()); // Guaranteed to be one
 }
 
 void FutureOffset::OnNotFound()
 {
-	auto name = mIFutureResultInfo.getUidentifier();
+	auto name = mpFutureResultInfo->getUidentifier();
 	printf("\"%s\" Not found\n", name.c_str());
 }
 
 void FutureOffset::OnMultipleFound()
 {
-	auto name = mIFutureResultInfo.getUidentifier();
+	auto name = mpFutureResultInfo->getUidentifier();
 	printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
 }
 
@@ -37,7 +37,7 @@ bool FutureOffset::Init()
 	if (IFutureResult::Init() == false)
 		return false;
 
-	if (ScanAlgoClassifier::Classify(mIFutureResultInfo.getMetadata(), mScanAlgo) == false)
+	if (ScanAlgoClassifier::Classify(mMetadata, mScanAlgo) == false)
 		return false;
 
 	mScanAlgo->setParent(this);
@@ -48,7 +48,7 @@ bool FutureOffset::Init()
 
 	mNeedCapstone = mScanAlgo->getNeedCapstone();
 
-	//printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
+	printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
 
 	return true;
 }
@@ -78,5 +78,5 @@ void FutureOffset::ComputeOffset()
 void FutureOffset::ComputeJsonResult()
 {
 	if (getDumpDynamic())
-		getResultJson()->set<uint64_t>(mIFutureResultInfo.getUIDHashStr(), mIFutureResultInfo.getFinalObfOffset());
+		getResultJson()->set<uint64_t>(mFutureResultInfo.getUIDHashStr(), mFutureResultInfo.getFinalObfOffset());
 }

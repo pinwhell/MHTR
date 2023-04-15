@@ -11,10 +11,16 @@ struct HeaderFileManager;
 class ICapstoneHelper;
 class ObfuscationManager;
 
+enum class ResultState {
+	NOT_STARTED,
+	IN_PROGRESS,
+	FINISH_SUCESS,
+	FINISH_INVALID
+};
+
 class IFutureResult : public IChild<SingleDumpTarget>
 {
 protected:
-	IFutureResultInfo mIFutureResultInfo;
 
 	// the buffer info i will be finded on
 	const char* mBuffer;
@@ -22,6 +28,10 @@ protected:
 	TargetManager* mTargetMgr;
 	bool mNeedCapstone;
 	JsonValueWrapper mObfuscationData;
+	JsonValueWrapper mMetadata;
+	bool bFinishComputing;
+	std::atomic<ResultState> mResultState;
+	IFutureResultInfo* mpFutureResultInfo;
 
 public:
 
@@ -29,6 +39,11 @@ public:
 
 	virtual bool Init();
 	virtual void ComputeOffset() = 0;
+	std::string getName();
+	std::string getSignature();
+	void WriteHppStaticDeclsDefs(); // This structs arround need to be refactored to handle general stuffs, not just offsets,
+	void WriteHppDynDecls(); // Code structure is done, just refactoring names, and key specific structures
+	void WriteHppDynDefs();
 
 	void setTargetManager(TargetManager* pTarget);
 	TargetManager* getTargetManager();
@@ -37,15 +52,9 @@ public:
 	bool getDumpDynamic();
 
 	void setMetadata(const JsonValueWrapper& metadata);
-
-	std::string getName();
-	std::string getSignature();
+	const JsonValueWrapper& getMetadata();
 
 	void setBufferInfo(const char* buff, size_t buffSz);
-
-	void WriteHppStaticDeclsDefs(); // This structs arround need to be refactored to handle general stuffs, not just offsets,
-	void WriteHppDynDecls(); // Code structure is done, just refactoring names, and key specific structures
-	void WriteHppDynDefs();
 
 	HeaderFileManager* getHppWriter();
 
@@ -53,11 +62,24 @@ public:
 	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
 	ObfuscationManager* getObfuscationManager();
-	IFutureResultInfo* getFutureResultInfo();
 
 	virtual void OnParentTargetFinish();
 	virtual void ComputeJsonResult();
 
-	bool WasComputed();
+	bool ResultWasSucessfull();
 };
 
+template <typename TFutureResultInfo>
+class IFutureResultImpl : public IFutureResult {
+protected:
+	TFutureResultInfo mFutureResultInfo;
+public: 
+
+	IFutureResultImpl();
+};
+
+template<typename TFutureResultInfo>
+inline IFutureResultImpl<TFutureResultInfo>::IFutureResultImpl()
+{
+	mpFutureResultInfo = &mFutureResultInfo;
+}
