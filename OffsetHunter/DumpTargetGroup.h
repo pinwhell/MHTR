@@ -29,6 +29,7 @@ public:
 
 	bool ReadAllTarget();
 
+	void ReportHppIncludes();
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
 	void WriteHppDynDefs();

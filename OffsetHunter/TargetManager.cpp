@@ -36,6 +36,7 @@ bool TargetManager::Init()
 		}
 
 		mJsonAccesor->setJsonObjectName(mDynamicJsonObjName);
+		AddInclude(mJsonAccesor->getGlobalInclude());
 	}
 
 	if (getDumpDynamic())
@@ -125,10 +126,8 @@ bool TargetManager::SaveJson()
 bool TargetManager::SaveHpp()
 {
 	mHppWriter->AppendPragmaOnce();
-	mHppWriter->AppendGlobalInclude("cstdint");
 
-	if (mDumpDynamic)
-		mHppWriter->AppendGlobalInclude(mJsonAccesor->getGlobalInclude());
+	WriteHppIncludes();
 
 	mHppWriter->AppendNextLine();
 
@@ -301,6 +300,15 @@ void TargetManager::setObfuscationBookPath(const std::string& obfuscationBookPat
 	mObfuscationBookPath = obfuscationBookPath;
 }
 
+void TargetManager::WriteHppIncludes()
+{
+	for (const auto& kv : mAllTargets)
+		kv.second->ReportHppIncludes();
+
+	for (const std::string& include : mIncludes)
+		mHppWriter->AppendGlobalInclude(include);
+}
+
 void TargetManager::WriteHppStaticDeclsDefs()
 {
 	for (const auto& kv : mAllTargets)
@@ -327,4 +335,9 @@ CapstoneHelperProvider* TargetManager::getCapstoneHelperProvider()
 ObfuscationManager* TargetManager::getObfuscationManager()
 {
 	return mObfucationManager.get();
+}
+
+void TargetManager::AddInclude(const std::string& toInclude)
+{
+	mIncludes.insert(toInclude);
 }

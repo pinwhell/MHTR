@@ -41,6 +41,7 @@ public:
 	virtual void Compute();
 	std::string getName();
 	std::string getSignature();
+	void ReportHppIncludes();
 	void WriteHppStaticDeclsDefs(); // This structs arround need to be refactored to handle general stuffs, not just offsets,
 	void WriteHppDynDecls(); // Code structure is done, just refactoring names, and key specific structures
 	void WriteHppDynDefs();

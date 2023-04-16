@@ -16,6 +16,7 @@ public:
 	uint64_t getFinalOffset();
 	uint64_t getFinalObfOffset();
 
+	void ReportHppIncludes() override;
 	void WriteHppStaticDeclsDefs() override;
 	void WriteHppDynDecls() override;
 	void WriteHppDynDefs() override;

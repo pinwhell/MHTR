@@ -18,6 +18,11 @@ std::string IFutureResult::getSignature()
 	return mpFutureResultInfo->getUidentifier();
 }
 
+void IFutureResult::ReportHppIncludes()
+{
+	mpFutureResultInfo->ReportHppIncludes();
+}
+
 bool IFutureResult::Init()
 {
 	mpFutureResultInfo->setParent(this);

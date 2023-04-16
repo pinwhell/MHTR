@@ -5,6 +5,8 @@
 #include "IFutureResult.h"
 #include "SingleDumpTarget.h"
 
+#include "TargetManager.h"
+
 FutureOffsetResultInfo::FutureOffsetResultInfo()
 {
 	setFinalOffset(0x0);
@@ -36,6 +38,11 @@ uint64_t FutureOffsetResultInfo::getFinalOffset()
 uint64_t FutureOffsetResultInfo::getFinalObfOffset()
 {
 	return mFinalObfOffset;
+}
+
+void FutureOffsetResultInfo::ReportHppIncludes()
+{
+	mParent->getTargetManager()->AddInclude("cstdint");
 }
 
 void FutureOffsetResultInfo::WriteHppStaticDeclsDefs()

@@ -162,6 +162,12 @@ std::string SingleDumpTarget::getCategoryObjectName()
 	return mCategoryObjName;
 }
 
+void SingleDumpTarget::ReportHppIncludes()
+{
+	for (auto& currOff : mFutureResults)
+		currOff.first->ReportHppIncludes();
+}
+
 void SingleDumpTarget::WriteHppStaticDeclsDefs()
 {
 	BeginStruct();

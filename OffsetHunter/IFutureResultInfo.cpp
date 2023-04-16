@@ -86,6 +86,9 @@ std::string IFutureResultInfo::getUIDHashStr()
 
 void IFutureResultInfo::WriteHppStaticDeclsDefs()
 {
+	if (mParent->ResultWasSucessfull() == false)
+		return;
+
 	getHppWriter()->AppendLineOfCode(mStaticResult->ComputeDefinitionAndDeclaration(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
@@ -97,6 +100,9 @@ void IFutureResultInfo::WriteHppStaticDeclsDefs()
 
 void IFutureResultInfo::WriteHppDynDecls()
 {
+	if (mParent->ResultWasSucessfull() == false)
+		return;
+
 	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDeclaration(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
@@ -108,6 +114,9 @@ void IFutureResultInfo::WriteHppDynDecls()
 
 void IFutureResultInfo::WriteHppDynDefs()
 {
+	if (mParent->ResultWasSucessfull() == false)
+		return;
+
 	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDefinition(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())

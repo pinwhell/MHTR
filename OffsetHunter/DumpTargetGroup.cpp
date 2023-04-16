@@ -110,6 +110,15 @@ bool DumpTargetGroup::ReadAllTarget()
     return true;
 }
 
+void DumpTargetGroup::ReportHppIncludes()
+{
+    if (mTargets.size() < 1)
+        return;
+
+    for (auto& kv : mTargets)
+        kv.first->ReportHppIncludes();
+}
+
 void DumpTargetGroup::WriteHppStaticDeclsDefs()
 {
     if (mTargets.size() < 1)

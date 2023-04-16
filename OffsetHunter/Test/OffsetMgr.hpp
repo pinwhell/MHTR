@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <json/json.h>
 
 struct OffMgr {

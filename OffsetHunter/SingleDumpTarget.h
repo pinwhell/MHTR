@@ -48,6 +48,7 @@ public:
 
 	std::string getCategoryObjectName();
 
+	void ReportHppIncludes();
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
 	void WriteHppDynDefs();

@@ -43,6 +43,7 @@ public:
 	const std::string& getComment();
 	std::string getUIDHashStr();
 
+	virtual void ReportHppIncludes() {};
 	virtual void WriteHppStaticDeclsDefs();
 	virtual void WriteHppDynDecls();
 	virtual void WriteHppDynDefs();

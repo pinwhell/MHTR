@@ -25,6 +25,8 @@ private:
 	std::string mDynamicJsonObjName; // by default "obj"
 	std::string mDynamicOffsetSetterFuncName; // by default "Set"
 
+	std::unordered_set<std::string> mIncludes;
+
 	JsonValueWrapper mDumpTargetsRoot;
 
 	std::unique_ptr<HeaderFileManager> mHppWriter;
@@ -75,10 +77,13 @@ public:
 	void setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName);
 	void setObfuscationBookPath(const std::string& obfuscationBookPath);
 
+	void WriteHppIncludes();
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
 	void WriteHppDynDefs();
 	CapstoneHelperProvider* getCapstoneHelperProvider();
 	ObfuscationManager* getObfuscationManager();
+
+	void AddInclude(const std::string& toInclude);
 };
 
