@@ -124,7 +124,7 @@ void FutureOffsetResultInfo::HandleCommentPreprocess()
 		return;
 
 	setComment(StringHelper::ReplacePlaceHolders(getComment(), [&](const std::string name) {
-		return "";
+		return "|_|" + name + "|_|";
 		}));
 }
 
