@@ -49,3 +49,34 @@ std::string StringHelper::ToHexString(uint64_t v)
 
     return sstream.str();
 }
+
+std::string StringHelper::ReplacePlaceHolders(const std::string& input, std::function<std::string(std::string)> onPlaceHolderAboutReplace)
+{
+    std::string result = "";
+    std::string acum = "";
+
+    for (const char* c = input.c_str(); c < input.c_str() + input.size(); c++)
+    {
+        if (c + 1 < input.c_str() + input.size())
+        {
+            if (c[0] == '#' && c[1] == '(')
+            {
+                c += 2;
+                result += acum;
+                acum.clear();
+            }
+            else if (c[0] == ')' && c[1] == '#')
+            {
+                c += 2;
+                result += onPlaceHolderAboutReplace(acum);
+                acum.clear();
+            }
+        }
+
+        acum += *c;
+    }
+
+    result += acum;
+
+    return result;
+}
