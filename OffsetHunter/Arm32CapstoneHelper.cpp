@@ -49,6 +49,30 @@ bool Arm32CapstoneHelper::InterpretDispInst(cs_insn* pInst, uintptr_t& outDisp)
         outDisp = pInst->detail->arm.operands[pInst->detail->arm.op_count - 1].imm;
     }break;
 
+    case ARM_INS_MOV:
+    case ARM_INS_MOVW:
+    case ARM_INS_MOVT:
+    {
+        auto op = pInst->detail->arm.operands[pInst->detail->arm.op_count - 1];
+
+        if (op.type == ARM_OP_IMM)
+        {
+            outDisp = op.imm;
+            break;
+        }
+    }
+
+    case ARM_INS_MVN:
+    {
+        auto op = pInst->detail->arm.operands[pInst->detail->arm.op_count - 1];
+
+        if (op.type == ARM_OP_IMM)
+        {
+            outDisp = ~(op.imm);
+            break;
+        }
+    }
+
     default:
         return false;
     }
