@@ -71,6 +71,12 @@ void FutureOffsetResultInfo::WriteHppDynDefs()
 
 void FutureOffsetResultInfo::OnParentTargetFinish()
 {
+	HandleCombinations();
+	HandleCommentPreprocess();
+}
+
+void FutureOffsetResultInfo::HandleCombinations()
+{
 	if (JSON_ASSERT(getMetadata(), "combine") == false)
 		return;
 
@@ -102,14 +108,24 @@ void FutureOffsetResultInfo::OnParentTargetFinish()
 			continue;
 		}
 
-		if(FutureOffsetResultInfo* o = dynamic_cast<FutureOffsetResultInfo*>(curr->getFutureResultInfo()))
+		if (FutureOffsetResultInfo* o = dynamic_cast<FutureOffsetResultInfo*>(curr->getFutureResultInfo()))
 			setFinalOffset(getFinalOffset() + o->getFinalOffset());
-		else 
+		else
 		{
 			printf("\"%s\" trying to combine with a non combinable future result \"%s\"\n", getUidentifier().c_str(), combiningWith.c_str());
 			continue;
-		}		
+		}
 	}
+}
+
+void FutureOffsetResultInfo::HandleCommentPreprocess()
+{
+	if (getNeedShowComment() == false)
+		return;
+
+	setComment(StringHelper::ReplacePlaceHolders(getComment(), [&](const std::string name) {
+		return "";
+		}));
 }
 
 

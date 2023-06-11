@@ -23,6 +23,9 @@ public:
 
 	void OnParentTargetFinish() override;
 
+	void HandleCombinations();
+	void HandleCommentPreprocess();
+
 	std::string getCppDataType() override;
 	std::string getCppDefaultRvalue() override;
 };
