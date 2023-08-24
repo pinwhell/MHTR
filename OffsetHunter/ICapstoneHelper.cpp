@@ -48,7 +48,7 @@ bool ICapstoneHelper::TryGetCallDestination(const unsigned char* pInst, uintptr_
 }
 
 
-bool ICapstoneHelper::TryInterpretDisp(const unsigned char* pInst, uintptr_t& outDisp)
+bool ICapstoneHelper::InstDisasmTryGetDisp(const unsigned char* pInst, uintptr_t& outDisp)
 {
     cs_insn* pDisasmdInst = nullptr;
     uintptr_t count = 0;
@@ -56,24 +56,35 @@ bool ICapstoneHelper::TryInterpretDisp(const unsigned char* pInst, uintptr_t& ou
 
     if ((count = cs_disasm(mHandle, pInst, 0x4, (uint64_t)(pInst), 0, &pDisasmdInst)) != 0 && pDisasmdInst)
     {
-        result = InterpretDispInst(pDisasmdInst, outDisp);
+        result = GetInstructionDisp(pDisasmdInst, outDisp);
         cs_free(pDisasmdInst, count);
     }
 
     return result;
 }
 
-bool ICapstoneHelper::TryInterpretDispPCRelative(cs_insn* pInst, uintptr_t& outDisp)
+bool ICapstoneHelper::DisasmTrySolvePositionIndependentAddress(cs_insn* pInst, uintptr_t& outDisp)
 {
     cs_insn* pDisasmdInst = nullptr;
-    uintptr_t count = 0;
-    bool result = false;
+    
 
-    if ((count = cs_disasm(mHandle, (uint8_t*)pInst->address, 0x50, PCRelInstAddrRebaseRoot() ? (pInst->address - uintptr_t(mpBase)) : pInst->address, 0, &pDisasmdInst)) != 0 && pDisasmdInst)
-    {
-        result = InterpretDispPCRelativeInst(pDisasmdInst, pDisasmdInst + count, outDisp);
-        cs_free(pDisasmdInst, count);
-    }
+    size_t dismInstCnt = cs_disasm(
+        mHandle,
+        (uint8_t*)pInst->address,
+        0x50,
+        PCRelInstAddrRebaseRoot() ?
+        (pInst->address - mBase) :
+        pInst->address,
+        0,
+        &pDisasmdInst
+    );
+
+    if (dismInstCnt < 1 || pDisasmdInst == nullptr)
+        return false;
+
+    bool result = SolvePositionIndependentAddress(pDisasmdInst, pDisasmdInst + dismInstCnt, outDisp);
+
+    cs_free(pDisasmdInst, dismInstCnt);
 
     return result;
 }
@@ -122,4 +133,27 @@ void ICapstoneHelper::setBaseAddress(unsigned char* base)
 void ICapstoneHelper::setBaseSize(size_t sz)
 {
     mBaseSize = sz;
+}
+
+void ICapstoneHelper::ForEachInstructionAbs(const unsigned char* startAt, std::function<bool(cs_insn* pInst)> callback)
+{
+    cs_insn pDisasmdInst{ 0 };
+    cs_detail pDisasmdDetail{ 0 };
+
+    uint64_t addr = (uint64_t)startAt;
+    const unsigned char* pCurrInst = startAt;
+    size_t szRem = (mBase + mBaseSize) - addr;
+
+    pDisasmdInst.detail = &pDisasmdDetail;
+
+    while (cs_disasm_iter(mHandle, (const uint8_t**)&pCurrInst, &szRem, (uint64_t*)&addr, &pDisasmdInst))
+    {
+        if (callback(&pDisasmdInst) == false)
+            break;
+    }
+}
+
+void ICapstoneHelper::ForEachInstructionRel(uint64_t baseOffset, std::function<bool(cs_insn* pInst)> callback)
+{
+    ForEachInstructionAbs(mpBase + baseOffset, callback);
 }

@@ -1,6 +1,6 @@
 #include "IBinaryFormat.h"
 
-bool IBinaryFormat::MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper)
+bool IBinaryFormat::MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper, std::string mode)
 {
 	return false;
 }

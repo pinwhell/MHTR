@@ -156,8 +156,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Dependencies\JSONCPP\dist\jsoncpp.cpp" />
-    <ClCompile Include="Arm32CapstoneHelper.cpp" />
+    <ClCompile Include="Arm32CapstoneHelper.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+    </ClCompile>
     <ClCompile Include="Arm32CapstoneHelperFactory.cpp" />
+    <ClCompile Include="Arm32ThumbCapstoneHelper.cpp" />
+    <ClCompile Include="Arm32ThumbCapstoneHelperFactory.cpp" />
     <ClCompile Include="BinaryFormatClassifier.cpp" />
     <ClCompile Include="CapstoneAux.cpp" />
     <ClCompile Include="CapstoneHelperProvider.cpp" />
@@ -210,6 +215,8 @@
   <ItemGroup>
     <ClInclude Include="Arm32CapstoneHelper.h" />
     <ClInclude Include="Arm32CapstoneHelperFactory.h" />
+    <ClInclude Include="Arm32ThumbCapstoneHelper.h" />
+    <ClInclude Include="Arm32ThumbCapstoneHelperFactory.h" />
     <ClInclude Include="BinaryFormatClassifier.h" />
     <ClInclude Include="CapstoneAux.h" />
     <ClInclude Include="CapstoneHelperProvider.h" />

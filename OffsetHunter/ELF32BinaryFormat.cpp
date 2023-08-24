@@ -1,12 +1,22 @@
 #include "ELF32BinaryFormat.h"
 #include "Arm32CapstoneHelperFactory.h"
+#include "Arm32ThumbCapstoneHelperFactory.h"
 
-bool ELF32BinaryFormat::MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper)
+bool ELF32BinaryFormat::MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper, std::string mode)
 {
 	if (outHelper == nullptr)
 		return false;
 
-	*outHelper = pProvider->getInstance(std::make_unique<Arm32CapstoneHelperFactory>());
+	*outHelper = nullptr;
+
+	if (mode == "default")
+		mode = "arm";
+
+	if (mode == "arm")
+		*outHelper = pProvider->getInstance(std::make_unique<Arm32CapstoneHelperFactory>());
+
+	if (mode == "thumb")
+		*outHelper = pProvider->getInstance(std::make_unique<Arm32ThumbCapstoneHelperFactory>());
 
 	return *outHelper != nullptr;
 }

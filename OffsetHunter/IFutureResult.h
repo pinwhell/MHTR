@@ -8,7 +8,6 @@
 class SingleDumpTarget;
 class TargetManager;
 struct HeaderFileManager;
-class ICapstoneHelper;
 class ObfuscationManager;
 
 enum class ResultState {
@@ -26,7 +25,6 @@ protected:
 	const char* mBuffer;
 	size_t mBuffSize;
 	TargetManager* mTargetMgr;
-	bool mNeedCapstone;
 	JsonValueWrapper mObfuscationData;
 	JsonValueWrapper mMetadata;
 	bool bFinishComputing;
@@ -59,8 +57,6 @@ public:
 
 	HeaderFileManager* getHppWriter();
 
-	bool getNeedCapstoneHelper();
-	ICapstoneHelper* getCapstoneHelper();
 	JsonValueWrapper* getResultJson();
 	ObfuscationManager* getObfuscationManager();
 

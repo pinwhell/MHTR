@@ -4,7 +4,6 @@
 
 IFutureResult::IFutureResult()
 {
-	mNeedCapstone = false;
 	mResultState = ResultState::NOT_STARTED;
 }
 
@@ -79,16 +78,6 @@ void IFutureResult::setBufferInfo(const char* buff, size_t buffSz)
 HeaderFileManager* IFutureResult::getHppWriter()
 {
 	return mParent->getHppWriter();
-}
-
-bool IFutureResult::getNeedCapstoneHelper()
-{
-	return mNeedCapstone;
-}
-
-ICapstoneHelper* IFutureResult::getCapstoneHelper()
-{
-	return mParent->getCapstoneHelper();
 }
 
 JsonValueWrapper* IFutureResult::getResultJson()

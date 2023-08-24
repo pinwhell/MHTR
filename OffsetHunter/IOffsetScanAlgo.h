@@ -21,6 +21,7 @@ protected:
 	JsonValueWrapper mAlgoMetadata;
 	int64_t mMainDisp;
 	bool mTryInterpret;
+	std::string mCapstoneMode;
 
 public:
 
@@ -33,9 +34,8 @@ public:
 
 	void HandleAllDisp();
 	void HandleInterpretation();
-
 	void setBufferInfo(const char* buff, size_t buffSz);
-	bool getNeedCapstone();
+	std::string getCapstoneMode();
 	ICapstoneHelper* getCapstoneHelper();
 };
 

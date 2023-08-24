@@ -1,12 +1,20 @@
 #include "IOffsetScanAlgo.h"
 #include "FutureOffset.h"
 #include "ICapstoneHelper.h"
+#include "TargetManager.h"
 
 bool IOffsetScanAlgo::Init()
 {
 	mMainDisp = mAlgoMetadata.get<int64_t>("disp", 0);
 
 	mTryInterpret = mAlgoMetadata.get<bool>("interpret", true);
+
+	if (mTryInterpret)
+	{
+		mCapstoneMode = mAlgoMetadata.get<std::string>("mode", "default");
+		mParent->getParent()->ReportCapstoneNeededMode(mCapstoneMode);
+		//printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
+	}
 
 	return true;
 }
@@ -77,7 +85,7 @@ void IOffsetScanAlgo::HandleInterpretation()
 	{
 		uintptr_t disp = 0x0;
 
-		if (getCapstoneHelper()->TryInterpretDisp(c, disp) == false)
+		if (getCapstoneHelper()->InstDisasmTryGetDisp(c, disp) == false)
 		{
 			auto sig = mParent->getSignature();
 			printf("Unable to resolve \"%s\" candidate \"0x%08X\" result Interpretation\n", sig.c_str(), c - (unsigned char*)mBuffer);
@@ -96,9 +104,9 @@ void IOffsetScanAlgo::setBufferInfo(const char* buff, size_t buffSz)
 	mBuffSize = buffSz;
 }
 
-bool IOffsetScanAlgo::getNeedCapstone()
+std::string IOffsetScanAlgo::getCapstoneMode()
 {
-	return mTryInterpret == true;
+	return mCapstoneMode;
 }
 
 ICapstoneHelper* IOffsetScanAlgo::getCapstoneHelper()

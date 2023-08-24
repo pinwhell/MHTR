@@ -5,6 +5,8 @@
 #include "FutureOffsetResultInfo.h"
 #include <memory>
 
+class ICapstoneHelper;
+
 class FutureOffset : public IFutureResultImpl<FutureOffsetResultInfo>, public IScanListener
 {
 private:
@@ -21,6 +23,9 @@ public:
 	void OnNotFound();
 	void OnMultipleFound();
 	uintptr_t getSingleResult();
+	uintptr_t getFirstResult();
+	
+	ICapstoneHelper* getCapstoneHelper();
 
 	void IgniteScan();
 	void Compute() override;

@@ -6,11 +6,6 @@
 #include "BinaryFormatClassifier.h"
 #include "TargetManager.h"
 
-SingleDumpTarget::SingleDumpTarget()
-{
-	mNeedCapstone = false;
-}
-
 bool SingleDumpTarget::Init()
 {
 	if (JSON_ASSERT_STR_EMPTY(mDumpTargetDesc, "name") == false)
@@ -64,22 +59,28 @@ bool SingleDumpTarget::Init()
 	if (InitAllMetadata() == false)
 		return false;
 
-	if (getNeedCapstone() == true)
+	if (mAllCapstoneNeededModes.size() > 0 == true)
 	{
-		if (mBinFormat->MakeCapstoneHelper(mTargetMgr->getCapstoneHelperProvider(), &mCapstoneHelper) == false)
+		for (const std::string& mode : mAllCapstoneNeededModes)
 		{
-			printf("\"%s\" Needs a capstone helper, but it fail to create one, maybe the file format is incorrect\n", mTargetBinaryPath.c_str());
-			return false;
-		}
+			mCapstoneHelpers[mode] = nullptr;
+			ICapstoneHelper** pCurrCapstoneHelper = &(mCapstoneHelpers[mode]);
 
-		if (mCapstoneHelper->Init() == false)
-		{
-			printf("\"%s\" Needs a capstone helper, but it fail to initialize one\n", mTargetBinaryPath.c_str());
-			return false;
-		}
+			if (mBinFormat->MakeCapstoneHelper(mTargetMgr->getCapstoneHelperProvider(), pCurrCapstoneHelper, mode) == false)
+			{
+				printf("\"%s\" Needs \'%s\' capstone helper, but it fail to create one, maybe the file format is incorrect\n", mTargetBinaryPath.c_str(), mode.c_str());
+				return false;
+			}
 
-		mCapstoneHelper->setBaseAddress((unsigned char*)mTargetBinary.data());
-		mCapstoneHelper->setBaseSize(mTargetBinary.size());
+			if ((*pCurrCapstoneHelper)->Init() == false)
+			{
+				printf("\"%s\" Needs a capstone helper, but it fail to initialize one\n", mTargetBinaryPath.c_str());
+				return false;
+			}
+
+			(*pCurrCapstoneHelper)->setBaseAddress((unsigned char*)mTargetBinary.data());
+			(*pCurrCapstoneHelper)->setBaseSize(mTargetBinary.size());
+		}
 	}
 
 	//printf("%s Need Capstone: %s\n\n", mCategoryName.c_str(), mNeedCapstone ? "Yes" : "No");
@@ -113,8 +114,6 @@ bool SingleDumpTarget::InitAllMetadata()
 	{
 		if (currFutRes.first->Init() == false)
 			return false;
-
-		mNeedCapstone = currFutRes.first->getNeedCapstoneHelper() || mNeedCapstone;
 	}
 
 	return true;
@@ -204,19 +203,17 @@ void SingleDumpTarget::EndStruct()
 	mParent->getHppWriter()->EndStruct(mCategoryName, { mCategoryObjName }); // by default mCategoryObjName = "m" + mCategoryName
 }
 
-bool SingleDumpTarget::getNeedCapstone()
-{
-	return mNeedCapstone;
-}
-
 HeaderFileManager* SingleDumpTarget::getHppWriter()
 {
 	return mParent->getHppWriter();
 }
 
-ICapstoneHelper* SingleDumpTarget::getCapstoneHelper()
+ICapstoneHelper* SingleDumpTarget::getCapstoneHelper(const std::string& mode)
 {
-	return mCapstoneHelper;
+	if (mCapstoneHelpers.find(mode) == mCapstoneHelpers.end())
+		return nullptr;
+
+	return mCapstoneHelpers[mode];
 }
 
 JsonValueWrapper* SingleDumpTarget::getResultJson()
@@ -238,6 +235,11 @@ IFutureResult* SingleDumpTarget::getFutureResultByName(const std::string& name)
 void SingleDumpTarget::LinkFutureResultWithName(const std::string& name, IFutureResult* off)
 {
 	mFutureResultsByName[name] = off;
+}
+
+void SingleDumpTarget::ReportCapstoneNeededMode(const std::string& mode)
+{
+	mAllCapstoneNeededModes.insert(mode);
 }
 
 void SingleDumpTarget::ComputeJsonResult()

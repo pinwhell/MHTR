@@ -21,6 +21,7 @@ private:
 	std::string mUIdentifierDynamic;
 	std::string mUIDHash;
 	std::string mComment; // If there is no comment available then this will be empty
+	bool mCanPickAnyResult;
 
 protected:
 	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
@@ -42,6 +43,7 @@ public:
 	const std::string& getName();
 	const std::string& getComment();
 	std::string getUIDHashStr();
+	bool CanPickAnyResult();
 
 	virtual void ReportHppIncludes() {};
 	virtual void WriteHppStaticDeclsDefs();
