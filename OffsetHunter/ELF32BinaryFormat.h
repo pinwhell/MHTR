@@ -8,6 +8,6 @@ class ELF32BinaryFormat : public IBinaryFormatImpl<elf32_hdr>
 private:
 
 public:
-	bool MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper) override;
+	bool MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper, std::string mode = "default") override;
 };
 

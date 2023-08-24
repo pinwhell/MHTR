@@ -22,9 +22,17 @@ void FutureOffset::OnNotFound()
 
 void FutureOffset::OnMultipleFound()
 {
-	onNotSucessComputing();
-	auto name = mpFutureResultInfo->getUidentifier();
-	printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
+	if (getFutureResultInfo()->CanPickAnyResult() == false)
+	{
+		onNotSucessComputing();
+		auto name = mpFutureResultInfo->getUidentifier();
+		printf("\"%s\" with %d Results\n", name.c_str(), mScanAlgo->getResults().size());
+
+		return;
+	}
+
+	mFutureResultInfo.setFinalOffset(getFirstResult()); // Picking the first
+	onSucessfullyComputed();
 }
 
 uintptr_t FutureOffset::getSingleResult()
@@ -32,7 +40,17 @@ uintptr_t FutureOffset::getSingleResult()
 	if (mScanAlgo->getResults().size() != 1)
 		return 0;
 
+	return getFirstResult();
+}
+
+uintptr_t FutureOffset::getFirstResult()
+{
 	return *(mScanAlgo->getResults().begin());
+}
+
+ICapstoneHelper* FutureOffset::getCapstoneHelper()
+{
+	return mParent->getCapstoneHelper(mScanAlgo->getCapstoneMode());
 }
 
 bool FutureOffset::Init()
@@ -48,10 +66,6 @@ bool FutureOffset::Init()
 
 	if (mScanAlgo->Init() == false)
 		return false;
-
-	mNeedCapstone = mScanAlgo->getNeedCapstone();
-
-	//printf("\t%s Need Capstone: %s\n", getName().c_str(), mNeedCapstone ? "Yes" : "No");
 
 	return true;
 }

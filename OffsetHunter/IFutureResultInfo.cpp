@@ -56,6 +56,8 @@ bool IFutureResultInfo::Init()
 		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mObfKey));
 	} else mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
 
+	mCanPickAnyResult = getMetadata().get<bool>("pick_any_result", false);
+
 	return true;
 }
 
@@ -82,6 +84,11 @@ const std::string& IFutureResultInfo::getComment()
 std::string IFutureResultInfo::getUIDHashStr()
 {
 	return mUIDHash;
+}
+
+bool IFutureResultInfo::CanPickAnyResult()
+{
+	return mCanPickAnyResult;
 }
 
 void IFutureResultInfo::WriteHppStaticDeclsDefs()

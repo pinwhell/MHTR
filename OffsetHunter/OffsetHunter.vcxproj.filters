@@ -162,6 +162,18 @@
     <ClCompile Include="FutureOffsetResultInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FuturePattern.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FuturePatternResultInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Arm32ThumbCapstoneHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Arm32ThumbCapstoneHelperFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConfigManager.h">
@@ -309,6 +321,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FutureOffsetResultInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FuturePattern.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FuturePatternResultInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Arm32ThumbCapstoneHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Arm32ThumbCapstoneHelperFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

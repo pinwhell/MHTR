@@ -19,7 +19,7 @@ private:
 	std::string mCategoryObjName; // by default "m" + mCategoryName
 	std::unordered_map<IFutureResult*, std::unique_ptr<IFutureResult>> mFutureResults;
 	std::unordered_map<std::string, IFutureResult*> mFutureResultsByName;
-	ICapstoneHelper* mCapstoneHelper;
+	std::unordered_map<std::string, ICapstoneHelper*> mCapstoneHelpers;
 	std::string mTargetMetadataPath;
 	JsonValueWrapper mTargetMetadataRoot;
 	std::string mTargetBinaryPath;
@@ -27,12 +27,9 @@ private:
 
 	std::vector<unsigned char> mTargetBinary;
 	std::unique_ptr<IBinaryFormat> mBinFormat;
-	bool mNeedCapstone;
+	std::unordered_set<std::string> mAllCapstoneNeededModes;
 
 public:
-
-	SingleDumpTarget();
-
 	bool Init() override;
 
 	bool LoadMetadata();
@@ -54,13 +51,13 @@ public:
 	void WriteHppDynDefs();
 	void BeginStruct();
 	void EndStruct();
-	bool getNeedCapstone();
 
 	HeaderFileManager* getHppWriter();
-	ICapstoneHelper* getCapstoneHelper();
+	ICapstoneHelper* getCapstoneHelper(const std::string& mode);
 	JsonValueWrapper* getResultJson();
 	IFutureResult* getFutureResultByName(const std::string& name);
 	void LinkFutureResultWithName(const std::string& name, IFutureResult* futureResult);
+	void ReportCapstoneNeededMode(const std::string& mode);
 
 	void ComputeJsonResult();
 };

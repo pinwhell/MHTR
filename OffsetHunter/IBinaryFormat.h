@@ -3,6 +3,7 @@
 #include <cstdint>
 #include "ICapstoneHelper.h"
 #include "CapstoneHelperProvider.h"
+#include <string>
 
 class IBinaryFormat {
 
@@ -13,7 +14,7 @@ private:
 	};
 
 public:
-	virtual bool MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper);
+	virtual bool MakeCapstoneHelper(CapstoneHelperProvider* pProvider, ICapstoneHelper** outHelper, std::string mode = "default");
 
 	void setBase(uintptr_t base);
 	void setBase(void* base);

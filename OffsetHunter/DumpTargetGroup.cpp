@@ -49,9 +49,11 @@ void DumpTargetGroup::ComputeAll()
     {
         printf("Computing %s\n", kv.second->getCategoryName().c_str());
 
-        tp.enqueue([&](SingleDumpTarget* pSingDumpTarg) {
-            pSingDumpTarg->ComputeAll();
-            }, kv.second.get());
+        kv.second->ComputeAll();
+
+        /*tp.enqueue([&](SingleDumpTarget* pSingDumpTarg) {
+            
+            }, kv.second.get());*/
     }
 }
 

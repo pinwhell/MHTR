@@ -1,6 +1,7 @@
 #pragma once
 
 #include <capstone/capstone.h>
+#include <functional>
 
 class ICapstoneHelper
 {
@@ -12,7 +13,11 @@ private:
 
 protected:
 
-	const unsigned char* mpBase;
+	union {
+		const unsigned char* mpBase;
+		uintptr_t mBase;
+	};
+
 	size_t mBaseSize;
 
 public:
@@ -31,14 +36,19 @@ public:
 	virtual bool IsIntructionReturnRelated(cs_insn* pInst) = 0;
 	virtual bool IsIntructionPrologRelated(cs_insn* pInst) = 0;
 
-	bool TryInterpretDisp(const unsigned char* pInst, uintptr_t& outDisp);
-	bool TryInterpretDispPCRelative(cs_insn* pInst, uintptr_t& outDisp);
-	virtual bool InterpretDispInst(cs_insn* pInst, uintptr_t& outDisp) = 0;
-	virtual bool InterpretDispPCRelativeInst(cs_insn* pInst, cs_insn* pInstEnd, uintptr_t& outDisp) = 0;
+	bool InstDisasmTryGetDisp(const unsigned char* pInst, uintptr_t& outDisp);
+	virtual bool GetInstructionDisp(cs_insn* pInst, uintptr_t& outDisp) = 0;
+	bool DisasmTrySolvePositionIndependentAddress(cs_insn* pInst, uintptr_t& outDisp);
+	virtual bool SolvePositionIndependentAddress(cs_insn* pInst, cs_insn* pInstEnd, uintptr_t& outDisp) = 0;
+
+	virtual uint64_t getPcFromInstruction(cs_insn* inst) = 0;
 
 	bool TryComputeParagraphSize(const unsigned char* pInst, uintptr_t& outSize);
 
 	void setBaseAddress(unsigned char* base);
 	void setBaseSize(size_t sz);
+
+	void ForEachInstructionAbs(const unsigned char* startAt, std::function<bool(cs_insn* pInst)> callback);
+	void ForEachInstructionRel(uint64_t baseOffset, std::function<bool(cs_insn* pInst)> callback);
 };
 
