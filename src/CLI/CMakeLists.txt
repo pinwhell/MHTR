@@ -1,0 +1,3 @@
+add_executable(OffsetHunterCLI main.cpp OffsetHunterCLI.cpp)
+
+target_link_libraries(OffsetHunterCLI cxxopts OffsetHunter)
