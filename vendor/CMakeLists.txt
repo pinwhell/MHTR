@@ -1,5 +1,5 @@
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/CXXOPTS)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/THUNDERBYTESCAN)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cxxopts)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ThunderByteScan)
 
 add_library(jsoncpp INTERFACE)
 
