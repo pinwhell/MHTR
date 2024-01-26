@@ -27,6 +27,18 @@ bool ArmCapstoneAux::RegisterPresent(cs_insn* pInst, uint16_t reg)
     return false;
 }
 
+bool Arm64CapstoneAux::RegisterPresent(cs_insn* pInst, uint16_t reg)
+{
+    for (int i = 0; i != pInst->detail->arm64.op_count; i++)
+    {
+        if (pInst->detail->arm64.operands[i].reg == reg)
+            return true;
+    }
+
+    return false;
+}
+
+
 bool ArmCapstoneAux::HeuristicProlog(cs_insn* pInst)
 {
     if (pInst->id == ARM_INS_PUSH)

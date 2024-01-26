@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <OH/OffsetHunter.h>
 #include <OH/RandManager.h>
+#include <filesystem>
 
 OffsetHunter::OffsetHunter()
 {
@@ -51,7 +52,12 @@ void OffsetHunter::SaveResults()
 
 void OffsetHunter::setConfigPath(const std::string& path)
 {
-    mConfigManager->setConfigPath(path);
+    const auto absCfgPath = std::filesystem::absolute(path);
+    const auto parentPath = absCfgPath.parent_path();
+
+    std::filesystem::current_path(parentPath);
+
+    mConfigManager->setConfigPath(absCfgPath.string());
 }
 
 CapstoneHelperProvider* OffsetHunter::getCapstoneHelperProvider()

@@ -21,6 +21,7 @@ protected:
 	JsonValueWrapper mAlgoMetadata;
 	int64_t mMainDisp;
 	bool mTryInterpret;
+	bool mTryFollow;
 	std::string mCapstoneMode;
 
 public:

@@ -8,6 +8,7 @@ bool IOffsetScanAlgo::Init()
 	mMainDisp = mAlgoMetadata.get<int64_t>("disp", 0);
 
 	mTryInterpret = mAlgoMetadata.get<bool>("interpret", true);
+	mTryFollow = mAlgoMetadata.get<bool>("follow", false);
 
 	if (mTryInterpret)
 	{
@@ -84,10 +85,22 @@ void IOffsetScanAlgo::HandleInterpretation()
 	for (unsigned char* c : candidadtes)
 	{
 		uintptr_t disp = 0x0;
+		auto sig = mParent->getSignature();
+
+		if (mTryFollow)
+		{
+			if (getCapstoneHelper()->InstDisasmTryFollow(c, disp) == false)
+			{
+				printf("Unable to follow \"%s\" candidate \"0x%08X\" result\n", sig.c_str(), c - (unsigned char*)mBuffer);
+				continue;
+			}
+
+			mResults.push_back(disp);
+			continue;
+		}
 
 		if (getCapstoneHelper()->InstDisasmTryGetDisp(c, disp) == false)
 		{
-			auto sig = mParent->getSignature();
 			printf("Unable to resolve \"%s\" candidate \"0x%08X\" result Interpretation\n", sig.c_str(), c - (unsigned char*)mBuffer);
 			continue;
 		}

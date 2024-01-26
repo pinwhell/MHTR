@@ -3,7 +3,7 @@
 #include "IBinaryFormat.h"
 #include "ELF.h"
 
-class ELF32BinaryFormat : public IBinaryFormatImpl<Elf32_Ehdr>
+class ELF64BinaryFormat : public IBinaryFormatImpl<Elf64_Ehdr>
 {
 private:
 

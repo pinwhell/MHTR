@@ -29,14 +29,14 @@ public:
 	void setArch(cs_arch arch);
 	void setMode(cs_mode mode);
 
-	virtual bool PCRelInstAddrRebaseRoot() = 0;
-
 	bool TryGetCallDestination(const unsigned char* pInst, uintptr_t& outDest);
 	virtual bool GetCallDestinationInst(cs_insn* pInst, uintptr_t& outDest) = 0;
 	virtual bool IsIntructionReturnRelated(cs_insn* pInst) = 0;
 	virtual bool IsIntructionPrologRelated(cs_insn* pInst) = 0;
 
 	bool InstDisasmTryGetDisp(const unsigned char* pInst, uintptr_t& outDisp);
+	bool InstDisasmTryFollow(const unsigned char* pInst, uintptr_t& outDisp);
+	virtual bool InstDisasmFollow(cs_insn* pInstBegin, cs_insn* pInstEnd, uintptr_t& outLocation) = 0;
 	virtual bool GetInstructionDisp(cs_insn* pInst, uintptr_t& outDisp) = 0;
 	bool DisasmTrySolvePositionIndependentAddress(cs_insn* pInst, uintptr_t& outDisp);
 	virtual bool SolvePositionIndependentAddress(cs_insn* pInst, cs_insn* pInstEnd, uintptr_t& outDisp) = 0;

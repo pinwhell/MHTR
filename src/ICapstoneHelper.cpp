@@ -63,17 +63,29 @@ bool ICapstoneHelper::InstDisasmTryGetDisp(const unsigned char* pInst, uintptr_t
     return result;
 }
 
+bool ICapstoneHelper::InstDisasmTryFollow(const unsigned char* pInst, uintptr_t& outDisp)
+{
+    cs_insn* pDisasmdInst = nullptr;
+    uintptr_t count = 0;
+    bool result = false;
+
+    if ((count = cs_disasm(mHandle, pInst, 0x4 * 20, (uint64_t)(pInst), 0, &pDisasmdInst)) != 0 && pDisasmdInst)
+    {
+        result = InstDisasmFollow(pDisasmdInst, pDisasmdInst + count, outDisp);
+        cs_free(pDisasmdInst, count);
+    }
+
+    return result;
+}
+
 bool ICapstoneHelper::DisasmTrySolvePositionIndependentAddress(cs_insn* pInst, uintptr_t& outDisp)
 {
     cs_insn* pDisasmdInst = nullptr;
-    
 
     size_t dismInstCnt = cs_disasm(
         mHandle,
         (uint8_t*)pInst->address,
         0x50,
-        PCRelInstAddrRebaseRoot() ?
-        (pInst->address - mBase) :
         pInst->address,
         0,
         &pDisasmdInst

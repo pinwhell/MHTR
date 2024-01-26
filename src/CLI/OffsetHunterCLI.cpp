@@ -2,6 +2,7 @@
 #include <OH/OffsetHunter.h>
 #include <cxxopts.hpp>
 #include <iostream>
+#include <filesystem>
 
 using namespace OH;
 
@@ -26,6 +27,8 @@ int OffsetHunterCLI::Run(int argc, const char** argv)
     }
 
     std::string configPath = args["config"].as<std::string>();
+    
+    std::filesystem::current_path(std::filesystem::path(configPath).parent_path());
 
     dumper->setConfigPath(configPath);
 
