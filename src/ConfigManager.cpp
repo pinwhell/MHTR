@@ -4,41 +4,6 @@
 
 namespace fs = std::filesystem;
 
-void ConfigManager::setConfigPath(const std::string& path)
-{
-	mConfigPath = path;
-}
-
-std::string ConfigManager::getDumpTargetPath()
-{
-	return mDumpTargetPath;
-}
-
-std::string ConfigManager::getMainCategoryName()
-{
-	return  mMainCategory;
-}
-
-std::string ConfigManager::getHppOutputPath()
-{
-	return mHppOutputPath;
-}
-
-std::string ConfigManager::getDumpJsonLibName()
-{
-	return mDumpJsonLibName;
-}
-
-std::string ConfigManager::getGlobalDumpObjectName()
-{
-	return mGlobalDumpObjName;
-}
-
-std::string ConfigManager::getObfuscationBookPath()
-{
-	return mObfuscationBookPath;
-}
-
 bool ConfigManager::Init()
 {
 	if (FileHelper::IsValidFilePath(mConfigPath, true, true) == false)
@@ -77,7 +42,7 @@ bool ConfigManager::InitDynamicDumpInfo()
 
 		mDumpJsonLibName = mConfigRoot.get<std::string>("dump_json_lib_name", "jsoncpp");
 
-		mObfuscationBookMutationEnabled = mConfigRoot.get<bool>("obf_book_mut_enabled", false);
+		mObfustationBookDoMutate = mConfigRoot.get<bool>("obf_book_do_mutate", false);
 
 		mObfuscationBookPath = mConfigRoot.get<std::string>("obf_book_path", mMainCategory + "_obf_book.json");
 	}
@@ -97,21 +62,7 @@ bool ConfigManager::InitDumpInfo()
 	mHppOutputPath = mConfigRoot.get<std::string>("hpp_output_path", mOutputName + ".hpp");
 	mDeclareGlobalDumpObj = mConfigRoot.get<bool>("declare_dump_global_obj", false);
 	mGlobalDumpObjName = mConfigRoot.get<std::string>("global_dump_obj_name", "g" + mMainCategory + "Offs");
+	mDumpEncrypt = mConfigRoot.get<bool>("dump_encrypt", false);
 
 	return true;
-}
-
-bool ConfigManager::getObfuscationBookMutationEnabled()
-{
-	return mObfuscationBookMutationEnabled;
-}
-
-bool ConfigManager::getDumpDynamic()
-{
-	return mDumpDynamic;
-}
-
-bool ConfigManager::getDeclareGlobalDumpObj()
-{
-	return mDeclareGlobalDumpObj;
 }

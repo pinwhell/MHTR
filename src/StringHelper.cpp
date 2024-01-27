@@ -76,7 +76,8 @@ std::string StringHelper::ReplacePlaceHolders(const std::string& input, std::fun
         acum += *c;
     }
 
-    result += acum;
+    if(acum.empty() == false)
+        result += acum;
 
     return result;
 }

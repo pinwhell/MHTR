@@ -19,20 +19,20 @@ TargetManager::TargetManager()
 
 bool TargetManager::Init()
 {
-	if (FileHelper::IsValidFilePath(mDumpTargetsPath, true, true) == false)
+	if (FileHelper::IsValidFilePath(mConfigMgr->mDumpTargetPath, true, true) == false)
 		return false;
 
-	if (JsonHelper::File2Json(mDumpTargetsPath, mDumpTargetsRoot) == false)
+	if (JsonHelper::File2Json(mConfigMgr->mDumpTargetPath, mDumpTargetsRoot) == false)
 	{
 		printf("Unable to parse DUmp Targets\n");
 		return false;
 	}
 
-	if (mDumpDynamic)
+	if (mConfigMgr->mDumpDynamic)
 	{
-		if (JsonAccesorClassifier::Classify(mDumpJsonLibName, mJsonAccesor) == false)
+		if (JsonAccesorClassifier::Classify(mConfigMgr->mDumpJsonLibName, mJsonAccesor) == false)
 		{
-			printf("\"%s\" Library mistyped or not supported\n", mDumpJsonLibName.c_str());
+			printf("\"%s\" Library mistyped or not supported\n", mConfigMgr->mDumpJsonLibName.c_str());
 			return false;
 		}
 
@@ -40,11 +40,11 @@ bool TargetManager::Init()
 		AddInclude(mJsonAccesor->getGlobalInclude());
 	}
 
-	if (getDumpDynamic())
+	if (mConfigMgr->mDumpEncrypt)
 	{
-		mObfucationManager->setPath(mObfuscationBookPath);
+		mObfucationManager->setPath(mConfigMgr->mObfuscationBookPath);
 		mObfucationManager->setParent(this);
-		mObfucationManager->setObfInfoMutationEnabled(mObfuscationBookMutationEnabled);
+		mObfucationManager->setObfInfoMutationEnabled(mConfigMgr->mObfustationBookDoMutate);
 
 		if (mObfucationManager->Init() == false)
 			return false;
@@ -56,13 +56,13 @@ bool TargetManager::Init()
 	if (InitAllTargets() == false)
 		return false;
 
-	if (mHppOutputPath.empty() == false)
+	if (mConfigMgr->mHppOutputPath.empty() == false)
 	{
-		std::unique_ptr<std::ofstream> mHppOutputFile = std::make_unique<std::ofstream>(mHppOutputPath);
+		std::unique_ptr<std::ofstream> mHppOutputFile = std::make_unique<std::ofstream>(mConfigMgr->mHppOutputPath);
 
 		if (mHppOutputFile->is_open() == false)
 		{
-			printf("Unable to open/create \"%s\"\n", mHppOutputPath.c_str());
+			printf("Unable to open/create \"%s\"\n", mConfigMgr->mHppOutputPath.c_str());
 			return false;
 		}
 
@@ -94,7 +94,7 @@ bool TargetManager::SaveResults()
 	if (SaveHpp() == false)
 		return false;
 	
-	if (getDumpDynamic())
+	if (mConfigMgr->mDumpDynamic)
 	{
 		if (SaveJson() == false)
 			return false;
@@ -124,7 +124,7 @@ bool TargetManager::SaveJson()
 	return bSucess;
 }
 
-bool TargetManager::SaveHpp()
+bool TargetManager::SaveHppRuntime()
 {
 	mHppWriter->AppendPragmaOnce();
 
@@ -132,7 +132,18 @@ bool TargetManager::SaveHpp()
 
 	mHppWriter->AppendNextLine();
 
-	mHppWriter->BeginStruct(mMainCategoryName);
+
+}
+
+bool TargetManager::SaveHppCompileTime()
+{
+	mHppWriter->AppendPragmaOnce();
+
+	WriteHppIncludes();
+
+	mHppWriter->AppendNextLine();
+
+	mHppWriter->BeginStruct(mConfigMgr->mMainCategory);
 
 	/*Inside the struct*/
 	
@@ -142,7 +153,7 @@ bool TargetManager::SaveHpp()
 
 	// Generate Declaration-Definition here staticly 
 
-	if (mDumpDynamic)
+	if (mConfigMgr->mDumpDynamic)
 	{
 		mHppWriter->AppendMacroElse();
 		/*Generate Declaration-only here*/
@@ -150,9 +161,17 @@ bool TargetManager::SaveHpp()
 		WriteHppDynDecls();
 
 		mHppWriter->BeginFunction("void", mDynamicOffsetSetterFuncName, { "const " + mJsonAccesor->getJsonObjFullType() + "& " + mDynamicJsonObjName });
+
+		// Generating Decryption Safeguards
+		mHppWriter->AppendLineOfCode("static bool initialized = false;"); mHppWriter->AppendNextLine();
+		mHppWriter->AppendLineOfCode("if(initialized) return;"); mHppWriter->AppendNextLine();
+
 		/*Generate Definition-only here*/
 		
-		WriteHppDynDefs();
+		WriteHppDynDefs(); 
+		mHppWriter->AppendNextLine();
+
+		mHppWriter->AppendLineOfCode("initialized = true;");
 
 		mHppWriter->EndFunction();
 
@@ -163,12 +182,22 @@ bool TargetManager::SaveHpp()
 	
 	std::vector<StructDeclarationInfo> decls;
 
-	if (mDeclareDumpObject)
-		decls.push_back(StructDeclarationInfo(mGlobalDumpObjName, true, true));
+	if (mConfigMgr->mDeclareGlobalDumpObj)
+		decls.push_back(StructDeclarationInfo(mConfigMgr->mGlobalDumpObjName, true, true));
 
-	mHppWriter->EndStruct(mMainCategoryName, decls);
+	mHppWriter->EndStruct(mConfigMgr->mMainCategory, decls);
 
 	return true;
+}
+
+void TargetManager::setConfigManager(ConfigManager* configMgr)
+{
+	mConfigMgr = configMgr;
+}
+
+ConfigManager* TargetManager::getConfigManager()
+{
+	return mConfigMgr;
 }
 
 void TargetManager::RemoveTarget(DumpTargetGroup* target)
@@ -189,26 +218,11 @@ void TargetManager::AddTarget(std::unique_ptr<DumpTargetGroup>& target)
 	mAllTargets[pDumpTarget] = std::move(target);
 }
 
-void TargetManager::setDumpTargetPath(const std::string& path)
-{
-	mDumpTargetsPath = path;
-}
-
-void TargetManager::setMainCategoryName(const std::string& mainCategoryName)
-{
-	mMainCategoryName = mainCategoryName;
-}
-
-void TargetManager::setHppOutputPath(const std::string& outputPath)
-{
-	mHppOutputPath = outputPath;
-}
-
 bool TargetManager::ReadAllTargets()
 {
 	if (mDumpTargetsRoot.isArray() == false)
 	{
-		printf("Unexpected Format of the \"%s\"\n", mDumpTargetsPath.c_str());
+		printf("Unexpected Format of the \"%s\"\n", mConfigMgr->mDumpTargetPath.c_str());
 		return false;
 	}
 
@@ -230,7 +244,7 @@ bool TargetManager::HandleTargetGroupJson(const JsonValueWrapper& targetGroupRoo
 
 	if (JSON_ASSERT_STR_EMPTY(targetGroupRoot, "macro") == false)
 	{
-		printf("\"macro\" Not present or empty in \"%s\" Targets config\n", mDumpTargetsPath.c_str());
+		printf("\"macro\" Not present or empty in \"%s\" Targets config\n", mConfigMgr->mDumpTargetPath.c_str());
 		return false;
 	}
 
@@ -239,7 +253,7 @@ bool TargetManager::HandleTargetGroupJson(const JsonValueWrapper& targetGroupRoo
 	targetGroup->setTargetManager(this);
 	targetGroup->setDumpTargetDescJson(targetGroupRoot);
 	targetGroup->setParent(this);
-	targetGroup->setTargetJsonPath(mDumpTargetsPath);
+	targetGroup->setTargetJsonPath(mConfigMgr->mDumpTargetPath);
 
 	AddTarget(targetGroup);
 
@@ -251,26 +265,6 @@ HeaderFileManager* TargetManager::getHppWriter()
 	return mHppWriter.get();
 }
 
-void TargetManager::setObfuscationBookMutationEnabled(bool b)
-{
-	mObfuscationBookMutationEnabled = b;
-}
-
-void TargetManager::setDumpDynamic(bool b)
-{
-	mDumpDynamic = b;
-}
-
-void TargetManager::setDeclareGlobalDumpObj(bool b)
-{
-	mDeclareDumpObject = b;
-}
-
-void TargetManager::setGlobalDumpObjectName(const std::string& globalObjName)
-{
-	mGlobalDumpObjName = globalObjName;
-}
-
 void TargetManager::setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor)
 {
 	mJsonAccesor = std::move(accesor);
@@ -279,26 +273,6 @@ void TargetManager::setJsonAccesor(std::unique_ptr<IJsonAccesor>&& accesor)
 IJsonAccesor* TargetManager::getJsonAccesor()
 {
 	return mJsonAccesor.get();
-}
-
-void TargetManager::setDumpJsonLibName(const std::string& dumpJsonLibName)
-{
-	mDumpJsonLibName = dumpJsonLibName;
-}
-
-bool TargetManager::getDumpDynamic()
-{
-	return mDumpDynamic;
-}
-
-void TargetManager::setDynamicOffsetSetterFuncName(const std::string& dynamicOffsetSetterFuncName)
-{
-	mDynamicOffsetSetterFuncName = dynamicOffsetSetterFuncName;
-}
-
-void TargetManager::setObfuscationBookPath(const std::string& obfuscationBookPath)
-{
-	mObfuscationBookPath = obfuscationBookPath;
 }
 
 void TargetManager::WriteHppIncludes()

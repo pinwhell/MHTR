@@ -11,6 +11,7 @@ public:
 	JsonValueWrapper mConfigRoot;
 
 	bool mDumpDynamic;
+	bool mDumpEncrypt;
 
 	std::string mMainCategory;
 	std::string mOutputName;
@@ -21,23 +22,9 @@ public:
 	std::string mObfuscationBookPath;
 
 	bool mDeclareGlobalDumpObj;
-	bool mObfuscationBookMutationEnabled;
-
-
-	void setConfigPath(const std::string& path);
-
-	std::string getDumpTargetPath();
-	std::string getMainCategoryName();
-	std::string getHppOutputPath();
-	std::string getDumpJsonLibName();
-	std::string getGlobalDumpObjectName();
-	std::string getObfuscationBookPath();
+	bool mObfustationBookDoMutate;
 
 	bool Init();
 	bool InitDynamicDumpInfo();
 	bool InitDumpInfo();
-
-	bool getObfuscationBookMutationEnabled();
-	bool getDumpDynamic();
-	bool getDeclareGlobalDumpObj();
 };

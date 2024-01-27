@@ -56,7 +56,12 @@ IJsonAccesor* IFutureResult::getJsonAccesor()
 
 bool IFutureResult::getDumpDynamic()
 {
-	return mTargetMgr->getDumpDynamic();
+	return mTargetMgr->getConfigManager()->mDumpDynamic;
+}
+
+bool IFutureResult::getDumpEncrypt()
+{
+	return mTargetMgr->getConfigManager()->mDumpEncrypt;
 }
 
 void IFutureResult::setMetadata(const JsonValueWrapper& metadata)

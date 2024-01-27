@@ -48,13 +48,13 @@ bool IFutureResultInfo::Init()
 		mObfKey = getObfuscationManager()->getObfKey(mUIdentifierDynamic);
 		mSaltKey = getObfuscationManager()->getSaltKey(mUIdentifierDynamic);
 
-		if (mSaltKey != 0)
+		if (mParent->getDumpEncrypt() && mSaltKey != 0)
 			mUIdentifierDynamic += "_" + std::to_string(mSaltKey);
 
 		mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifierDynamic.c_str(), mUIdentifierDynamic.size()));
 
-		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mObfKey));
-	} else mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));
+		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mParent->getDumpEncrypt() ? mObfKey : 0x0));
+	}/* else mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));*/
 
 	mCanPickAnyResult = getMetadata().get<bool>("pick_any_result", false);
 

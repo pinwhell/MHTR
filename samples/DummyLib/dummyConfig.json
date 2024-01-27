@@ -7,12 +7,12 @@
 
 	"enable_extern" : true,
 	"extern_name" : "g_Offs",
-
+	"dump_encrypt" : false,
 	"dump_dynamic" : true,
 	"dump_json_lib_name" : "jsoncpp",
 
 	"declare_dump_global_obj": true,
 
-	"obf_book_mut_enabled" : false,
+	"obf_book_do_mutate" : false,
 	"obf_book_path" : "dummyObfBook.json",
 }

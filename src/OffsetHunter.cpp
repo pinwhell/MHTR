@@ -18,15 +18,7 @@ bool OffsetHunter::Init()
     if (mConfigManager->Init() == false)
         return false;
 
-    mTargetManager->setDumpTargetPath(mConfigManager->getDumpTargetPath());
-    mTargetManager->setMainCategoryName(mConfigManager->getMainCategoryName());
-    mTargetManager->setHppOutputPath(mConfigManager->getHppOutputPath());
-    mTargetManager->setDumpDynamic(mConfigManager->getDumpDynamic());
-    mTargetManager->setDumpJsonLibName(mConfigManager->getDumpJsonLibName());
-    mTargetManager->setDeclareGlobalDumpObj(mConfigManager->getDeclareGlobalDumpObj());
-    mTargetManager->setGlobalDumpObjectName(mConfigManager->getGlobalDumpObjectName());
-    mTargetManager->setObfuscationBookPath(mConfigManager->getObfuscationBookPath());
-    mTargetManager->setObfuscationBookMutationEnabled(mConfigManager->getObfuscationBookMutationEnabled());
+    mTargetManager->setConfigManager(mConfigManager.get());
 
     if (mTargetManager->Init() == false)
         return false;
@@ -57,7 +49,7 @@ void OffsetHunter::setConfigPath(const std::string& path)
 
     std::filesystem::current_path(parentPath);
 
-    mConfigManager->setConfigPath(absCfgPath.string());
+    mConfigManager->mConfigPath = absCfgPath.string();
 }
 
 CapstoneHelperProvider* OffsetHunter::getCapstoneHelperProvider()

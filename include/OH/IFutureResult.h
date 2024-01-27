@@ -49,6 +49,7 @@ public:
 
 	IJsonAccesor* getJsonAccesor();
 	bool getDumpDynamic();
+	bool getDumpEncrypt();
 
 	void setMetadata(const JsonValueWrapper& metadata);
 	JsonValueWrapper& getMetadata();
