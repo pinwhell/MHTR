@@ -161,6 +161,12 @@ std::string SingleDumpTarget::getCategoryObjectName()
 	return mCategoryObjName;
 }
 
+void SingleDumpTarget::HppRuntimeDecryptionWrite(IJsonAccesor* jsonAccesor)
+{
+	for (auto& futureResult : mFutureResults)
+		futureResult.first->HppRuntimeDecryptionWrite(jsonAccesor);
+}
+
 void SingleDumpTarget::ReportHppIncludes()
 {
 	for (auto& currOff : mFutureResults)
@@ -187,10 +193,10 @@ void SingleDumpTarget::WriteHppDynDecls()
 	EndStruct();
 }
 
-void SingleDumpTarget::WriteHppDynDefs()
+void SingleDumpTarget::WriteHppCompileTimeDefs()
 {
 	for (auto& currOff : mFutureResults)
-		currOff.first->WriteHppDynDefs();
+		currOff.first->WriteHppCompileTimeDefs();
 }
 
 void SingleDumpTarget::BeginStruct()

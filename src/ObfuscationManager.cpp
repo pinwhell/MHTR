@@ -5,6 +5,9 @@
 
 bool ObfuscationManager::Init()
 {
+	if (mConfigMgr == nullptr)
+		return false;
+
 	if (Import() == false)
 		return false;
 	
@@ -13,12 +16,15 @@ bool ObfuscationManager::Init()
 
 bool ObfuscationManager::Import()
 {
-	if (FileHelper::FileExist(mObfuscationInfoBookPath))
+	if (mConfigMgr == nullptr)
+		return false;
+
+	if (FileHelper::FileExist(mConfigMgr->mObfuscationBookPath))
 	{
-		if (FileHelper::IsValidFilePath(mObfuscationInfoBookPath, true, true) == false)
+		if (FileHelper::IsValidFilePath(mConfigMgr->mObfuscationBookPath, true, true) == false)
 			return false;
 
-		if (JsonHelper::File2Json(mObfuscationInfoBookPath, mObfuscationInfoBookRoot) == false)
+		if (FileHelper::FileIsEmpty(mConfigMgr->mObfuscationBookPath) == false && JsonHelper::File2Json(mConfigMgr->mObfuscationBookPath, mObfuscationInfoBookRoot) == false)
 			return false;
 	}
 
@@ -27,7 +33,10 @@ bool ObfuscationManager::Import()
 
 bool ObfuscationManager::Export()
 {
-	return JsonHelper::Json2File(mObfuscationInfoBookRoot, mObfuscationInfoBookPath);
+	if (mConfigMgr == nullptr)
+		return false;
+
+	return JsonHelper::Json2File(mObfuscationInfoBookRoot, mConfigMgr->mObfuscationBookPath);
 }
 
 bool ObfuscationManager::getObfInfoPage(const std::string& uId, JsonValueWrapper& outPage)
@@ -49,7 +58,7 @@ bool ObfuscationManager::getObfInfoPage(const std::string& uId, JsonValueWrapper
 
 bool ObfuscationManager::getObfInfoPageUpdateMutation(const std::string& uId, JsonValueWrapper& outPage)
 {
-	if (mObfInfoMutationEnabled)
+	if (mConfigMgr->mObfustationBookDoMutate)
 		MutatePage(uId);
 
 	return getObfInfoPage(uId, outPage);
@@ -101,12 +110,7 @@ uint32_t ObfuscationManager::getObfKey(const std::string& uId)
 	return page.get<uint32_t>("obf_key", 0);
 }
 
-void ObfuscationManager::setPath(const std::string& path)
+void ObfuscationManager::setConfigManager(ConfigManager* cfgMgr)
 {
-	mObfuscationInfoBookPath = path;
-}
-
-void ObfuscationManager::setObfInfoMutationEnabled(bool b)
-{
-	mObfInfoMutationEnabled = b;
+	mConfigMgr = cfgMgr;
 }

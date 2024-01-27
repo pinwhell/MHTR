@@ -63,6 +63,9 @@ bool ConfigManager::InitDumpInfo()
 	mDeclareGlobalDumpObj = mConfigRoot.get<bool>("declare_dump_global_obj", false);
 	mGlobalDumpObjName = mConfigRoot.get<std::string>("global_dump_obj_name", "g" + mMainCategory + "Offs");
 	mDumpEncrypt = mConfigRoot.get<bool>("dump_encrypt", false);
+	mDumpRuntime = mConfigRoot.get<bool>("dump_runtime", false);
+	mIdentifierSalt = mConfigRoot.get<bool>("identifier_salt", false);
+	mIdentifierHash = mConfigRoot.get<bool>("identifier_hash", false);
 
 	return true;
 }

@@ -10,9 +10,11 @@
 #include <OH/FutureOffsetResultInfo.h>
 
 IFutureResultInfo::IFutureResultInfo()
+	: mSaltKey(0)
+	, mObfKey(0)
 {
 	mStaticResult = std::make_unique<CppLValueRValueWrapper>(); // Will be used for Declaring-defining the static result
-	mDynamicResult = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
+	mStructMemberAccessor = std::make_unique<CppNestedLValueRValueWrapper>(); // Will be used for declaring and defining the dynamic result
 
 	mName = "";
 	mComment = "";
@@ -34,27 +36,27 @@ bool IFutureResultInfo::Init()
 	mStaticResult->setName(mName);
 	mStaticResult->setValue(getCppDefaultRvalue());
 
-	if (mParent->getDumpDynamic())
+	mStructMemberAccessor->setType(getCppDataType());
+	mStructMemberAccessor->PushParentName(mParent->getParent()->getCategoryObjectName());
+	mStructMemberAccessor->setName(mName);
+
+	mUIdentifierDynamic = mStructMemberAccessor->getFullName();   // This will chain all, and will get the full name
+	// for example: mA.mB.mC.mD
+	// so this way can get a unique identifier for this variable
+
+	if (mParent->getIdentifierSalt())
 	{
-		mDynamicResult->setType(getCppDataType());
-		mDynamicResult->PushParentName(mParent->getParent()->getCategoryObjectName());
-		mDynamicResult->setName(mName);
-
-		mUIdentifierDynamic = mDynamicResult->getFullName();   // This will chain all, and will get the full name
-														// for example: mA.mB.mC.mD
-														// so this way can get a unique identifier for this variable
-
-
-		mObfKey = getObfuscationManager()->getObfKey(mUIdentifierDynamic);
 		mSaltKey = getObfuscationManager()->getSaltKey(mUIdentifierDynamic);
-
-		if (mParent->getDumpEncrypt() && mSaltKey != 0)
-			mUIdentifierDynamic += "_" + std::to_string(mSaltKey);
-
+		mUIdentifierDynamicSalted = mUIdentifierDynamic + "_" + std::to_string(mSaltKey);
+		mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifierDynamicSalted.c_str(), mUIdentifierDynamicSalted.size()));
+	} else 
 		mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifierDynamic.c_str(), mUIdentifierDynamic.size()));
 
-		mDynamicResult->setValue(mParent->getJsonAccesor()->genGetUInt(mUIDHash, mParent->getDumpEncrypt() ? mObfKey : 0x0));
-	}/* else mUIDHash = std::to_string((uint32_t)fnv1a_32(mUIdentifier.c_str(), mUIdentifier.size()));*/
+	if (mParent->getDumpEncrypt())
+		mObfKey = getObfuscationManager()->getObfKey(mUIdentifierDynamic);
+
+	if(mParent->getDumpDynamic() || mParent->getDumpRuntime())
+		mStructMemberAccessor->setValue(mParent->getJsonAccesor()->genGetUInt(getUniqueIdentifier(), mParent->getDumpEncrypt() ? mObfKey : 0x0));
 
 	mCanPickAnyResult = getMetadata().get<bool>("pick_any_result", false);
 
@@ -110,7 +112,7 @@ void IFutureResultInfo::WriteHppDynDecls()
 	if (mParent->ResultWasSucessfull() == false)
 		return;
 
-	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDeclaration(), true, getNeedShowComment() == false);
+	getHppWriter()->AppendLineOfCode(mStructMemberAccessor->ComputeDeclaration(), true, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
 	{
@@ -119,12 +121,29 @@ void IFutureResultInfo::WriteHppDynDecls()
 	}
 }
 
-void IFutureResultInfo::WriteHppDynDefs()
+void IFutureResultInfo::WriteHppDef()
 {
 	if (mParent->ResultWasSucessfull() == false)
 		return;
 
-	getHppWriter()->AppendLineOfCode(mDynamicResult->ComputeDefinition(), true, getNeedShowComment() == false);
+	getHppWriter()->AppendLineOfCode(mStructMemberAccessor->ComputeDefinition(), true, getNeedShowComment() == false);
+
+	if (getNeedShowComment())
+	{
+		getHppWriter()->AppendTab();
+		getHppWriter()->AppendComment(mComment);
+	}
+}
+
+void IFutureResultInfo::HppRuntimeDecryptionWrite(IJsonAccesor* jsonAccesor)
+{
+	if (mParent->ResultWasSucessfull() == false)
+		return;
+
+	if(mParent->getIdentifierHash()) 
+		getHppWriter()->AppendLineOfCode("/* " + (mParent->getIdentifierSalt() ? mUIdentifierDynamicSalted : mUIdentifierDynamic) + " */\t", true, false);
+
+	getHppWriter()->AppendLineOfCode(jsonAccesor->genAssign(getUniqueIdentifier(), jsonAccesor->genGetUInt(getUniqueIdentifier(), mObfKey)), mParent->getIdentifierHash() == false, getNeedShowComment() == false);
 
 	if (getNeedShowComment())
 	{
@@ -156,4 +175,9 @@ ObfuscationManager* IFutureResultInfo::getObfuscationManager()
 JsonValueWrapper& IFutureResultInfo::getMetadata()
 {
 	return mParent->getMetadata();
+}
+
+std::string IFutureResultInfo::getUniqueIdentifier()
+{
+	return mParent->getIdentifierHash() ? getUIDHashStr() : (mParent->getIdentifierSalt() ? mUIdentifierDynamicSalted : mUIdentifierDynamic);
 }

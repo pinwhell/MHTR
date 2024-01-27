@@ -59,9 +59,24 @@ bool IFutureResult::getDumpDynamic()
 	return mTargetMgr->getConfigManager()->mDumpDynamic;
 }
 
+bool IFutureResult::getDumpRuntime()
+{
+	return mTargetMgr->getConfigManager()->mDumpRuntime;
+}
+
 bool IFutureResult::getDumpEncrypt()
 {
 	return mTargetMgr->getConfigManager()->mDumpEncrypt;
+}
+
+bool IFutureResult::getIdentifierSalt()
+{
+	return mTargetMgr->getConfigManager()->mIdentifierSalt;
+}
+
+bool IFutureResult::getIdentifierHash()
+{
+	return mTargetMgr->getConfigManager()->mIdentifierHash;
 }
 
 void IFutureResult::setMetadata(const JsonValueWrapper& metadata)
@@ -110,9 +125,14 @@ void IFutureResult::WriteHppDynDecls()
 	mpFutureResultInfo->WriteHppDynDecls();
 }
 
-void IFutureResult::WriteHppDynDefs()
+void IFutureResult::WriteHppCompileTimeDefs()
 {
-	mpFutureResultInfo->WriteHppDynDefs();
+	mpFutureResultInfo->WriteHppDef();
+}
+
+void IFutureResult::HppRuntimeDecryptionWrite(IJsonAccesor* jsonAccesor)
+{
+	mpFutureResultInfo->HppRuntimeDecryptionWrite(jsonAccesor);
 }
 
 void IFutureResult::WriteHppStaticDeclsDefs()

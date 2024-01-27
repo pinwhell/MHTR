@@ -28,7 +28,7 @@ bool TargetManager::Init()
 		return false;
 	}
 
-	if (mConfigMgr->mDumpDynamic)
+	if (mConfigMgr->mDumpDynamic || mConfigMgr->mDumpRuntime)
 	{
 		if (JsonAccesorClassifier::Classify(mConfigMgr->mDumpJsonLibName, mJsonAccesor) == false)
 		{
@@ -40,11 +40,10 @@ bool TargetManager::Init()
 		AddInclude(mJsonAccesor->getGlobalInclude());
 	}
 
-	if (mConfigMgr->mDumpEncrypt)
+	if (mConfigMgr->mDumpEncrypt || mConfigMgr->mIdentifierSalt)
 	{
-		mObfucationManager->setPath(mConfigMgr->mObfuscationBookPath);
+		mObfucationManager->setConfigManager(mConfigMgr);
 		mObfucationManager->setParent(this);
-		mObfucationManager->setObfInfoMutationEnabled(mConfigMgr->mObfustationBookDoMutate);
 
 		if (mObfucationManager->Init() == false)
 			return false;
@@ -91,7 +90,10 @@ void TargetManager::ComputeAll()
 
 bool TargetManager::SaveResults()
 {
-	if (SaveHpp() == false)
+	if (!mConfigMgr->mDumpRuntime && SaveHppCompileTime() == false)
+		return false;
+
+	if (mConfigMgr->mDumpRuntime && SaveHppRuntime() == false)
 		return false;
 	
 	if (mConfigMgr->mDumpDynamic)
@@ -132,7 +134,14 @@ bool TargetManager::SaveHppRuntime()
 
 	mHppWriter->AppendNextLine();
 
+	for (const auto& kv : mAllTargets)
+	{
+		kv.second->HPPRuntimeResultWrite(mJsonAccesor.get());
 
+		mHppWriter->AppendNextLine();
+	}
+
+	return true;
 }
 
 bool TargetManager::SaveHppCompileTime()
@@ -168,8 +177,7 @@ bool TargetManager::SaveHppCompileTime()
 
 		/*Generate Definition-only here*/
 		
-		WriteHppDynDefs(); 
-		mHppWriter->AppendNextLine();
+		WriteHppCompileTimeDefs();
 
 		mHppWriter->AppendLineOfCode("initialized = true;");
 
@@ -296,10 +304,10 @@ void TargetManager::WriteHppDynDecls()
 		kv.second->WriteHppDynDecls();
 }
 
-void TargetManager::WriteHppDynDefs()
+void TargetManager::WriteHppCompileTimeDefs()
 {
 	for (const auto& kv : mAllTargets)
-		kv.second->WriteHppDynDefs();
+		kv.second->WriteHppCompileTimeDefs();
 }
 
 CapstoneHelperProvider* TargetManager::getCapstoneHelperProvider()

@@ -6,8 +6,9 @@
 #include "ILValueRValueWrapper.h"
 #include "INestedLValueRValueWrapper.h"
 #include "IChild.h"
+#include <OH/IJsonAccesor.h>
 
-#define ERR_INVALID_OFFSET ((uint64_t)0xFFFFFFFFFFFFFFFF)
+#define ERR_INVALID_OFFSET ((uint64_t)~0ull)
 
 class IFutureResult;
 struct HeaderFileManager;
@@ -19,13 +20,14 @@ private:
 	std::string mName;
 	std::string mUIdentifier;
 	std::string mUIdentifierDynamic;
+	std::string mUIdentifierDynamicSalted;
 	std::string mUIDHash;
 	std::string mComment; // If there is no comment available then this will be empty
 	bool mCanPickAnyResult;
 
 protected:
 	std::unique_ptr<ILValueRValueWrapper> mStaticResult;
-	std::unique_ptr<INestedLValueRValueWrapper> mDynamicResult; // Why nested? well, basicly we need to do, chainig struct
+	std::unique_ptr<INestedLValueRValueWrapper> mStructMemberAccessor; // Why nested? well, basicly we need to do, chainig struct
 																// objects to be able to modify/acess the desired offset
 																// for ex. mA.mB.mC = 0xXYZ;
 
@@ -48,7 +50,9 @@ public:
 	virtual void ReportHppIncludes() {};
 	virtual void WriteHppStaticDeclsDefs();
 	virtual void WriteHppDynDecls();
-	virtual void WriteHppDynDefs();
+	virtual void WriteHppDef();
+
+	virtual void HppRuntimeDecryptionWrite(IJsonAccesor* jsonAccesor);
 
 	HeaderFileManager* getHppWriter();
 
@@ -62,4 +66,9 @@ public:
 
 	virtual std::string getCppDataType() = 0;
 	virtual std::string getCppDefaultRvalue() = 0;
+
+
+
+
+	std::string getUniqueIdentifier();
 };

@@ -7,6 +7,7 @@
 #include "JsonValueWrapper.h"
 #include "IChild.h"
 #include "IBinaryFormat.h"
+#include <OH/IJsonAccesor.h>
 
 class DumpTargetGroup;
 struct HeaderFileManager;
@@ -45,10 +46,12 @@ public:
 
 	std::string getCategoryObjectName();
 
+	void HppRuntimeDecryptionWrite(IJsonAccesor* jsonAccesor);
+
 	void ReportHppIncludes();
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
-	void WriteHppDynDefs();
+	void WriteHppCompileTimeDefs();
 	void BeginStruct();
 	void EndStruct();
 

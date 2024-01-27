@@ -11,7 +11,10 @@ public:
 	JsonValueWrapper mConfigRoot;
 
 	bool mDumpDynamic;
+	bool mDumpRuntime;
 	bool mDumpEncrypt;
+	bool mIdentifierSalt;
+	bool mIdentifierHash;
 
 	std::string mMainCategory;
 	std::string mOutputName;

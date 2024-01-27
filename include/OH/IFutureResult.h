@@ -42,14 +42,19 @@ public:
 	void ReportHppIncludes();
 	void WriteHppStaticDeclsDefs(); // This structs arround need to be refactored to handle general stuffs, not just offsets,
 	void WriteHppDynDecls(); // Code structure is done, just refactoring names, and key specific structures
-	void WriteHppDynDefs();
+	void WriteHppCompileTimeDefs();
+
+	void HppRuntimeDecryptionWrite(IJsonAccesor* jsonAccesor);
 
 	void setTargetManager(TargetManager* pTarget);
 	TargetManager* getTargetManager();
 
 	IJsonAccesor* getJsonAccesor();
 	bool getDumpDynamic();
+	bool getDumpRuntime();
 	bool getDumpEncrypt();
+	bool getIdentifierSalt();
+	bool getIdentifierHash();
 
 	void setMetadata(const JsonValueWrapper& metadata);
 	JsonValueWrapper& getMetadata();

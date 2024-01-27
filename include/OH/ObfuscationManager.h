@@ -3,6 +3,7 @@
 #include "JsonValueWrapper.h"
 #include <unordered_set>
 #include "IChild.h"
+#include <OH/ConfigManager.h>
 
 class TargetManager;
 
@@ -17,10 +18,10 @@ just like a book, where the pages are each "[identifier]" : {
 class ObfuscationManager : public IChild<TargetManager>
 {
 private:
-	std::string mObfuscationInfoBookPath;
 	JsonValueWrapper mObfuscationInfoBookRoot;
-	bool mObfInfoMutationEnabled;
 	std::unordered_set<std::string> mMutatedUIDs;
+
+	ConfigManager* mConfigMgr;
 
 	bool getObfInfoPage(const std::string& uId, JsonValueWrapper& outPage);
 	bool getObfInfoPageUpdateMutation(const std::string& uId, JsonValueWrapper& outPage);
@@ -38,8 +39,6 @@ public:
 	uint32_t getSaltKey(const std::string& uId);
 	uint32_t getObfKey(const std::string& uId);
 
-	void setPath(const std::string& path);
-
-	void setObfInfoMutationEnabled(bool b);
+	void setConfigManager(ConfigManager* cfgMgr);
 };
 

@@ -112,6 +112,18 @@ bool DumpTargetGroup::ReadAllTarget()
     return true;
 }
 
+void DumpTargetGroup::HPPRuntimeResultWrite(IJsonAccesor* jsonAccesor)
+{
+    getHppWriter()->BeginFunction("void", getMacro() + "Decrypt", {
+        jsonAccesor->getJsonObjFullType() + "& " + jsonAccesor->getJsonObjectName()
+        });
+
+    for (auto& target : mTargets)
+        target.first->HppRuntimeDecryptionWrite(jsonAccesor);
+
+    getHppWriter()->EndFunction();
+}
+
 void DumpTargetGroup::ReportHppIncludes()
 {
     if (mTargets.size() < 1)
@@ -147,7 +159,7 @@ void DumpTargetGroup::WriteHppDynDecls()
     MacroEnd();
 }
 
-void DumpTargetGroup::WriteHppDynDefs()
+void DumpTargetGroup::WriteHppCompileTimeDefs()
 {
     if (mTargets.size() < 1)
         return;
@@ -155,7 +167,7 @@ void DumpTargetGroup::WriteHppDynDefs()
     MacroBegin();
 
     for (auto& kv : mTargets)
-        kv.first->WriteHppDynDefs();
+        kv.first->WriteHppCompileTimeDefs();
 
     MacroEnd();
 }

@@ -10,6 +10,11 @@ std::string IJsonAccesor::genGetUInt(const std::string& key, uint32_t xorend)
     return genJsonAccess(key) + genXorend(xorend);
 }
 
+std::string IJsonAccesor::genAssign(const std::string& key, const std::string& what)
+{
+    return genJsonAccess(key) + " = " + what + ";";
+}
+
 std::string IJsonAccesor::genJsonAccess(const std::string& key)
 {
     return mJsonObjName + "[\"" + key + "\"]";
@@ -33,4 +38,9 @@ std::string IJsonAccesor::getGlobalInclude()
 std::string IJsonAccesor::getJsonObjFullType()
 {
     return "";
+}
+
+std::string IJsonAccesor::getJsonObjectName()
+{
+    return mJsonObjName;
 }

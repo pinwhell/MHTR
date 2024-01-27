@@ -190,10 +190,14 @@ void HeaderFileManager::BeginFunction(const std::string& retType, const std::str
 		traits << params[i];
 	}; 
 	traits << ") {"; AppendNextLine();
+
+	m_TabLevel++;
 }
 
 void HeaderFileManager::EndFunction()
 {
+	m_TabLevel--;
+
 	std::ostream& traits = *m_Traits;
 
 	AppendTab(m_TabLevel);  traits << "}"; AppendNextLine();

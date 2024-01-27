@@ -62,7 +62,21 @@ public:
 	void WriteHppIncludes();
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
-	void WriteHppDynDefs();
+
+
+	/*Will Generate Compiletime/Runtime Conditional Definitions for all targets*/
+	/*Where each target have its sub-fields, ej.*/
+
+	/*
+#ifdef TARGET
+	mTarget.mSubField1 = ...;
+	mTarget.mSubField2 = ...;
+	...
+#endif
+	*/
+
+	void WriteHppCompileTimeDefs();
+	void TargetsWriteCompileTime();
 	CapstoneHelperProvider* getCapstoneHelperProvider();
 	ObfuscationManager* getObfuscationManager();
 

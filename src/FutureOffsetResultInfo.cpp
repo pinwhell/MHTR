@@ -61,12 +61,12 @@ void FutureOffsetResultInfo::WriteHppDynDecls()
 	IFutureResultInfo::WriteHppDynDecls();
 }
 
-void FutureOffsetResultInfo::WriteHppDynDefs()
+void FutureOffsetResultInfo::WriteHppDef()
 {
 	if (mFinalOffset == ERR_INVALID_OFFSET)
 		return;
 
-	IFutureResultInfo::WriteHppDynDefs();
+	IFutureResultInfo::WriteHppDef();
 }
 
 void FutureOffsetResultInfo::OnParentTargetFinish()

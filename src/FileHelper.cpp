@@ -70,3 +70,13 @@ bool FileHelper::ReadFileBinary(const std::string& filePath, std::vector<unsigne
 	return true;
 }
 
+bool FileHelper::FileIsEmpty(const std::string& filePath)
+{
+	std::string fileContent = "";
+
+	if (ReadFile(filePath, fileContent) == false)
+		return false;
+
+	return fileContent.empty();
+}
+

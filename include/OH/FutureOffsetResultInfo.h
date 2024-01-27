@@ -19,7 +19,7 @@ public:
 	void ReportHppIncludes() override;
 	void WriteHppStaticDeclsDefs() override;
 	void WriteHppDynDecls() override;
-	void WriteHppDynDefs() override;
+	void WriteHppDef() override;
 
 	void OnParentTargetFinish() override;
 

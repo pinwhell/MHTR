@@ -5,6 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include "IChild.h"
+#include <OH/IJsonAccesor.h>
 
 struct HeaderFileManager;
 
@@ -29,10 +30,12 @@ public:
 
 	bool ReadAllTarget();
 
+	void HPPRuntimeResultWrite(IJsonAccesor* jsonAccesor);
+
 	void ReportHppIncludes();
 	void WriteHppStaticDeclsDefs();
 	void WriteHppDynDecls();
-	void WriteHppDynDefs();
+	void WriteHppCompileTimeDefs();
 	void MacroBegin();
 	void MacroEnd();
 	HeaderFileManager* getHppWriter();
