@@ -27,8 +27,6 @@ int OffsetHunterCLI::Run(int argc, const char** argv)
     }
 
     std::string configPath = args["config"].as<std::string>();
-    
-    std::filesystem::current_path(std::filesystem::path(configPath).parent_path());
 
     dumper->setConfigPath(configPath);
 

@@ -1,6 +1,5 @@
 {
 	"output_name" : "DummyOffsetMgr",
-
 	"main_category" : "OffMgr",
 
 	"dump_targets_path" : "dummyTargets.json",

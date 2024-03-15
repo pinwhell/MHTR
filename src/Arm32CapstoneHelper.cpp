@@ -184,21 +184,35 @@ bool Arm32CapstoneHelper::InstDisasmFollow(cs_insn* pInstBegin, cs_insn* pInstEn
         if ((curr < pInstEnd) == false)
             return false;
 
-        if (curr->id != ARM_INS_ADD)
-            continue;
-
         if ((ArmCapstoneAux::RegisterPresent(curr, followRegId) && ArmCapstoneAux::RegisterPresent(curr, ARM_REG_PC)) == false)
             continue;
 
-        if ((curr->detail->arm.operands[1].reg == followRegId ||
-            curr->detail->arm.operands[2].reg == followRegId) == false)
+        switch (curr->id)
+        {
+        default:
             continue;
+
+        case ARM_INS_ADD:
+            if ((curr->detail->arm.operands[1].reg == followRegId ||
+                curr->detail->arm.operands[2].reg == followRegId) == false)
+                continue;
+            else break;
+
+        case ARM_INS_LDR:
+        case ARM_INS_STR:
+            if (curr->detail->arm.operands[1].type == ARM_OP_MEM &&
+                (curr->detail->arm.operands[1].mem.base == followRegId ||
+                    curr->detail->arm.operands[1].mem.index == followRegId) == false)
+                continue;
+            else break;
+        }
 
         uint64_t currInstPc = getPcFromInstruction(curr);
         uint64_t currInstPcBinRelOff = currInstPc - mBase;
 
         // At this point an
         // ADD Rx, Rx, Rx was found, having our follow reg and pc, lets add PC and return result
+     // or STR/LDR Rx, [PC, Rx]
 
         outLocationDisp = currInstPcBinRelOff + followRegContent;
         break;

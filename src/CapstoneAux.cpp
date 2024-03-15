@@ -20,6 +20,12 @@ bool ArmCapstoneAux::RegisterPresent(cs_insn* pInst, uint16_t reg)
 {
     for (int i = 0; i != pInst->detail->arm.op_count; i++)
     {
+        const auto currOperand = pInst->detail->arm.operands[i];
+
+        if (currOperand.type == ARM_OP_MEM &&
+            (currOperand.mem.base == reg || currOperand.mem.index == reg))
+            return true;
+
         if (pInst->detail->arm.operands[i].reg == reg)
             return true;
     }
