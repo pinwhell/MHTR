@@ -5,7 +5,7 @@
 
 bool IOffsetScanAlgo::Init()
 {
-	mMainDisp = mAlgoMetadata.get<int64_t>("disp", 0);
+	mMainDisp = JsonUint64Get(mAlgoMetadata, "disp");
 
 	mTryInterpret = mAlgoMetadata.get<bool>("interpret", true);
 	mTryFollow = mAlgoMetadata.get<bool>("follow", false);

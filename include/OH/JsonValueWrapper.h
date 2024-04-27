@@ -23,6 +23,20 @@ public:
 
 };
 
+inline uint64_t JsonUint64Get(const JsonValueWrapper& val, const char* name)
+{
+	if (val[name].isUInt())
+		return val.get<uint32_t>(name, 0);
+
+	if (val[name].isUInt64())
+		return val.get<uint64_t>(name, 0);
+
+	if (val[name].isString())
+		return strtoll(val[name].asCString(), nullptr, 16);
+
+	return 0;
+}
+
 
 template<typename T>
 inline T JsonValueWrapper::get(const std::string& key, T def) const

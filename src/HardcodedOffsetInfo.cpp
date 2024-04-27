@@ -17,8 +17,8 @@ void HardcodedResultInfo::Compute()
 {
     IFutureResult::Compute();
 
-    uintptr_t value = mMetadata.get<uintptr_t>("value", 0);
-    size_t disp = mMetadata.get<uintptr_t>("disp", 0);
+    uintptr_t value = JsonUint64Get(mMetadata, "value");
+    size_t disp = JsonUint64Get(mMetadata, "disp");
 
     mFutureResultInfo.setFinalOffset(value + disp);
 
