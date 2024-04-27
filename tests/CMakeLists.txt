@@ -1,3 +1,0 @@
-add_executable(SampleTest sampleTest.cpp)
-
-target_link_libraries(SampleTest OffsetHunter)
