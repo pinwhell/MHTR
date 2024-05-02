@@ -4,3 +4,6 @@
 [submodule "vendor/cxxopts"]
 	path = vendor/cxxopts
 	url = https://github.com/jarro2783/cxxopts
+[submodule "vendor/doctest"]
+	path = vendor/doctest
+	url = https://github.com/doctest/doctest
