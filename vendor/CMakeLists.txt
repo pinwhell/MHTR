@@ -1,3 +1,10 @@
-if(NOT BUILD_TESTS)
+if(BUILD_TESTS)
 	add_subdirectory(doctest)
 endif()
+
+set (TBS_MT OFF)
+add_subdirectory(TBS)
+add_subdirectory(json)
+add_subdirectory(fmt)
+add_subdirectory(capstone)
+add_subdirectory(ELFPP)

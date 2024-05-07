@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project (OffsetHunter)
+project (MetadataHunter)
 
 option(BUILD_TESTS "Build tests" ON)
 
