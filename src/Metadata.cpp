@@ -5,6 +5,8 @@
 #include <PatternScan.h>
 #include <iostream>
 
+#include <CStone/CStone.h>
+
 template<>
 std::string Metadata<uint64_t>::ToString() const {
 	std::stringstream ss;

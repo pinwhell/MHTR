@@ -6,9 +6,10 @@
 #include <capstone/capstone.h>
 #include <ELFPP.hpp>
 #include <fmt/core.h>
-#include <Capstone.h>
 #include <TBS.hpp>
 #include <PatternScan.h>
+#include <BinFmt/ELF.h>
+#include <CStone/CStone.h>
 
 template<typename ResultT, typename T>
 ResultT ARM32PCFollow(ICapstone* capstone, T at, uint64_t disp = 0)
@@ -77,18 +78,7 @@ ResultT ARM32LDRLongLEATryFollow(ICapstone* capstone, T at, bool bDerref = false
     return res;
 }
 
-class ELFView : public ICapstoneFactory {
-    using EELFMachine = ELFPP::EMachine;
 
-public:
-
-    ELFView(const BufferView& view);
-
-    std::unique_ptr<ICapstone> CreateCapstoneInstance(bool bDetailedInst = true);
-
-    BufferView mView;
-    std::unique_ptr<ELFPP::IELF> mELF;
-};
 
 void BasicScan()
 {
@@ -130,8 +120,8 @@ void RawELF()
     try {
         FileView fileView("libdrm.so");
         BufferView buffView = BufferViewFromFileView(fileView);
-        ELFView elfView(buffView);
-        ELFPP::IELF& elf = *(elfView.mELF);
+        ELFBuffer ELFBuffer(buffView);
+        ELFPP::IELF& elf = *(ELFBuffer.mELF);
     }
     catch (const std::exception& e)
     {
@@ -178,8 +168,8 @@ void TestCapstone()
     try {
         FileView fileView("libdummy.so");
         BufferView buffView = BufferViewFromFileView(fileView);
-        ELFView elfView(buffView);
-        CapstoneTSafeInstanceProvider capstoneInstanceProvider(&elfView);
+        ELFBuffer ELFBuffer(buffView);
+        CapstoneTSafeInstanceProvider capstoneInstanceProvider(&ELFBuffer);
 
         std::thread t([&capstoneInstanceProvider, &buffView] {
             // PoC Thread Safe Instancer
@@ -225,8 +215,8 @@ void TestImmediateLookup()
     try {
         FileView fileView("libdummy.so");
         BufferView buffView = BufferViewFromFileView(fileView);
-        ELFView elfView(buffView);
-        std::unique_ptr<ICapstone> capstone = elfView.CreateCapstoneInstance();
+        ELFBuffer ELFBuffer(buffView);
+        std::unique_ptr<ICapstone> capstone = ELFBuffer.CreateCapstoneInstance();
         MetadataTarget target("Example");
         PatternScanAddresses addresses(buffView, "?0 ?8 ?1 ?0", 0);
         InsnImmediateLookup immLookup(target,&addresses, &buffView, capstone.get(), 0);
@@ -260,12 +250,12 @@ const cs_insn* CsInsn::operator->() const
     return &mInsn;
 }
 
-ELFView::ELFView(const BufferView& view)
+ELFBuffer::ELFBuffer(const BufferView& view)
     : mView(view)
     , mELF(ELFPP::FromBuffer(view.start()))
 {}
 
-std::unique_ptr<ICapstone> ELFView::CreateCapstoneInstance(bool bDetailedInst)
+std::unique_ptr<ICapstone> ELFBuffer::CreateCapstoneInstance(bool bDetailedInst)
 {
     auto machine = mELF->GetTargetMachine();
     ECapstoneArchMode archMode{ ECapstoneArchMode::UNDEFINED };

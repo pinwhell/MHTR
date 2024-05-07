@@ -5,10 +5,11 @@
 #include <atomic>
 #include <mutex>
 
+#include <CStone/ICapstone.h>
+
 #include <ILookable.h>
 #include <IAddressesProvider.h>
 #include <BufferView.h>
-#include <Capstone.h>
 
 constexpr auto METADATA_OFFSET_INVALID = -1;
 constexpr auto METADATA_STRING_INVALID = "";

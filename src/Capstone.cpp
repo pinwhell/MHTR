@@ -1,4 +1,5 @@
-#include <Capstone.h>
+#include <CStone/CStone.h>
+#include <CStone/Arch/ARM.h>
 #include <fmt/core.h>
 
 Capstone::Capstone(cs_arch arch, cs_mode mode, bool bDetailedDisasm)
