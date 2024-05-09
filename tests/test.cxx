@@ -10,10 +10,10 @@
 
 #include <CStone/CStone.h>
 #include <CStone/Factory.h>
-#include <CStone/Arch/ARM.h>
 #include <CStone/Provider.h>
+#include <CStone/Arch/ARM/32/Capstone.h>
 
-#include <Arch/ARM/FarAddressResolver.h>
+#include <Arch/ARM/32/FarAddressResolver.h>
 
 #include <FarAddressLookup.h>
 #include <RangeProvider.h>
@@ -86,7 +86,7 @@ void TestCapstone(IMetadataLookupContextProvider* metdtContextProvider)
                 "{}\n",
                 fmt::ptr(
                     (void*)buffView.OffsetFromBase(
-                        ARM32FarPcRelLEATryResolve<uint64_t>(
+                        (uint64_t)ARM32FarPcRelLEATryResolve(
                             capstone,
                             buffView.start<char*>() + 0x1BAC
                         )
@@ -282,7 +282,7 @@ ARM32FarAddressResolver::ARM32FarAddressResolver(ICapstone* capstone)
 
 uint64_t ARM32FarAddressResolver::TryResolve(uint64_t at, bool bDerref)
 {
-    return ARM32FarPcRelLEATryResolve<uint64_t>(mCapstone, at, bDerref);
+    return (uint64_t)ARM32FarPcRelLEATryResolve(mCapstone, (void*)at, bDerref);
 }
 
 ProcedureRangeProvider::ProcedureRangeProvider(ICapstone* capstone, IProcedureEntryProvider* procEntryProvider)

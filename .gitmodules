@@ -22,3 +22,6 @@
 [submodule "vendor/ELFPP"]
 	path = vendor/ELFPP
 	url = https://github.com/pinwhell/ELFPP
+[submodule "vendor/CStone"]
+	path = vendor/CStone
+	url = https://github.com/pinwhell/CStone
