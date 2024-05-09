@@ -1,6 +1,23 @@
 #include <CStone/CStone.h>
+#include <CStone/Factory.h>
+#include <CStone/Provider.h>
 #include <CStone/Arch/ARM.h>
+
 #include <fmt/core.h>
+
+static bool InsnIsBranch(const cs_insn* pInsn)
+{
+    bool bIsBranch = pInsn->id == ARM_INS_B || pInsn->id == ARM_INS_BX;
+    bool bIsBranchLink = pInsn->id == ARM_INS_BL || pInsn->id == ARM_INS_BLX;
+    bool bIsBranchAny = bIsBranch || bIsBranchLink;
+
+    return bIsBranchAny;
+}
+
+static bool InsnHasCondition(const cs_insn* pInsn)
+{
+    return pInsn->detail->arm.cc != ARMCC_AL;
+}
 
 Capstone::Capstone(cs_arch arch, cs_mode mode, bool bDetailedDisasm)
     : mhCapstone(0)
@@ -38,7 +55,7 @@ CsInsn Capstone::DisassembleOne(const void* start, uint64_t pcAddr)
     InsnForEach(start, [&r](const CsInsn& insn) {
         r = insn;
         return false;
-        }, SIZE_MAX, pcAddr);
+        }, pcAddr);
 
     if (r->address != pcAddr)
         throw DismFailedException(fmt::format("Addr:{} disassembly failed", fmt::ptr(start)));
@@ -46,7 +63,7 @@ CsInsn Capstone::DisassembleOne(const void* start, uint64_t pcAddr)
     return r;
 }
 
-void Capstone::InsnForEach(const void* _start, std::function<bool(const CsInsn& insn)> callback, size_t buffSize, uint64_t pcAddr)
+void Capstone::InsnForEach(const void* _start, std::function<bool(const CsInsn& insn)> callback, uint64_t pcAddr, size_t buffSize)
 {
     const uint8_t* start = (const uint8_t*)_start;
     const uint8_t* curr = start;
@@ -59,6 +76,11 @@ void Capstone::InsnForEach(const void* _start, std::function<bool(const CsInsn& 
 }
 
 ICapstoneUtility* Capstone::getUtility() {
+    return nullptr;
+}
+
+ICapstoneHeuristic* Capstone::getHeuristic()
+{
     return nullptr;
 }
 
@@ -89,6 +111,11 @@ ICapstoneUtility* ARM32Capstone::getUtility() {
     return &mUtility;
 }
 
+ICapstoneHeuristic* ARM32Capstone::getHeuristic()
+{
+    return &mHeuristic;
+}
+
 CapstoneDismHandle ARM32Capstone::Disassemble(const void* start, size_t nBytes, uint64_t pcAddr) {
     return mCapstone.Disassemble(start, nBytes, pcAddr);
 }
@@ -98,9 +125,9 @@ CsInsn ARM32Capstone::DisassembleOne(const void* start, uint64_t pcAddr)
     return mCapstone.DisassembleOne(start, pcAddr);
 }
 
-void ARM32Capstone::InsnForEach(const void* _start, std::function<bool(const CsInsn& insn)> callback, size_t buffSize, uint64_t pcAddr)
+void ARM32Capstone::InsnForEach(const void* _start, std::function<bool(const CsInsn& insn)> callback, uint64_t pcAddr, size_t buffSize)
 {
-    mCapstone.InsnForEach(_start, callback, buffSize, pcAddr);
+    mCapstone.InsnForEach(_start, callback, pcAddr, buffSize);
 }
 
 bool ARM32CapstoneUtility::InsnHasRegister(const cs_insn* pIns, uint16_t reg) const
@@ -135,6 +162,16 @@ uint16_t ARM32CapstoneUtility::InsnGetPseudoDestReg(const cs_insn* pIns) const
     return 0;
 }
 
+bool ARM32CapstoneUtility::InsnHasCondition(const cs_insn* pInsn) const
+{
+    return ::InsnHasCondition(pInsn);
+}
+
+bool ARM32CapstoneUtility::InsnIsBranch(const cs_insn* pInsn) const
+{
+    return ::InsnIsBranch(pInsn);
+}
+
 CapstoneFactory::CapstoneFactory(ECapstoneArchMode archMode)
     : mArchMode(archMode)
 {}
@@ -160,3 +197,57 @@ DismFailedException::DismFailedException(const std::string& what)
 CapstoneCreationFailedException::CapstoneCreationFailedException(const std::string& what)
     : std::runtime_error(what)
 {}
+
+CsInsn::CsInsn()
+{
+    memset(&mInsn, 0x0, sizeof(mInsn));
+    memset(&mDetail, 0x0, sizeof(mDetail));
+    mInsn.detail = &mDetail;
+}
+
+const cs_insn* CsInsn::operator->() const
+{
+    return &mInsn;
+}
+
+bool ARM32CapstoneHeuristic::InsnIsProcedureEntry(const cs_insn* pInsn) const {
+    return
+        pInsn->detail->arm.cc == ARMCC_AL &&
+        pInsn->id == ARM_INS_PUSH &&
+        CapstoneUtility::InsnHasRegister(pInsn->detail->arm, ARM_REG_LR);
+}
+
+bool ARM32CapstoneHeuristic::InsnIsProcedureExit(const cs_insn* pInsn) const {
+    bool foundUnconditionalPopPc =
+        pInsn->detail->arm.cc == ARMCC_AL &&
+        pInsn->id == ARM_INS_POP &&
+        CapstoneUtility::InsnHasRegister(pInsn->detail->arm, ARM_REG_PC);
+
+    bool foundBranchLinkReg =
+        pInsn->id == ARM_INS_BX &&
+        CapstoneUtility::InsnHasRegister(pInsn->detail->arm, ARM_REG_LR);
+
+    return foundUnconditionalPopPc || foundBranchLinkReg;
+}
+
+CapstoneConcurrentInstanceProvider::CapstoneConcurrentInstanceProvider(ICapstoneFactory* defFactory)
+    : mDefaultFactory(defFactory)
+{}
+
+ICapstone* CapstoneConcurrentInstanceProvider::GetInstance(bool bDetailedInstuction, ICapstoneFactory* _factory)
+{
+    std::thread::id this_id = std::this_thread::get_id();
+
+    std::unique_lock<std::mutex> lock(mMutex);
+    while (mInstances.find(this_id) == mInstances.end()) {
+        ICapstoneFactory* factory = _factory ? _factory : mDefaultFactory;
+
+        if (factory == nullptr)
+            return nullptr;
+
+        // This thread doesn't have a Capstone object yet, so create one.
+        mInstances[this_id] = factory->CreateCapstoneInstance(bDetailedInstuction);
+    }
+
+    return mInstances[this_id].get();
+}

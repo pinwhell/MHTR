@@ -4,5 +4,5 @@
 
 class IRelativeDispProvider {
 public:
-    virtual uint64_t OffsetFromBase(uint64_t what) = 0;
+    virtual uint64_t OffsetFromBase(uint64_t what) const = 0;
 };

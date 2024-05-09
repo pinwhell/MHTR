@@ -2,8 +2,6 @@
 
 #include <stdexcept>
 #include <CStone/ICapstone.h>
-#include <CStone/Factory.h>
-#include <CStone/Utility.h>
 
 class DismFailedException : public std::runtime_error {
 public:
@@ -17,8 +15,9 @@ public:
 
     CapstoneDismHandle Disassemble(const void* _start, size_t nBytes, uint64_t pcAddr = 0) override;
     CsInsn DisassembleOne(const void* start, uint64_t pcAddr = 0) override;
-    void InsnForEach(const void* start, std::function<bool(const CsInsn& insn)> callback, size_t buffSize = SIZE_MAX, uint64_t pcAddr = 0) override;
+    void InsnForEach(const void* start, std::function<bool(const CsInsn& insn)> callback, uint64_t pcAddr = 0, size_t buffSize = SIZE_MAX) override;
     ICapstoneUtility* getUtility() override;
+    ICapstoneHeuristic* getHeuristic() override;
 
     csh mhCapstone;
 };

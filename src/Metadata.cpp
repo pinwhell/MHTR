@@ -114,7 +114,7 @@ void PatternSingleResultLookup::Lookup()
 	TBS::Pattern::Results res;
 	PatternScanOrExceptWithName(mTarget.mName, mScanRange, mPattern, res, true);
 
-	mTarget.TrySetResult(MetadataResult(res[0]));
+	mTarget.TrySetResult(MetadataResult(mScanRange.OffsetFromBase(res[0])));
 }
 
 InsnImmediateLookup::InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstone* capstone, size_t immIndex)
@@ -150,10 +150,10 @@ void InsnImmediateLookup::Lookup()
 	}
 
 	if (immResults.size() < 1)
-		throw std::runtime_error(fmt::format("'{}' no immediates found.", mTarget.mName));
+		throw MetadataLookupException(fmt::format("'{}' no immediates found.", mTarget.mName));
 
 	if (immResults.size() > 1)
-		throw std::runtime_error(fmt::format("'{}' multiple instruction immediates", mTarget.mName));
+		throw MetadataLookupException(fmt::format("'{}' multiple instruction immediates", mTarget.mName));
 
 	mTarget.TrySetResult(MetadataResult(*immResults.begin()));
 }

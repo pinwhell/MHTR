@@ -19,7 +19,7 @@ struct BufferView : public IRelativeDispProvider {
         return (T)mEnd;
     }
 
-    inline uint64_t OffsetFromBase(uint64_t what) override
+    inline uint64_t OffsetFromBase(uint64_t what) const override
     {
         return what - start<uint64_t>();
     }

@@ -5,6 +5,7 @@
 #include <string>
 #include <stdexcept>
 #include <TBS.hpp>
+#include <IRangeProvider.h>
 
 class PatternScanException : public std::runtime_error {
 public:
@@ -16,11 +17,11 @@ void PatternScanOrExceptWithName(const std::string& name, const BufferView& scan
 
 class PatternScanAddresses : public IAddressesProvider {
 public:
-    PatternScanAddresses(const BufferView& scanRange, const std::string& pattern, int64_t resDisp = 0);
+    PatternScanAddresses(IRangeProvider* scanRangeProvider, const std::string& pattern, int64_t resDisp = 0);
 
     std::vector<uint64_t> GetAllAddresses() override;
 
-    BufferView mScanRange;
+    IRangeProvider* mScanRangeProvider;
     std::string mPattern;
     int64_t mDisp;
 };

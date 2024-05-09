@@ -24,8 +24,8 @@ void PatternScanOrExceptWithName(const std::string& name, const BufferView& scan
 	}
 }
 
-PatternScanAddresses::PatternScanAddresses(const BufferView& scanRange, const std::string& pattern, int64_t resDisp)
-    : mScanRange(scanRange)
+PatternScanAddresses::PatternScanAddresses(IRangeProvider* scanRangeProvider, const std::string& pattern, int64_t resDisp)
+    : mScanRangeProvider(scanRangeProvider)
     , mPattern(pattern)
     , mDisp(resDisp)
 {}
@@ -33,7 +33,9 @@ PatternScanAddresses::PatternScanAddresses(const BufferView& scanRange, const st
 std::vector<uint64_t> PatternScanAddresses::GetAllAddresses()
 {
     std::vector<uint64_t> results;
-    PatternScanOrExcept(mScanRange, mPattern, results, false);
+	BufferView scanRange = mScanRangeProvider->GetRange();
+
+    PatternScanOrExcept(scanRange, mPattern, results, false);
 
     for (auto& result : results)
         result += mDisp;
