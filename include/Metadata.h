@@ -7,8 +7,9 @@
 
 #include <CStone/ICapstone.h>
 
+#include <Provider/IAddresses.h>
+
 #include <ILookable.h>
-#include <IAddressesProvider.h>
 #include <BufferView.h>
 
 constexpr auto METADATA_OFFSET_INVALID = -1;

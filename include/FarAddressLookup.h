@@ -1,9 +1,10 @@
 #pragma once
 
 #include <Metadata.h>
-#include <IAddressesProvider.h>
-#include <IFarAddressResolver.h>
-#include <IRelativeDispProvider.h>
+
+#include <Resolver/IFarAddress.h>
+#include <Provider/IAddresses.h>
+#include <Provider/IRelativeDisp.h>
 
 class FarAddressLookup : public ILookable {
 public:

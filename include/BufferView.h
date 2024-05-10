@@ -1,6 +1,6 @@
 #pragma once
 
-#include <IRelativeDispProvider.h>
+#include <Provider/IRelativeDisp.h>
 
 struct BufferView : public IRelativeDispProvider {
     inline BufferView(const void* buff, size_t len)

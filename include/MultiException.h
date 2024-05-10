@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdexcept>
-#include <sstream>
 #include <string>
 #include <vector>
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <IAddressesProvider.h>
+#include <Provider/IAddresses.h>
+#include <Provider/IRange.h>
 #include <BufferView.h>
 #include <string>
 #include <stdexcept>
 #include <TBS.hpp>
-#include <IRangeProvider.h>
 
 class PatternScanException : public std::runtime_error {
 public:

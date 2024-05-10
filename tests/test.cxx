@@ -1,26 +1,21 @@
 #include <iostream>
+#include <filesystem>
+
 #include <fmt/core.h>
+#include <BinFmt/ELF.h>
+#include <Provider/Range.h>
+#include <Provider/AsmExtractedProcedureEntry.h>
+#include <Provider/ProcedureRange.h>
+#include <CStone/Provider.h>
+#include <Arch/ARM/32/Resolver/FarAddress.h>
 
 #include <Metadata.h>
-
-#include <FileBufferView.h>
 #include <PatternScan.h>
-
-#include <BinFmt/ELF.h>
-
-#include <CStone/CStone.h>
-#include <CStone/Factory.h>
-#include <CStone/Provider.h>
-#include <CStone/Arch/ARM/32/Capstone.h>
-
-#include <Arch/ARM/32/FarAddressResolver.h>
-
+#include <FileBufferView.h>
 #include <FarAddressLookup.h>
-#include <RangeProvider.h>
-#include <ProcedureRangeProvider.h>
-#include <AsmExtractedProcedureEntryProvider.h>
 
-#include <MultiException.h>
+
+
 
 class IMetadataLookupContextProvider {
 public:
@@ -82,17 +77,17 @@ void TestCapstone(IMetadataLookupContextProvider* metdtContextProvider)
             if (t.joinable())
                 t.join(); // Wait thread finish
 
-            std::cout << fmt::format(
-                "{}\n",
-                fmt::ptr(
-                    (void*)buffView.OffsetFromBase(
-                        (uint64_t)ARM32FarPcRelLEATryResolve(
-                            capstone,
-                            buffView.start<char*>() + 0x1BAC
-                        )
-                    )
-                )
-            );
+            //std::cout << fmt::format(
+            //    "{}\n",
+            //    fmt::ptr(
+            //        (void*)buffView.OffsetFromBase(
+            //            (uint64_t)ARM32FarPcRelLEATryResolve(
+            //                capstone,
+            //                buffView.start<char*>() + 0x1BAC
+            //            )
+            //        )
+            //    )
+            //);
         }
         catch (const std::exception& e)
         {
@@ -188,198 +183,4 @@ int main(int argc, const char** argv)
     }
 
     return 0;
-}
-
-ELFBuffer::ELFBuffer(const BufferView& view)
-    : mView(view)
-    , mELF(ELFPP::FromBuffer(view.start()))
-{}
-
-std::unique_ptr<ICapstone> ELFBuffer::CreateCapstoneInstance(bool bDetailedInst)
-{
-    auto machine = mELF->GetTargetMachine();
-    ECapstoneArchMode archMode{ ECapstoneArchMode::UNDEFINED };
-
-    switch (machine)
-    {
-    case EELFMachine::ARM:
-    {
-        if (mELF->Is64())
-            archMode = ECapstoneArchMode::AARCH64_ARM;
-        else
-            archMode = ELFPP::ARMIsThumb(mELF.get()) ? ECapstoneArchMode::ARM32_THUMB : ECapstoneArchMode::ARM32_ARM;
-        break;
-    }
-
-    default:
-        break;
-    }
-
-    return CapstoneFactory(archMode).CreateCapstoneInstance(bDetailedInst);
-}
-
-MultiException::MultiException(const std::vector<std::string>& exceptions)
-    : std::runtime_error(""), mExceptions(exceptions) {}
-
-const char* MultiException::what() const noexcept {
-    std::stringstream ss;
-
-    for (size_t i = 0; i < mExceptions.size(); ++i)
-        ss << "\n" << mExceptions[i];
-
-    mFullException = ss.str();
-
-    return mFullException.c_str();
-}
-
-FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IRelativeDispProvider* dispCalculator, bool bDeref)
-    : mTarget(target)
-    , mInsnAddressesProvider(insnAddrsProvider)
-    , mFarAddressResolver(farAddrResolver)
-    , mDispCalculator(dispCalculator)
-    , mDeref(bDeref)
-{}
-
-void FarAddressLookup::Lookup()
-{
-    if (mTarget.ResultIsFound())
-        return;
-
-    std::vector<uint64_t> insnAddresses = mInsnAddressesProvider->GetAllAddresses();
-    std::unordered_set<uint64_t> addrRes;
-
-    std::vector<std::string> errs;
-
-    for (const auto insnAddr : insnAddresses)
-    {
-        try {
-            auto farAddr = mFarAddressResolver->TryResolve(insnAddr, mDeref);
-            addrRes.insert(mDispCalculator->OffsetFromBase(farAddr));
-        }
-        catch (const std::exception& e)
-        {
-            errs.push_back(e.what());
-        }
-    }
-
-    if (addrRes.size() < 1)
-    {
-        if (errs.empty())
-            throw MetadataLookupException(fmt::format("'{}' no far-addresses found.", mTarget.mName));
-        else
-            throw MetadataLookupException(fmt::format("'{}' {}", mTarget.mName, MultiException(errs).what()));
-    }
-
-    if (addrRes.size() > 1)
-        throw MetadataLookupException(fmt::format("'{}' multiple diferent far-addresses found.", mTarget.mName));
-
-    mTarget.TrySetResult(MetadataResult(*addrRes.begin()));
-}
-
-ARM32FarAddressResolver::ARM32FarAddressResolver(ICapstone* capstone)
-    : mCapstone(capstone)
-{}
-
-uint64_t ARM32FarAddressResolver::TryResolve(uint64_t at, bool bDerref)
-{
-    return (uint64_t)ARM32FarPcRelLEATryResolve(mCapstone, (void*)at, bDerref);
-}
-
-ProcedureRangeProvider::ProcedureRangeProvider(ICapstone* capstone, IProcedureEntryProvider* procEntryProvider)
-    : mCapstone(capstone)
-    , mProcEntryProvider(procEntryProvider)
-{}
-
-BufferView ProcedureRangeProvider::GetRange() {
-    uint64_t procEntry = mProcEntryProvider->GetEntry();
-    uint64_t procEnd = 0;
-    ICapstoneHeuristic* heuristic = mCapstone->getHeuristic();
-
-    mCapstone->InsnForEach((void*)procEntry, [&](const CsInsn& curr) {
-        auto currDisp = curr->address;
-        uint64_t currAddr = procEntry + currDisp;
-
-        procEnd = currAddr + curr->size;
-
-        if (heuristic->InsnIsProcedureEntry(&curr.mInsn) && currDisp)
-        {
-            // At this point, seems current instruciton 
-            // is a procedure entry from anoter procedure
-            // probably we missed the epilog of the 
-            // mProcEntry or, it didnt have any, 
-            // just like the case of non-return functions
-
-            return false;
-        }
-
-        return heuristic->InsnIsProcedureExit(&curr.mInsn) == false;
-        }, 0);
-
-    if (!procEnd)
-        throw std::runtime_error("procedure end lookup failed");
-
-    return BufferView((void*)procEntry, procEnd - procEntry);
-}
-
-AsmExtractedProcedureEntryProvider::AsmExtractedProcedureEntryProvider(ICapstone* capstone, IAddressesProvider* adressesProvider)
-    : mCapstone(capstone)
-    , mAddressesProvider(adressesProvider)
-{}
-
-uint64_t AsmExtractedProcedureEntryProvider::GetEntry()
-{
-    std::vector<uint64_t> addresses = mAddressesProvider->GetAllAddresses();
-    std::unordered_set<uint64_t> procAddresses;
-
-    ICapstoneUtility* utility = mCapstone->getUtility();
-
-    std::vector<std::string> allErrs;
-
-    for (const auto addr : addresses)
-    {
-        try {
-            auto insn = mCapstone->DisassembleOne((void*)addr, 0);
-
-            if (utility->InsnIsBranch(&insn.mInsn) == false)
-            {
-                // Treating the address as 
-                // a normal procedure entry
-
-                procAddresses.insert(addr);
-                continue;
-            }
-
-            // Seems to be a type of branch. 
-            // lets extract the disp
-
-            uint64_t callDisp = utility->InsnGetImmByIndex(&insn.mInsn, 0);
-            uint64_t callDst = addr + callDisp;
-
-            // Successfully solved, saving
-
-            procAddresses.insert(callDst);
-
-        }
-        catch (std::exception& e)
-        {
-            allErrs.push_back(e.what());
-        }
-    }
-
-    if (procAddresses.size() > 1)
-        throw "multiple procedure entry found";
-
-    if (procAddresses.size() < 1)
-        throw MultiException(allErrs);
-
-    return *procAddresses.begin();
-}
-
-RangeProvider::RangeProvider(const BufferView& buffView)
-    : mBuffView(buffView)
-{}
-
-BufferView RangeProvider::GetRange()
-{
-    return mBuffView;
 }

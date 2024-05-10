@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cstdint>
+
 #include <CStone/ICapstone.h>
-#include <IFarAddressResolver.h>
+#include <Resolver/IFarAddress.h>
 
 class ARM32FarAddressResolver : public IFarAddressResolver {
 public:

@@ -2,8 +2,8 @@
 
 #include <CStone/ICapstone.h>
 
-#include <IProcedureEntryProvider.h>
-#include <IAddressesProvider.h>
+#include <Provider/IProcedureEntry.h>
+#include <Provider/IAddresses.h>
 
 class AsmExtractedProcedureEntryProvider : public IProcedureEntryProvider {
 public:

@@ -13,7 +13,7 @@ public:
 
     ELFBuffer(const BufferView& view);
 
-    std::unique_ptr<ICapstone> CreateCapstoneInstance(bool bDetailedInst = true);
+    std::unique_ptr<ICapstone> CreateInstance(bool bDetailedInst = true);
 
     BufferView mView;
     std::unique_ptr<ELFPP::IELF> mELF;

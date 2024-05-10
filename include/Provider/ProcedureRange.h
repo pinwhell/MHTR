@@ -2,8 +2,8 @@
 
 #include <CStone/ICapstone.h>
 
-#include <IProcedureEntryProvider.h>
-#include <IRangeProvider.h>
+#include <Provider/IProcedureEntry.h>
+#include <Provider/IRange.h>
 
 class ProcedureRangeProvider : public IRangeProvider {
 public:
