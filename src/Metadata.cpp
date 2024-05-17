@@ -44,7 +44,9 @@ MetadataResult::~MetadataResult()
 
 MetadataResult& MetadataResult::operator=(const MetadataResult& other)
 {
-	switch (other.mType)
+	mType = other.mType;
+
+	switch (mType)
 	{
 	case EMetadataResult::OFFSET:
 		mOffset = other.mOffset;
@@ -70,11 +72,21 @@ std::string MetadataResult::ToString() const {
 	return "";
 }
 
-MetadataTarget::MetadataTarget(const std::string& name)
-	: mName(name)
+MetadataTarget::MetadataTarget(const std::string& name, INamespace* ns)
+	: mFullIdentifier(name, ns)
 	, mResult(0)
-	, mDone(false)
+	, mHasResult(false)
 {}
+
+std::string MetadataTarget::GetName() const
+{
+	return mFullIdentifier.mIdentifier;
+}
+
+std::string MetadataTarget::GetFullName() const
+{
+	return mFullIdentifier.GetFullIdentifier();
+}
 
 MetadataLookupException::MetadataLookupException(const std::string& what)
 	: std::runtime_error(what)
@@ -91,11 +103,11 @@ void PatternCheckLookup::Lookup() { Check(); }
 
 void PatternCheckLookup::Check()
 {
-	if (mTarget.ResultIsFound())
+	if (mTarget.mHasResult)
 		return;
 
 	TBS::Pattern::Results res;
-	PatternScanOrExceptWithName(mTarget.mName, mScanRange, mPattern, res, mbUniqueLookup);
+	PatternScanOrExceptWithName(mTarget.mFullIdentifier.GetFullIdentifier(), mScanRange, mPattern, res, mbUniqueLookup);
 
 	mTarget.TrySetResult(MetadataResult(mPattern));
 }
@@ -108,11 +120,11 @@ PatternSingleResultLookup::PatternSingleResultLookup(MetadataTarget& target, con
 
 void PatternSingleResultLookup::Lookup()
 {
-	if (mTarget.ResultIsFound())
+	if (mTarget.mHasResult)
 		return;
 
 	TBS::Pattern::Results res;
-	PatternScanOrExceptWithName(mTarget.mName, mScanRange, mPattern, res, true);
+	PatternScanOrExceptWithName(mTarget.mFullIdentifier.GetFullIdentifier(), mScanRange, mPattern, res, true);
 
 	mTarget.TrySetResult(MetadataResult(mScanRange.OffsetFromBase(res[0])));
 }
@@ -127,7 +139,7 @@ InsnImmediateLookup::InsnImmediateLookup(MetadataTarget& target, IAddressesProvi
 
 void InsnImmediateLookup::Lookup()
 {
-	if (mTarget.ResultIsFound())
+	if (mTarget.mHasResult)
 		return;
 
 	std::vector<uint64_t> insnAddresses = mInsnAddrsProvider->GetAllAddresses();
@@ -141,19 +153,37 @@ void InsnImmediateLookup::Lookup()
 		}
 		catch (DismFailedException& e)
 		{
-			std::cout << fmt::format("'{}':'{}' diassembly failed\n", mTarget.mName, fmt::ptr((void*)mRelDispProvider->OffsetFromBase(insnResult)));
+			std::cout << fmt::format("'{}':'{}' diassembly failed\n", mTarget.GetFullName(), fmt::ptr((void*)mRelDispProvider->OffsetFromBase(insnResult)));
 		}
 		catch (std::exception& e)
 		{
-			std::cout << fmt::format("'{}':'{}':{}\n", mTarget.mName, fmt::ptr((void*)mRelDispProvider->OffsetFromBase(insnResult)), e.what());
+			std::cout << fmt::format("'{}':'{}':{}\n", mTarget.GetFullName(), fmt::ptr((void*)mRelDispProvider->OffsetFromBase(insnResult)), e.what());
 		}
 	}
 
 	if (immResults.size() < 1)
-		throw MetadataLookupException(fmt::format("'{}' no immediates found.", mTarget.mName));
+		throw MetadataLookupException(fmt::format("'{}' no immediates found.", mTarget.GetFullName()));
 
 	if (immResults.size() > 1)
-		throw MetadataLookupException(fmt::format("'{}' multiple instruction immediates", mTarget.mName));
+		throw MetadataLookupException(fmt::format("'{}' multiple instruction immediates", mTarget.GetFullName()));
 
 	mTarget.TrySetResult(MetadataResult(*immResults.begin()));
+}
+
+std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespacedMap(const std::vector<MetadataTarget*>& targets)
+{
+	std::unordered_map<std::string, std::vector<MetadataTarget*>> result;
+
+	for (auto* target : targets)
+	{
+		const INamespace* targetNs = target->mFullIdentifier.mNamespace;
+		std::string targetNsStr = targetNs ? targetNs->GetNamespace() : METADATA_NULL_NS;
+
+		if (result.find(targetNsStr) == result.end())
+			result[targetNsStr] = std::vector<MetadataTarget*>();
+
+		result[targetNsStr].push_back(target);
+	}
+
+	return result;
 }

@@ -8,14 +8,13 @@
 #include <Provider/ProcedureRange.h>
 #include <CStone/Provider.h>
 #include <Arch/ARM/32/Resolver/FarAddress.h>
+#include <Synther/Namespace.h>
 
 #include <Metadata.h>
 #include <PatternScan.h>
 #include <FileBufferView.h>
 #include <FarAddressLookup.h>
-
-
-
+#include <MetadataSynthers.h>
 
 class IMetadataLookupContextProvider {
 public:
@@ -100,11 +99,12 @@ void TestImmediateLookup(IMetadataLookupContextProvider* metdtContextProvider)
 {
     metdtContextProvider->ContextProvide([](BufferView& buffView, ICapstoneInstanceProvider* capstoneInstancer) {
         try {
-            ICapstone* capstone = capstoneInstancer->GetInstance();
             MetadataTarget target("Example");
+            ICapstone* capstone = capstoneInstancer->GetInstance();
             RangeProvider rangeProvider(buffView);
             PatternScanAddresses addresses(&rangeProvider, "?0 ?8 ?1 ?0", 0);
             InsnImmediateLookup immLookup(target, &addresses, &buffView, capstone, 0);
+
             immLookup.Lookup();
         }
         catch (const std::exception& e)
@@ -126,6 +126,11 @@ void FarAddressLookupTest(IMetadataLookupContextProvider* metdtContextProvider)
             FarAddressLookup stackCheckGuardAddr(target, &addressesProvider, &addrResolver, &buffView, false);
 
             stackCheckGuardAddr.Lookup();
+
+            auto lines = MultiNsMultiMetadataStaticSynther({ &target }).Synth();
+
+            for (const auto& line : lines)
+                std::cout << line << std::endl;
 
             std::cout << std::hex << stackCheckGuardAddr.mTarget.mResult.mOffset << std::endl;
         }
@@ -153,7 +158,7 @@ private:
     CapstoneConcurrentInstanceProvider mCapstoneInstanceProvider;
 };
 
-int main(int argc, const char** argv)
+void RunMetadataTests()
 {
     try {
         std::filesystem::current_path(MHR_SAMPLES_DIR);
@@ -181,6 +186,44 @@ int main(int argc, const char** argv)
     {
         std::cerr << e.what() << std::endl;
     }
+}
+
+void TestDumpMetadata()
+{
+    Namespace n1("Foo");
+    Namespace n2("Bar");
+
+    MetadataTarget r1("foo", &n1); r1.TrySetResult(MetadataResult("AA BB CC"));
+    MetadataTarget r2("bar", &n2); r2.TrySetResult(MetadataResult(0x10));
+
+    std::vector<MetadataTarget*> targets{
+        &r1,
+        &r2
+    };
+
+    auto lines = MultiNsMultiMetadataStaticSynther(targets).Synth();
+
+    for (const auto& line : lines)
+        std::cout << line << std::endl;
+}
+
+void TestNamespaces()
+{
+    Namespace outer("Outer");
+    Namespace inner("Inner", &outer);
+    Namespace bar("Bar", &inner);
+    Namespace foo("Foo", &bar);
+    NamespacedIdentifier baz("baz", &foo);
+
+    std::cout << baz.GetFullIdentifier(true) << std::endl;
+}
+
+int main(int argc, const char** argv)
+{
+    //TestDumpMetadata();
+    //TestNamespaces();
+    //RunMetadataTests();
+
 
     return 0;
 }

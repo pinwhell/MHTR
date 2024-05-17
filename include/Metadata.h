@@ -9,11 +9,15 @@
 
 #include <Provider/IAddresses.h>
 
+#include <Synther/NamespacedIdentifier.h>
+
 #include <ILookable.h>
 #include <BufferView.h>
 
 constexpr auto METADATA_OFFSET_INVALID = -1;
 constexpr auto METADATA_STRING_INVALID = "";
+constexpr auto METADATA_NULL_NS = "";
+
 
 template<typename T>
 struct Metadata {
@@ -72,31 +76,26 @@ public:
 };
 
 struct MetadataTarget {
-	MetadataTarget(const std::string& name);
-
-	bool ResultIsFound()
-	{
-		std::lock_guard lck(mResultMtx);
-
-		return mDone;
-	}
+	MetadataTarget(const std::string& name, INamespace* ns = nullptr);
 
 	bool TrySetResult(const MetadataResult&& result)
 	{
-		std::lock_guard lck(mResultMtx);
-
-		if (mDone)
+		bool _false = false;
+		
+		if (mHasResult.compare_exchange_strong(_false, true) == false)
 			return false;
 
 		mResult = result;
 
-		return mDone = true;
+		return true;
 	}
 
-	std::string mName;
-	bool mDone;
+	std::string GetName() const;
+	std::string GetFullName() const;
+
+	NamespacedIdentifier mFullIdentifier;
+	std::atomic<bool> mHasResult;
 	MetadataResult mResult;
-	std::mutex mResultMtx;
 };
 
 class PatternCheckLookup : public ILookable {
@@ -137,3 +136,5 @@ public:
 	MetadataTarget& mTarget;
 	size_t mImmIndex;
 };
+
+std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespacedMap(const std::vector<MetadataTarget*>& targets);

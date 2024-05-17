@@ -14,7 +14,7 @@ FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* i
 
 void FarAddressLookup::Lookup()
 {
-    if (mTarget.ResultIsFound())
+    if (mTarget.mHasResult)
         return;
 
     std::vector<uint64_t> insnAddresses = mInsnAddressesProvider->GetAllAddresses();
@@ -37,13 +37,13 @@ void FarAddressLookup::Lookup()
     if (addrRes.size() < 1)
     {
         if (errs.empty())
-            throw MetadataLookupException(fmt::format("'{}' no far-addresses found.", mTarget.mName));
+            throw MetadataLookupException(fmt::format("'{}' no far-addresses found.", mTarget.GetFullName()));
         else
-            throw MetadataLookupException(fmt::format("'{}' {}", mTarget.mName, MultiException(errs).what()));
+            throw MetadataLookupException(fmt::format("'{}' {}", mTarget.GetFullName(), MultiException(errs).what()));
     }
 
     if (addrRes.size() > 1)
-        throw MetadataLookupException(fmt::format("'{}' multiple diferent far-addresses found.", mTarget.mName));
+        throw MetadataLookupException(fmt::format("'{}' multiple diferent far-addresses found.", mTarget.GetFullName()));
 
     mTarget.TrySetResult(MetadataResult(*addrRes.begin()));
 }
