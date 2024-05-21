@@ -78,6 +78,18 @@ MetadataTarget::MetadataTarget(const std::string& name, INamespace* ns)
 	, mHasResult(false)
 {}
 
+bool MetadataTarget::TrySetResult(const MetadataResult&& result)
+{
+	bool _false = false;
+
+	if (mHasResult.compare_exchange_strong(_false, true) == false)
+		return false;
+
+	mResult = result;
+
+	return true;
+}
+
 std::string MetadataTarget::GetName() const
 {
 	return mFullIdentifier.mIdentifier;
@@ -92,7 +104,7 @@ MetadataLookupException::MetadataLookupException(const std::string& what)
 	: std::runtime_error(what)
 {}
 
-PatternCheckLookup::PatternCheckLookup(MetadataTarget& target, const BufferView& scanRange, const std::string& pattern, bool bUniqueLookup)
+PatternCheckLookup::PatternCheckLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern, bool bUniqueLookup)
 	: mTarget(target)
 	, mScanRange(scanRange)
 	, mPattern(pattern)
@@ -100,6 +112,10 @@ PatternCheckLookup::PatternCheckLookup(MetadataTarget& target, const BufferView&
 {}
 
 void PatternCheckLookup::Lookup() { Check(); }
+
+MetadataTarget* PatternCheckLookup::GetTarget() {
+	return &mTarget;
+}
 
 void PatternCheckLookup::Check()
 {
@@ -112,7 +128,7 @@ void PatternCheckLookup::Check()
 	mTarget.TrySetResult(MetadataResult(mPattern));
 }
 
-PatternSingleResultLookup::PatternSingleResultLookup(MetadataTarget& target, const BufferView& scanRange, const std::string& pattern)
+PatternSingleResultLookup::PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern)
 	: mTarget(target)
 	, mScanRange(scanRange)
 	, mPattern(pattern)
@@ -123,14 +139,20 @@ void PatternSingleResultLookup::Lookup()
 	if (mTarget.mHasResult)
 		return;
 
+	BufferView bv = mScanRange->GetRange();
+
 	TBS::Pattern::Results res;
 	PatternScanOrExceptWithName(mTarget.mFullIdentifier.GetFullIdentifier(), mScanRange, mPattern, res, true);
 
-	mTarget.TrySetResult(MetadataResult(mScanRange.OffsetFromBase(res[0])));
+	mTarget.TrySetResult(MetadataResult(bv.OffsetFromBase(res[0])));
 }
 
-InsnImmediateLookup::InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstone* capstone, size_t immIndex)
-	: mCapstone(capstone)
+MetadataTarget* PatternSingleResultLookup::GetTarget() {
+	return &mTarget;
+}
+
+InsnImmediateLookup::InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstoneProvider* cstoneProvider, size_t immIndex)
+	: mCStoneProvider(cstoneProvider)
 	, mTarget(target)
 	, mInsnAddrsProvider(insnAddrsProvider)
 	, mRelDispProvider(relDispProvider)
@@ -142,14 +164,15 @@ void InsnImmediateLookup::Lookup()
 	if (mTarget.mHasResult)
 		return;
 
+	ICapstone* cstone = mCStoneProvider->GetInstance();
 	std::vector<uint64_t> insnAddresses = mInsnAddrsProvider->GetAllAddresses();
 	std::unordered_set<uint64_t> immResults;
 
 	for (const auto& insnResult : insnAddresses)
 	{
 		try {
-			CapstoneDismHandle hInsns = mCapstone->Disassemble((void*)insnResult, 0x20);
-			immResults.insert(mCapstone->getUtility()->InsnGetImmByIndex(hInsns.mpFirst, mImmIndex));
+			CapstoneDismHandle hInsns = cstone->Disassemble((void*)insnResult, 0x20);
+			immResults.insert(cstone->getUtility()->InsnGetImmByIndex(hInsns.mpFirst, mImmIndex));
 		}
 		catch (DismFailedException& e)
 		{
@@ -168,6 +191,10 @@ void InsnImmediateLookup::Lookup()
 		throw MetadataLookupException(fmt::format("'{}' multiple instruction immediates", mTarget.GetFullName()));
 
 	mTarget.TrySetResult(MetadataResult(*immResults.begin()));
+}
+
+MetadataTarget* InsnImmediateLookup::GetTarget() {
+	return &mTarget;
 }
 
 std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespacedMap(const std::vector<MetadataTarget*>& targets)

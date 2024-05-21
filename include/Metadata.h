@@ -5,7 +5,7 @@
 #include <atomic>
 #include <mutex>
 
-#include <CStone/ICapstone.h>
+#include <CStone/IProvider.h>
 
 #include <Provider/IAddresses.h>
 
@@ -14,10 +14,11 @@
 #include <ILookable.h>
 #include <BufferView.h>
 
+#include <Provider/IRange.h>
+
 constexpr auto METADATA_OFFSET_INVALID = -1;
 constexpr auto METADATA_STRING_INVALID = "";
 constexpr auto METADATA_NULL_NS = "";
-
 
 template<typename T>
 struct Metadata {
@@ -78,17 +79,7 @@ public:
 struct MetadataTarget {
 	MetadataTarget(const std::string& name, INamespace* ns = nullptr);
 
-	bool TrySetResult(const MetadataResult&& result)
-	{
-		bool _false = false;
-		
-		if (mHasResult.compare_exchange_strong(_false, true) == false)
-			return false;
-
-		mResult = result;
-
-		return true;
-	}
+	bool TrySetResult(const MetadataResult&& result);
 
 	std::string GetName() const;
 	std::string GetFullName() const;
@@ -98,14 +89,20 @@ struct MetadataTarget {
 	MetadataResult mResult;
 };
 
-class PatternCheckLookup : public ILookable {
+class ILookableMetadata : public ILookable {
 public:
-	PatternCheckLookup(MetadataTarget& target, const BufferView& scanRange, const std::string& pattern, bool bUniqueLookup = true);
+	virtual MetadataTarget* GetTarget() = 0;
+};
+
+class PatternCheckLookup : public ILookableMetadata {
+public:
+	PatternCheckLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern, bool bUniqueLookup = true);
 
 	void Lookup() override;
+	MetadataTarget* GetTarget() override;
 
 	MetadataTarget& mTarget;
-	BufferView mScanRange;
+	IRangeProvider* mScanRange;
 	std::string mPattern;
 	bool mbUniqueLookup;
 
@@ -113,26 +110,28 @@ private:
 	void Check();
 };
 
-class PatternSingleResultLookup : public ILookable {
+class PatternSingleResultLookup : public ILookableMetadata {
 public:
-	PatternSingleResultLookup(MetadataTarget& target, const BufferView& scanRange, const std::string& pattern);
+	PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern);
 
 	void Lookup() override;
+	MetadataTarget* GetTarget() override;
 
 	MetadataTarget& mTarget;
-	BufferView mScanRange;
+	IRangeProvider* mScanRange;
 	std::string mPattern;
 };
 
-class InsnImmediateLookup : public ILookable {
+class InsnImmediateLookup : public ILookableMetadata {
 public:
-	InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstone* capstone, size_t immIndex = 0);
+	InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstoneProvider* cstoneProvider, size_t immIndex = 0);
 
 	void Lookup() override;
+	MetadataTarget* GetTarget() override;
 
 	IAddressesProvider* mInsnAddrsProvider;
 	IRelativeDispProvider* mRelDispProvider;
-	ICapstone* mCapstone;
+	ICapstoneProvider* mCStoneProvider;
 	MetadataTarget& mTarget;
 	size_t mImmIndex;
 };

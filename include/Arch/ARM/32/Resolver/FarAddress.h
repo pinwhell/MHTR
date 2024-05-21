@@ -2,14 +2,14 @@
 
 #include <cstdint>
 
-#include <CStone/ICapstone.h>
+#include <CStone/IProvider.h>
 #include <Resolver/IFarAddress.h>
 
 class ARM32FarAddressResolver : public IFarAddressResolver {
 public:
-    ARM32FarAddressResolver(ICapstone* capstone);
+    ARM32FarAddressResolver(ICapstoneProvider* cstoneProvider);
 
     uint64_t TryResolve(uint64_t at, bool bDerref = false) override;
 
-    ICapstone* mCapstone;
+    ICapstoneProvider* mCStoneProvider;
 };

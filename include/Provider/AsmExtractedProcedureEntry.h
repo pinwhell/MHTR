@@ -1,6 +1,6 @@
 #pragma once
 
-#include <CStone/ICapstone.h>
+#include <CStone/IProvider.h>
 
 #include <Provider/IProcedureEntry.h>
 #include <Provider/IAddresses.h>
@@ -8,10 +8,10 @@
 class AsmExtractedProcedureEntryProvider : public IProcedureEntryProvider {
 public:
 
-    AsmExtractedProcedureEntryProvider(ICapstone* capstone, IAddressesProvider* adressesProvider);
+    AsmExtractedProcedureEntryProvider(ICapstoneProvider* cstoneProvider, IAddressesProvider* adressesProvider);
 
     uint64_t GetEntry() override;
 
-    ICapstone* mCapstone;
+    ICapstoneProvider* mCStoneProvider;
     IAddressesProvider* mAddressesProvider;
 };

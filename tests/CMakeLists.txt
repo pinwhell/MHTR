@@ -8,5 +8,5 @@ foreach(MHR_TEST_SRC ${MHR_TESTS_SRCS})
 	target_link_libraries(${MHR_TEST_NAME} MetadataHunter doctest_with_main)
 endforeach()
 
-add_executable(Test test.cxx )
-target_link_libraries(Test MetadataHunter)
+add_executable(MetadataAndGeneralTests MetadataAndGeneralTests.cxx)
+target_link_libraries(MetadataAndGeneralTests MetadataHunter)

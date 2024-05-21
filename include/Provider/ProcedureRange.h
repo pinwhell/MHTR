@@ -1,16 +1,16 @@
 #pragma once
 
-#include <CStone/ICapstone.h>
+#include <CStone/IProvider.h>
 
 #include <Provider/IProcedureEntry.h>
 #include <Provider/IRange.h>
 
 class ProcedureRangeProvider : public IRangeProvider {
 public:
-    ProcedureRangeProvider(ICapstone* capstone, IProcedureEntryProvider* procEntryProvider);
+    ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider);
 
     BufferView GetRange() override;
 
-    ICapstone* mCapstone;
+    ICapstoneProvider* mCStoneProvider;
     IProcedureEntryProvider* mProcEntryProvider;
 };

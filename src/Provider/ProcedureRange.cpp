@@ -2,21 +2,20 @@
 
 #include <stdexcept>
 
-ProcedureRangeProvider::ProcedureRangeProvider(ICapstone* capstone, IProcedureEntryProvider* procEntryProvider)
-    : mCapstone(capstone)
+ProcedureRangeProvider::ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider)
+    : mCStoneProvider(cstoneProvider)
     , mProcEntryProvider(procEntryProvider)
 {}
 
 BufferView ProcedureRangeProvider::GetRange() {
     uint64_t procEntry = mProcEntryProvider->GetEntry();
     uint64_t procEnd = 0;
-    ICapstoneHeuristic* heuristic = mCapstone->getHeuristic();
+    ICapstone* cstone = mCStoneProvider->GetInstance();
+    ICapstoneHeuristic* heuristic = cstone->getHeuristic();
 
-    mCapstone->InsnForEach((void*)procEntry, [&](const CsInsn& curr) {
+    cstone->InsnForEach((void*)procEntry, [&](const CsInsn& curr) {
         auto currDisp = curr->address;
         uint64_t currAddr = procEntry + currDisp;
-
-        procEnd = currAddr + curr->size;
 
         if (heuristic->InsnIsProcedureEntry(&curr.mInsn) && currDisp)
         {
@@ -28,6 +27,8 @@ BufferView ProcedureRangeProvider::GetRange() {
 
             return false;
         }
+
+        procEnd = currAddr + curr->size;
 
         return heuristic->InsnIsProcedureExit(&curr.mInsn) == false;
         }, 0);
