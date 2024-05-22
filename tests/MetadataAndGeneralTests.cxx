@@ -378,11 +378,6 @@ private:
     }
 };
 
-struct MetadataTargetIR {
-    std::string mName;
-    std::string mNamespace;
-};
-
 struct MetadataScanComboIR {
     MetadataScanRangeIR mScanRange;
     PatternScanConfigIR mScanCFG;
@@ -399,11 +394,16 @@ struct PatternSingleResultLookupIR {
 
 struct InsnImmediateLookupIR {
     MetadataScanComboIR mScanCombo;
-    int mDispIndx;
+    size_t mImmIndex;
 };
 
 struct FarAddressLookupIR {
     MetadataScanComboIR mScanCombo;
+};
+
+struct MetadataTargetIR {
+    std::string mName;
+    std::string mNamespace;
 };
 
 struct MetadataLookupIR {
@@ -497,35 +497,11 @@ public:
 
 class JsonMetadataLookupFactory {
 public:
-    /*static EMetadataLookup guessType(const nlohmann::json& config)
-    {
-
-    }*/
-
-    /*static MetadataLookupIR createMetadataLookup(const nlohmann::json& config) {
-        
-        EMetadataLookup type = config.contains("type") ? parseType(config["type"]) : guessType(config);
-        MetadataLookupIR lookup;
-        lookup.mTarget = parseTarget(config);
-        lookup.mType = type;
-
-        switch (type) {
-        case EMetadataLookup::INSN_IMMEDIATE:
-            lookup.mInsnImmediate = createInsnImmediate(config);
-            break;
-        case EMetadataLookup::FAR_ADDRESS:
-            lookup.mFarAddress = createFarAddress(config["detail"]);
-            break;
-        case EMetadataLookup::HARDCODED:
-            lookup.mHardcoded = createHardcoded(config["detail"]);
-            break;
-        }
-
-        return lookup;
-    }*/
-
     static PatternScanConfigIR ParsePatternScanConfig(const nlohmann::json& scanCfg) {
-        return { scanCfg["pattern"].get<std::string>(), scanCfg.contains("disp") ? scanCfg["disp"].get<int64_t>() : 0};
+        return { 
+            scanCfg["pattern"].get<std::string>(),
+            scanCfg.contains("disp") ? scanCfg["disp"].get<int64_t>() : 0
+        };
     }
 
     static MetadataScanRangeStageFunctionIR ParseMetadataScanRangeStageFunction(const nlohmann::json& stage)
@@ -569,104 +545,162 @@ public:
         MetadataScanRangePipelineIR result;
 
         for (const auto& stage : pipeline)
-            result.mStages.push_back(std::move(ParseMetadataScanRangeStage(stage)));
+            result.mStages.emplace_back(std::move(ParseMetadataScanRangeStage(stage)));
 
         return result;
     }
 
-private:
-    /*static EMetadataLookup parseType(const std::string& typeStr) {
-        if (typeStr == "PATTERN_VALIDATE") return EMetadataLookup::PATTERN_VALIDATE;
-        if (typeStr == "PATTERN_SINGLE_RESULT") return EMetadataLookup::PATTERN_SINGLE_RESULT;
-        if (typeStr == "INSN_IMMEDIATE") return EMetadataLookup::INSN_IMMEDIATE;
-        if (typeStr == "FAR_ADDRESS") return EMetadataLookup::FAR_ADDRESS;
-        if (typeStr == "HARDCODED") return EMetadataLookup::HARDCODED;
-        throw std::invalid_argument("Unknown type");
-    }
+    static MetadataScanRangeIR ParseMetadataScanRange(const nlohmann::json& scanRange)
+    {
+        MetadataScanRangeIR result;
 
-    static MetadataTargetIR parseTarget(const nlohmann::json& targetConfig) {
-        return { targetConfig["name"].get<std::string>(), targetConfig["namespace"].get<std::string>() };
-    }
+        result.mType = EMetadataScanRange::DEFAULT;
 
-    static PatternValidateLookupIR createPatternValidate(const nlohmann::json& detailConfig) {
-        return { parseScanRange(detailConfig["scanRange"]), detailConfig["pattern"] };
-    }
+        if (scanRange.empty())
+            return result;
 
-    static PatternSingleResultLookupIR createPatternSingleResult(const nlohmann::json& detailConfig) {
-        return { parseScanRange(detailConfig["scanRange"]), parseScanConfig(detailConfig["scanCFG"]) };
-    }
+        if (scanRange.is_array())
+        {
+            result.mType = EMetadataScanRange::PIPELINE;
+            result.mPipeline = new MetadataScanRangePipelineIR(std::move(ParseMetadataScanRangePipeline(scanRange)));
 
-    static InsnImmediateLookupIR createInsnImmediate(const nlohmann::json& detailConfig) {
-        return { parseScanRange(detailConfig["scanRange"]), parseScanConfig(detailConfig["scanCFG"]), detailConfig["dispIndx"] };
-    }
-
-    static FarAddressLookupIR createFarAddress(const nlohmann::json& detailConfig) {
-        return { parseScanRange(detailConfig["scanRange"]), parseScanConfig(detailConfig["scanCFG"]) };
-    }
-
-    static HardcodedMetadataIR createHardcoded(const nlohmann::json& detailConfig) {
-        EHardcodedMetadata type = parseHardcodedType(detailConfig["type"]);
-        HardcodedMetadataIR hardcoded;
-        hardcoded.mType = type;
-        if (type == EHardcodedMetadata::PATTERN) {
-            hardcoded.mDetail.mPattern = detailConfig["pattern"];
+            return result;
         }
-        else if (type == EHardcodedMetadata::OFFSET) {
-            hardcoded.mDetail.mOffset = detailConfig["offset"];
+
+        throw UnexpectedLayoutException(fmt::format("Invalid format of scan range"));
+    }
+
+    static MetadataTargetIR ParseMetadataTarget(const nlohmann::json& metadataTarget)
+    {
+        return {
+            metadataTarget["name"].get<std::string>(),
+            metadataTarget.contains("namespace") ? metadataTarget["name"].get<std::string>() : ""
+        };
+    }
+
+    static MetadataScanComboIR ParseMetadataScanCombo(const nlohmann::json& scanCombo)
+    {
+        nlohmann::json scanRange = scanCombo.contains("scanRange") ? scanCombo["scanRange"] : nlohmann::json::parse("{}");
+
+        return {
+            std::move(ParseMetadataScanRange(scanRange)),
+            std::move(ParsePatternScanConfig(scanCombo.contains("scanCFG") ? scanCombo["scanCFG"] : scanCombo))
+        };
+    }
+
+    static PatternValidateLookupIR ParsePatternValidateLookup(const nlohmann::json& metadata)
+    {
+        return {
+            std::move(ParseMetadataScanRange(metadata.contains("scanRange") ? metadata["scanRange"] : nlohmann::json::parse("{}"))),
+            metadata["pattern"].get<std::string>()
+        };
+    }
+
+    static PatternSingleResultLookupIR ParsePatternSingleResultLookup(const nlohmann::json& metadata)
+    {
+        return {
+            std::move(ParseMetadataScanCombo(metadata))
+        };
+    }
+
+    static InsnImmediateLookupIR ParseInsnImmediateLookup(const nlohmann::json& metadata)
+    {
+        return {
+            std::move(ParseMetadataScanCombo(metadata)),
+            metadata.contains("immIndex") ? metadata["immIndex"].get<size_t>() : 0
+        };
+    }
+
+    static FarAddressLookupIR ParseFarAddressLookup(const nlohmann::json& metadata)
+    {
+        return {
+            std::move(ParseMetadataScanCombo(metadata))
+        };
+    }
+
+    static MetadataResult ParseHardcoded(const nlohmann::json& metadata)
+    {
+        auto value = metadata["value"];
+
+        if (value.is_number_integer() || value.is_number_unsigned())
+            return MetadataResult(value.get<uint64_t>());
+
+        if (value.is_string())
+            return MetadataResult(value.get<std::string>());
+
+        throw UnexpectedLayoutException(fmt::format("invalid 'value' format"));
+    }
+
+    static EMetadataLookup TryParseMetadataType(const nlohmann::json& metadata)
+    {
+        if (metadata.contains("type"))
+        {
+            std::string type = metadata["type"].get<std::string>();
+
+            if (type == "PATTERN_VALIDATE")
+                return EMetadataLookup::PATTERN_VALIDATE;
+
+            if (type == "PATTERN_SINGLE_RESULT")
+                return EMetadataLookup::PATTERN_SINGLE_RESULT;
+
+            if (type == "INSN_IMM")
+                return EMetadataLookup::INSN_IMMEDIATE;
+
+            if (type == "FAR_ADDR")
+                return EMetadataLookup::FAR_ADDRESS;
+
+            if (type == "HARDCODED")
+                return EMetadataLookup::HARDCODED;
+
+            throw UnexpectedLayoutException(fmt::format("'{}' invalid metadata lookup type", type));
         }
-        return hardcoded;
+
+        // At this point, type wasnt defined 
+        // explicitly, defaulting to INSN_IMMEDIATE
+
+        return EMetadataLookup::INSN_IMMEDIATE;
     }
 
-    static EHardcodedMetadata parseHardcodedType(const std::string& typeStr) {
-        if (typeStr == "PATTERN") return EHardcodedMetadata::PATTERN;
-        if (typeStr == "OFFSET") return EHardcodedMetadata::OFFSET;
-        throw std::invalid_argument("Unknown hardcoded type");
-    }
+    static MetadataLookupIR ParseMetadataLookup(const nlohmann::json& metadata)
+    {
+        MetadataLookupIR result;
 
-    static MetadataScanRangeIR parseScanRange(const nlohmann::json& scanRangeConfig) {
-        EMetadataScanRange type = parseScanRangeType(scanRangeConfig["type"]);
-        MetadataScanRangeIR scanRange;
-        scanRange.mType = type;
-        if (type == EMetadataScanRange::PIPELINE) {
-            scanRange.mDetail.mPipeline = parsePipeline(scanRangeConfig["pipeline"]);
+        result.mTarget = std::move(ParseMetadataTarget(metadata));
+        result.mType = TryParseMetadataType(metadata);
+
+        try {
+            switch (result.mType)
+            {
+            case EMetadataLookup::PATTERN_VALIDATE:
+                result.mPatternValidate = new PatternValidateLookupIR(std::move(ParsePatternValidateLookup(metadata)));
+                break;
+
+            case EMetadataLookup::PATTERN_SINGLE_RESULT:
+                result.mPatternSingleResult = new PatternSingleResultLookupIR(std::move(ParsePatternSingleResultLookup(metadata)));
+                break;
+
+            case EMetadataLookup::INSN_IMMEDIATE:
+                result.mInsnImmediate = new InsnImmediateLookupIR(std::move(ParseInsnImmediateLookup(metadata)));
+                break;
+
+            case EMetadataLookup::FAR_ADDRESS:
+                result.mFarAddress = new FarAddressLookupIR(std::move(ParseFarAddressLookup(metadata)));
+                break;
+
+            case EMetadataLookup::HARDCODED:
+                result.mHardcoded = new MetadataResult(ParseHardcoded(metadata));
+                break;
+            }
         }
-        return scanRange;
-    }
-
-    static EMetadataScanRange parseScanRangeType(const std::string& typeStr) {
-        if (typeStr == "DEFAULT") return EMetadataScanRange::DEFAULT;
-        if (typeStr == "PIPELINE") return EMetadataScanRange::PIPELINE;
-        throw std::invalid_argument("Unknown scan range type");
-    }
-
-    static MetadataScanRangePipelineIR parsePipeline(const nlohmann::json& pipelineConfig) {
-        MetadataScanRangePipelineIR pipeline;
-        for (const auto& stageConfig : pipelineConfig["stages"]) {
-            pipeline.mStages.push_back(parseStage(stageConfig));
+        catch (const std::exception& e)
+        {
+            throw UnexpectedLayoutException(fmt::format("'{}':{}", result.mTarget.mName, e.what()));
         }
-        return pipeline;
+
+        return result;
     }
 
-    static MetadataScanRangeStageIR parseStage(const nlohmann::json& stageConfig) {
-        EMetadataScanRangeStage type = parseStageType(stageConfig["type"]);
-        MetadataScanRangeStageIR stage;
-        stage.mType = type;
-        if (type == EMetadataScanRangeStage::FUNCTION) {
-            stage.mDetail.mFunction = parseFunctionStage(stageConfig["function"]);
-        }
-        return stage;
-    }
-
-    static EMetadataScanRangeStage parseStageType(const std::string& typeStr) {
-        if (typeStr == "FUNCTION") return EMetadataScanRangeStage::FUNCTION;
-        throw std::invalid_argument("Unknown stage type");
-    }
-
-    static MetadataScanRangeStageFunctionIR parseFunctionStage(const nlohmann::json& functionConfig) {
-        return { parseScanConfig(functionConfig["scanCFG"]), functionConfig["defFnSize"] };
-    }*/
-
-    
+private:    
 };
 
 int main(int argc, const char** argv)
@@ -675,25 +709,48 @@ int main(int argc, const char** argv)
     //TestNamespaces();
     //RunMetadataTests();
 
-    auto pipeline = nlohmann::json::parse(R"(
-    [
-        {
-            "defFnSize" : 10,
-            "pattern" : {
-                "pattern" : "AA BB C? D? ? E?",
-                "disp" : -10
+    auto metadata1 = nlohmann::json::parse(R"(
+    {
+        "name" : "Foo",
+        "namespace" : "Bar", 
+        "type" : "INSN_IMM",        
+        "immIndex" : 1,             
+        "pattern" : "AA BB CC",
+        "disp" : -5,                
+        "scanRange" : [             
+            {
+                "defFnSize" : 10,   
+                "pattern" : {
+                    "pattern" : "AA BB C? D? ? E?",
+                    "disp" : -10    
+                }
+            },
+            {
+                "defFnSize" : 10,   
+                "pattern" : {
+                    "pattern" : "AA BB C? D? ? E?",
+                    "disp" : -10    
+                }
             }
-        },
-        {
-            "defFnSize" : 10,
-            "pattern" : {
-                "pattern" : "AA BB C? D? ? E?",
-                "disp" : -10
-            }
-        }
-    ]
+        ]
+    }
 )"); 
-    auto res = JsonMetadataLookupFactory::ParseMetadataScanRangePipeline(pipeline);
+
+    auto metadata1Simple = nlohmann::json::parse(R"(
+    {
+        "name" : "Foo",                
+        "pattern" : "AA BB CC",
+        "disp" : "ABCD"
+    }
+)");
+
+    try {
+        auto res1 = JsonMetadataLookupFactory::ParseMetadataLookup(metadata1Simple);
+    }
+    catch (const std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 
     return 0;
 }
