@@ -151,11 +151,10 @@ MetadataTarget* PatternSingleResultLookup::GetTarget() {
 	return &mTarget;
 }
 
-InsnImmediateLookup::InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstoneProvider* cstoneProvider, size_t immIndex)
+InsnImmediateLookup::InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, ICapstoneProvider* cstoneProvider, size_t immIndex)
 	: mCStoneProvider(cstoneProvider)
 	, mTarget(target)
 	, mInsnAddrsProvider(insnAddrsProvider)
-	, mRelDispProvider(relDispProvider)
 	, mImmIndex(immIndex)
 {}
 
@@ -176,11 +175,11 @@ void InsnImmediateLookup::Lookup()
 		}
 		catch (DismFailedException& e)
 		{
-			std::cout << fmt::format("'{}':'{}' diassembly failed\n", mTarget.GetFullName(), fmt::ptr((void*)mRelDispProvider->OffsetFromBase(insnResult)));
+			std::cout << fmt::format("'{}' diassembly failed\n", mTarget.GetFullName());
 		}
 		catch (std::exception& e)
 		{
-			std::cout << fmt::format("'{}':'{}':{}\n", mTarget.GetFullName(), fmt::ptr((void*)mRelDispProvider->OffsetFromBase(insnResult)), e.what());
+			std::cout << fmt::format("'{}':{}\n", mTarget.GetFullName(), e.what());
 		}
 	}
 

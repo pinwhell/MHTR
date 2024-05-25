@@ -19,6 +19,9 @@
 #include <Storage.h>
 #include <PatternScanConfig.h>
 #include <nlohmann/json.hpp>
+#include <IR/Metadata.h>
+#include <IR/From/Json.h>
+#include <Exception/UnexpectedLayout.h>
 
 class IMetadataLookupContextProvider {
 public:
@@ -106,7 +109,7 @@ void TestImmediateLookup(IMetadataLookupContextProvider* metdtContextProvider)
         try {
             MetadataTarget target("Example");
             PatternScanAddresses addresses(scanRangeProvider, "?0 ?8 ?1 ?0", 0);
-            InsnImmediateLookup immLookup(target, &addresses, relDispCalculator, capstoneInstancer, 0);
+            InsnImmediateLookup immLookup(target, &addresses, capstoneInstancer, 0);
 
             immLookup.Lookup();
 
@@ -255,497 +258,233 @@ void TestNamespaces()
     std::cout << baz.GetFullIdentifier(true) << std::endl;
 }
 
-enum class EMetadataLookup {
-    NONE,
-    PATTERN_VALIDATE,
-    PATTERN_SINGLE_RESULT,
-    INSN_IMMEDIATE,
-    FAR_ADDRESS,
-    HARDCODED
-};
-
-enum class EMetadataScanRange {
-    DEFAULT,
-    PIPELINE
-};
-
-enum class EMetadataScanRangeStage {
-    NONE,
-    FUNCTION
-};
-
-enum class EHardcodedMetadata {
-    PATTERN,
-    OFFSET
-};
-
-struct PatternScanConfigIR {
-    std::string mPattern;
-    int64_t mDisp;
-};
-
-struct MetadataScanRangeStageFunctionIR {
-    uint64_t mDefFnSize;
-    PatternScanConfigIR mScanCFG;
-};
-
-struct MetadataScanRangeStageIR {
-    MetadataScanRangeStageIR()
-        : mType(EMetadataScanRangeStage::NONE)
-        , mPtr(nullptr)
-    {}
-
-    ~MetadataScanRangeStageIR()
-    {
-        Reset();
-    }
-
-    MetadataScanRangeStageIR(MetadataScanRangeStageIR&& other) noexcept
-    {
-        Reset();
-
-        mType = other.mType;
-        mPtr = other.mPtr; other.mPtr = nullptr;
-    }
-
-    MetadataScanRangeStageIR(const MetadataScanRangeStageIR&) = delete;
-    MetadataScanRangeStageIR& operator=(const MetadataScanRangeStageIR&) = delete;
-
-    EMetadataScanRangeStage mType;
-
-    union {
-        MetadataScanRangeStageFunctionIR* mFunction;
-        void* mPtr;
-    };
-
-private:
-    void Reset()
-    {
-        if (mPtr == nullptr)
-            return;
-
-        if (mType == EMetadataScanRangeStage::FUNCTION)
-        {
-            delete mFunction;
-            return;
-        }
-
-        mPtr = nullptr;
-    }
-};
-
-struct MetadataScanRangePipelineIR {
-    std::vector<MetadataScanRangeStageIR> mStages;
-};
-
-struct MetadataScanRangeIR {
-
-    MetadataScanRangeIR()
-    {}
-
-    ~MetadataScanRangeIR() {
-       
-    }
-
-    MetadataScanRangeIR(MetadataScanRangeIR&& other) noexcept {
-        mType = other.mType;
-        mPtr = other.mPtr; other.mPtr = nullptr;
-    }
-
-    MetadataScanRangeIR(MetadataScanRangeIR&) = delete;
-    MetadataScanRangeIR& operator=(MetadataScanRangeIR&) = delete;
-
-    EMetadataScanRange mType;
-
-    union {
-        MetadataScanRangePipelineIR* mPipeline;
-        void* mPtr;
-    };
-
-private:
-    void Reset()
-    {
-        if (mPtr == nullptr)
-            return;
-
-        if (mType == EMetadataScanRange::PIPELINE)
-        {
-            delete mPipeline;
-            return;
-        }
-
-        mPtr = nullptr;
-    }
-};
-
-struct MetadataScanComboIR {
-    MetadataScanRangeIR mScanRange;
-    PatternScanConfigIR mScanCFG;
-};
-
-struct PatternValidateLookupIR {
-    MetadataScanRangeIR mScanRange;
-    std::string mPattern;
-};
-
-struct PatternSingleResultLookupIR {
-    MetadataScanComboIR mScanCombo;
-};
-
-struct InsnImmediateLookupIR {
-    MetadataScanComboIR mScanCombo;
-    size_t mImmIndex;
-};
-
-struct FarAddressLookupIR {
-    MetadataScanComboIR mScanCombo;
-};
-
-struct MetadataTargetIR {
-    std::string mName;
-    std::string mNamespace;
-};
-
-struct MetadataLookupIR {
-    MetadataLookupIR()
-        : mType(EMetadataLookup::NONE)
-    {
-        mPtr = nullptr;
-    }
-
-    MetadataLookupIR(MetadataLookupIR&& other)
-    {
-        Reset();
-
-        mTarget = std::move(other.mTarget);
-        mType = other.mType;
-        mPtr = other.mPtr; other.mPtr = nullptr;
-    }
-
-    ~MetadataLookupIR()
-    {
-        Reset();
-    }
-
-    MetadataLookupIR& operator=(MetadataLookupIR& other)
-    {
-        Reset();
-
-        mTarget = std::move(other.mTarget);
-        mType = other.mType;
-        mPtr = other.mPtr; other.mPtr = nullptr;
-    }
-
-    MetadataTargetIR mTarget;
-    EMetadataLookup mType;
-
-    union {
-        PatternValidateLookupIR* mPatternValidate;
-        PatternSingleResultLookupIR* mPatternSingleResult;
-        InsnImmediateLookupIR* mInsnImmediate;
-        FarAddressLookupIR* mFarAddress;
-        MetadataResult* mHardcoded;
-        void* mPtr;
-    };
-
-private:
-    void Reset()
-    {
-        if (mPtr == nullptr)
-            return;
-
-        if (mType == EMetadataLookup::HARDCODED)
-        {
-            delete mHardcoded;
-            return;
-        }
-
-        if (mType == EMetadataLookup::PATTERN_VALIDATE)
-        {
-            delete mPatternValidate;
-            return;
-        }
-
-        if (mType == EMetadataLookup::PATTERN_SINGLE_RESULT)
-        {
-            delete mPatternSingleResult;
-            return;
-        }
-
-        if (mType == EMetadataLookup::FAR_ADDRESS)
-        {
-            delete mFarAddress;
-            return;
-        }
-
-        if (mType == EMetadataLookup::INSN_IMMEDIATE)
-        {
-            delete mInsnImmediate;
-            return;
-        }
-
-        mPtr = nullptr;
-    }
-};
-
-class UnexpectedLayoutException : public std::runtime_error {
+class IMetadataTargetProvider {
 public:
-    UnexpectedLayoutException(const std::string& what)
-        : std::runtime_error(what)
-    {}
+    virtual MetadataTarget* GetMetadataTarget(const std::string& name, INamespace* ns = nullptr) = 0;
 };
 
-class JsonMetadataLookupFactory {
-public:
-    static PatternScanConfigIR ParsePatternScanConfig(const nlohmann::json& scanCfg) {
-        return { 
-            scanCfg["pattern"].get<std::string>(),
-            scanCfg.contains("disp") ? scanCfg["disp"].get<int64_t>() : 0
-        };
-    }
+// Flygweight Metadata Target Factory Owninig & Providing
+// Centralized access to Metadata Targets
 
-    static MetadataScanRangeStageFunctionIR ParseMetadataScanRangeStageFunction(const nlohmann::json& stage)
+class MetadataTargetFactory : public IMetadataTargetProvider {
+private:
+    // a map perfectly mapping the fully qualified name 
+    // from the metadata target to its metadata target object
+
+    std::unordered_map<std::string, std::unique_ptr<MetadataTarget>> mMetadataTargetMap;
+
+    MetadataTarget* GetMetadataTarget(const std::string& name, INamespace* ns = nullptr) override
     {
-        if (!stage.contains("pattern"))
-            throw UnexpectedLayoutException(fmt::format("Pattern Scan Information missing"));
+        std::string fullyQualifiedName = fmt::format("{}{}", ns ? ns->GetNamespace() + "::" : "", name);
 
-        // At this point, is gurantee 
-        // a pattern thing exists
+        if (mMetadataTargetMap.find(fullyQualifiedName) != mMetadataTargetMap.end())
+            return mMetadataTargetMap[fullyQualifiedName].get();
 
-        MetadataScanRangeStageFunctionIR result;
+        mMetadataTargetMap[fullyQualifiedName] = std::make_unique<MetadataTarget>(name, ns);
 
-        result.mDefFnSize = stage.contains("defFnSize") ? stage["defFnSize"].get<uint64_t>() : 0;
-        result.mScanCFG = stage["pattern"].is_object() ? ParsePatternScanConfig(stage["pattern"]) : ParsePatternScanConfig(stage);
+        return mMetadataTargetMap[fullyQualifiedName].get();
+    }
+};
+
+class FromIR2MetadataFactory {
+public:
+    FromIR2MetadataFactory(
+        Storage<std::unique_ptr<IProvider>>& providersStorage,
+        IMetadataTargetProvider* metadataTargetProvider,
+        IMultiMetadataIRProvider* metadataIRProvider,
+        IRangeProvider* defaultScanRange,
+        ICapstoneProvider* capstoneProvider,
+        INamespace* ns = nullptr
+    )
+        : mProvidersStorage(providersStorage)
+        , mMetadataTargetProvider(metadataTargetProvider)
+        , mMetadataIRProvider(metadataIRProvider)
+        , mDefaultScanRange(defaultScanRange)
+        , mCapstoneProvider(capstoneProvider)
+        , mNs(ns)
+    {}
+
+    std::vector<std::unique_ptr<ILookableMetadata>> ProduceAll() {
+        std::vector<MetadataIR> allMetadata = mMetadataIRProvider->GetAllMetadatas();
+
+        for (MetadataIR& metadata : allMetadata)
+        {
+            if (metadata.mType != EMetadata::METADATA_SCAN_RANGE)
+                continue;
+
+            CreateMetadataScanRangeFromIR(metadata);
+        }
+
+        std::vector<std::unique_ptr<ILookableMetadata>> result;
+
+        for (MetadataIR& metadata : allMetadata)
+        {
+            if (metadata.mType != EMetadata::METADATA_LOOKUP)
+                continue;
+
+            result.emplace_back(std::move(CreateMetadataLookupFromIR(metadata)));
+        }
 
         return result;
     }
 
-    static MetadataScanRangeStageIR ParseMetadataScanRangeStage(const nlohmann::json& stage)
+    Storage<std::unique_ptr<IProvider>>& mProvidersStorage;
+    IMetadataTargetProvider* mMetadataTargetProvider;
+    IMultiMetadataIRProvider* mMetadataIRProvider;
+    IRangeProvider* mDefaultScanRange;
+    ICapstoneProvider* mCapstoneProvider;
+    INamespace* mNs;
+
+    // Internal
+    std::unordered_map<std::string, IRangeProvider*> mRangeProviderMap;
+
+private:
+    MetadataTarget* MetadataTargetFromIR(MetadataTargetIR& ir)
     {
-        MetadataScanRangeStageIR result;
+        return mMetadataTargetProvider->GetMetadataTarget(ir.mName, mNs);
+    }
 
-        result.mType = EMetadataScanRangeStage::FUNCTION;
+    std::unique_ptr<ILookableMetadata> CreateMetadataLookupFromIR(MetadataIR& ir)
+    {
+        MetadataTarget& target = *MetadataTargetFromIR(ir.mTarget);
 
-        result.mFunction = new MetadataScanRangeStageFunctionIR(
-            std::move(
-                ParseMetadataScanRangeStageFunction(
-                    stage
+        const auto& lookup = *ir.mLookup;
+
+        if (lookup.mType == EMetadataLookup::PATTERN_VALIDATE)
+            return CreatePatternValidateLookupFromIR(target, *lookup.mPatternValidate);
+
+        if (lookup.mType == EMetadataLookup::INSN_IMMEDIATE)
+            return CreateInsnImmLookupFromIR(target, *lookup.mInsnImmediate);
+
+        return 0;
+    }
+
+    std::unique_ptr<ILookableMetadata> CreatePatternValidateLookupFromIR(MetadataTarget& target, PatternValidateLookupIR& ir)
+    {
+        IRangeProvider* scanRange = CreateScanRangeFromIR(ir.mScanRange);
+
+        return std::make_unique<PatternCheckLookup>(target, scanRange, ir.mPattern, ir.mbUnique);
+    }
+
+    std::unique_ptr<ILookableMetadata> CreateInsnImmLookupFromIR(MetadataTarget& target, InsnImmediateLookupIR& ir)
+    {
+        auto& scanCombo = ir.mScanCombo;
+        auto& scanCFG = scanCombo.mScanCFG;
+
+        IRangeProvider* scanRange = CreateScanRangeFromIR(scanCombo.mScanRange);
+        IAddressesProvider* addressesProvider = (IAddressesProvider*) mProvidersStorage.Store(
+            std::make_unique<PatternScanAddresses>(
+                scanRange,
+                PatternScanConfig(
+                    scanCFG.mPattern,
+                    scanCFG.mDisp
                 )
             )
-        );
-        
-        return result;
+        ).get();
+
+        return std::make_unique<InsnImmediateLookup>(target, addressesProvider, mCapstoneProvider, ir.mImmIndex);
     }
 
-    static MetadataScanRangePipelineIR ParseMetadataScanRangePipeline(const nlohmann::json& pipeline)
+    IRangeProvider* CreateMetadataScanRangeFromIR(MetadataIR& ir)
     {
-        if(pipeline.is_array() == false)
-            throw UnexpectedLayoutException(fmt::format("Pipeline invalid pipeline type."));
+        if(mRangeProviderMap.find(ir.mTarget.mName) != mRangeProviderMap.end())
+            throw UnexpectedLayoutException(fmt::format("'{}':Metadata Scan Range duplicated detected."));
 
-        MetadataScanRangePipelineIR result;
-
-        for (const auto& stage : pipeline)
-            result.mStages.emplace_back(std::move(ParseMetadataScanRangeStage(stage)));
-
-        return result;
+        return mRangeProviderMap[ir.mTarget.mName] = CreateScanRangeFromIR(ir.mScanRange->mScanRange);
     }
 
-    static MetadataScanRangeIR ParseMetadataScanRange(const nlohmann::json& scanRange)
+    IRangeProvider* CreateScanRangeFromIR(ScanRangeIR& ir)
     {
-        MetadataScanRangeIR result;
+        if (ir.mType == EMetadataScanRange::DEFAULT)
+            return mDefaultScanRange;
 
-        result.mType = EMetadataScanRange::DEFAULT;
-
-        if (scanRange.empty())
-            return result;
-
-        if (scanRange.is_array())
+        if (ir.mType == EMetadataScanRange::REFERENCE)
         {
-            result.mType = EMetadataScanRange::PIPELINE;
-            result.mPipeline = new MetadataScanRangePipelineIR(std::move(ParseMetadataScanRangePipeline(scanRange)));
+            auto& key = *ir.mRef;
 
-            return result;
+            if (mRangeProviderMap.find(key) == mRangeProviderMap.end())
+                throw UnexpectedLayoutException(fmt::format("'{}':Scan Range Reference not found."));
+
+            return mRangeProviderMap[key];
         }
 
-        throw UnexpectedLayoutException(fmt::format("Invalid format of scan range"));
+        return CreateScanRangePipelineFromIR(*ir.mPipeline);
     }
 
-    static MetadataTargetIR ParseMetadataTarget(const nlohmann::json& metadataTarget)
+    IRangeProvider* CreateScanRangePipelineFromIR(MetadataScanRangePipelineIR& pipeline)
     {
-        return {
-            metadataTarget["name"].get<std::string>(),
-            metadataTarget.contains("namespace") ? metadataTarget["name"].get<std::string>() : ""
-        };
-    }
+        std::vector<PatternScanConfig> configs;
 
-    static MetadataScanComboIR ParseMetadataScanCombo(const nlohmann::json& scanCombo)
-    {
-        nlohmann::json scanRange = scanCombo.contains("scanRange") ? scanCombo["scanRange"] : nlohmann::json::parse("{}");
-
-        return {
-            std::move(ParseMetadataScanRange(scanRange)),
-            std::move(ParsePatternScanConfig(scanCombo.contains("scanCFG") ? scanCombo["scanCFG"] : scanCombo))
-        };
-    }
-
-    static PatternValidateLookupIR ParsePatternValidateLookup(const nlohmann::json& metadata)
-    {
-        return {
-            std::move(ParseMetadataScanRange(metadata.contains("scanRange") ? metadata["scanRange"] : nlohmann::json::parse("{}"))),
-            metadata["pattern"].get<std::string>()
-        };
-    }
-
-    static PatternSingleResultLookupIR ParsePatternSingleResultLookup(const nlohmann::json& metadata)
-    {
-        return {
-            std::move(ParseMetadataScanCombo(metadata))
-        };
-    }
-
-    static InsnImmediateLookupIR ParseInsnImmediateLookup(const nlohmann::json& metadata)
-    {
-        return {
-            std::move(ParseMetadataScanCombo(metadata)),
-            metadata.contains("immIndex") ? metadata["immIndex"].get<size_t>() : 0
-        };
-    }
-
-    static FarAddressLookupIR ParseFarAddressLookup(const nlohmann::json& metadata)
-    {
-        return {
-            std::move(ParseMetadataScanCombo(metadata))
-        };
-    }
-
-    static MetadataResult ParseHardcoded(const nlohmann::json& metadata)
-    {
-        auto value = metadata["value"];
-
-        if (value.is_number_integer() || value.is_number_unsigned())
-            return MetadataResult(value.get<uint64_t>());
-
-        if (value.is_string())
-            return MetadataResult(value.get<std::string>());
-
-        throw UnexpectedLayoutException(fmt::format("invalid 'value' format"));
-    }
-
-    static EMetadataLookup TryParseMetadataType(const nlohmann::json& metadata)
-    {
-        if (metadata.contains("type"))
+        for (const auto& stage : pipeline.mStages)
         {
-            std::string type = metadata["type"].get<std::string>();
+            const auto& scanCFG = stage.mFunction->mScanCFG;
 
-            if (type == "PATTERN_VALIDATE")
-                return EMetadataLookup::PATTERN_VALIDATE;
-
-            if (type == "PATTERN_SINGLE_RESULT")
-                return EMetadataLookup::PATTERN_SINGLE_RESULT;
-
-            if (type == "INSN_IMM")
-                return EMetadataLookup::INSN_IMMEDIATE;
-
-            if (type == "FAR_ADDR")
-                return EMetadataLookup::FAR_ADDRESS;
-
-            if (type == "HARDCODED")
-                return EMetadataLookup::HARDCODED;
-
-            throw UnexpectedLayoutException(fmt::format("'{}' invalid metadata lookup type", type));
+            configs.emplace_back(std::move(PatternScanConfig(
+                scanCFG.mPattern,
+                scanCFG.mDisp
+            )));
         }
 
-        // At this point, type wasnt defined 
-        // explicitly, defaulting to INSN_IMMEDIATE
-
-        return EMetadataLookup::INSN_IMMEDIATE;
+        return (IRangeProvider*) mProvidersStorage.Store(std::make_unique<ProcedureRangeProviderChain>(mCapstoneProvider, mDefaultScanRange, configs)).get();
     }
-
-    static MetadataLookupIR ParseMetadataLookup(const nlohmann::json& metadata)
-    {
-        MetadataLookupIR result;
-
-        result.mTarget = std::move(ParseMetadataTarget(metadata));
-        result.mType = TryParseMetadataType(metadata);
-
-        try {
-            switch (result.mType)
-            {
-            case EMetadataLookup::PATTERN_VALIDATE:
-                result.mPatternValidate = new PatternValidateLookupIR(std::move(ParsePatternValidateLookup(metadata)));
-                break;
-
-            case EMetadataLookup::PATTERN_SINGLE_RESULT:
-                result.mPatternSingleResult = new PatternSingleResultLookupIR(std::move(ParsePatternSingleResultLookup(metadata)));
-                break;
-
-            case EMetadataLookup::INSN_IMMEDIATE:
-                result.mInsnImmediate = new InsnImmediateLookupIR(std::move(ParseInsnImmediateLookup(metadata)));
-                break;
-
-            case EMetadataLookup::FAR_ADDRESS:
-                result.mFarAddress = new FarAddressLookupIR(std::move(ParseFarAddressLookup(metadata)));
-                break;
-
-            case EMetadataLookup::HARDCODED:
-                result.mHardcoded = new MetadataResult(ParseHardcoded(metadata));
-                break;
-            }
-        }
-        catch (const std::exception& e)
-        {
-            throw UnexpectedLayoutException(fmt::format("'{}':{}", result.mTarget.mName, e.what()));
-        }
-
-        return result;
-    }
-
-private:    
 };
 
 int main(int argc, const char** argv)
 {
+    std::filesystem::current_path(MHR_SAMPLES_DIR);
+
     //TestDumpMetadata();
     //TestNamespaces();
     //RunMetadataTests();
 
-    auto metadata1 = nlohmann::json::parse(R"(
-    {
-        "name" : "Foo",
-        "namespace" : "Bar", 
-        "type" : "INSN_IMM",        
-        "immIndex" : 1,             
-        "pattern" : "AA BB CC",
-        "disp" : -5,                
-        "scanRange" : [             
-            {
-                "defFnSize" : 10,   
-                "pattern" : {
-                    "pattern" : "AA BB C? D? ? E?",
-                    "disp" : -10    
+    FromJsonMultiMetadataIRProvider multiMetadataProvider(R"(
+    [
+        {
+            "name" : "Bar",               
+            "scanRange" : [             
+                {
+                    "defFnSize" : 10,   
+                    "pattern" : {
+                        "pattern" : "AA BB C? D? ? E?",
+                        "disp" : -10    
+                    }
+                },
+                {
+                    "defFnSize" : 10,   
+                    "pattern" : {
+                        "pattern" : "AA BB C? D? ? E?",
+                        "disp" : -10    
+                    }
                 }
-            },
-            {
-                "defFnSize" : 10,   
-                "pattern" : {
-                    "pattern" : "AA BB C? D? ? E?",
-                    "disp" : -10    
-                }
-            }
-        ]
-    }
-)"); 
-
-    auto metadata1Simple = nlohmann::json::parse(R"(
-    {
-        "name" : "Foo",                
-        "pattern" : "AA BB CC",
-        "disp" : "ABCD"
-    }
+            ]
+        },
+        {
+            "name" : "Foo",
+            "type" : "INSN_IMM",        
+            "immIndex" : 1,             
+            "pattern" : "AA BB CC",
+            "disp" : -5,               
+ 
+            "scanRange" : "Bar"
+        }
+    ]
 )");
 
     try {
-        auto res1 = JsonMetadataLookupFactory::ParseMetadataLookup(metadata1Simple);
+        FileBufferView fileView("libdummy.so");
+        ELFBuffer elfBuffer(fileView.mBufferView);
+        CapstoneConcurrentProvider capstoneProvider(&elfBuffer);
+        MetadataTargetFactory metadatTargets;
+        Storage<std::unique_ptr<IProvider>> scanRanges;
+        FromIR2MetadataFactory multiMetadatasBuilder(
+            scanRanges,
+            &metadatTargets,
+            &multiMetadataProvider,
+            &fileView,
+            &capstoneProvider
+        );
+        
+        auto allMetadata = multiMetadatasBuilder.ProduceAll();
     }
     catch (const std::exception& e)
     {

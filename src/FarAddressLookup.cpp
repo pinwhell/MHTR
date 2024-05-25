@@ -1,7 +1,7 @@
 #include <fmt/core.h>
+#include <Exception/Multi.h>
 
 #include <FarAddressLookup.h>
-#include <MultiException.h>
 #include <unordered_set>
 
 FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IRelativeDispProvider* dispCalculator, bool bDeref)

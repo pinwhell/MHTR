@@ -48,6 +48,37 @@ struct Metadata {
 using OffsetMetadata = Metadata<uint64_t>;
 using PatternMetadata = Metadata<std::string>;
 
+enum class EMetadata {
+	NONE,
+	METADATA_LOOKUP,
+	METADATA_SCAN_RANGE
+};
+
+enum class EMetadataLookup {
+	NONE,
+	PATTERN_VALIDATE,
+	PATTERN_SINGLE_RESULT,
+	INSN_IMMEDIATE,
+	FAR_ADDRESS,
+	HARDCODED
+};
+
+enum class EMetadataScanRange {
+	DEFAULT,
+	PIPELINE,
+	REFERENCE
+};
+
+enum class EMetadataScanRangeStage {
+	NONE,
+	FUNCTION
+};
+
+enum class EHardcodedMetadata {
+	PATTERN,
+	OFFSET
+};
+
 enum class EMetadataResult {
 	OFFSET,
 	PATTERN
@@ -57,6 +88,7 @@ struct MetadataResult {
 
 	MetadataResult(uint64_t offset);
 	MetadataResult(const std::string& pattern);
+	MetadataResult(MetadataResult&) = default;
 	~MetadataResult();
 
 	MetadataResult& operator=(const MetadataResult& other);
@@ -124,13 +156,12 @@ public:
 
 class InsnImmediateLookup : public ILookableMetadata {
 public:
-	InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IRelativeDispProvider* relDispProvider, ICapstoneProvider* cstoneProvider, size_t immIndex = 0);
+	InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, ICapstoneProvider* cstoneProvider, size_t immIndex = 0);
 
 	void Lookup() override;
 	MetadataTarget* GetTarget() override;
 
 	IAddressesProvider* mInsnAddrsProvider;
-	IRelativeDispProvider* mRelDispProvider;
 	ICapstoneProvider* mCStoneProvider;
 	MetadataTarget& mTarget;
 	size_t mImmIndex;

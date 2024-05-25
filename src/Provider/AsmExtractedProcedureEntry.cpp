@@ -1,9 +1,8 @@
 #include <Provider/AsmExtractedProcedureEntry.h>
+#include <Exception/Multi.h>
 
 #include <unordered_set>
 #include <string>
-
-#include <MultiException.h>
 
 AsmExtractedProcedureEntryProvider::AsmExtractedProcedureEntryProvider(ICapstoneProvider* cstoneProvider, IAddressesProvider* adressesProvider)
     : mCStoneProvider(cstoneProvider)
