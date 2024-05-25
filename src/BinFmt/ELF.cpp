@@ -1,5 +1,7 @@
 #include <BinFmt/ELF.h>
 #include <CStone/Factory.h>
+#include <fmt/core.h>
+#include <Arch/ARM/32/Resolver/FarAddress.h>
 
 ELFBuffer::ELFBuffer(const BufferView& view)
     : mView(view)
@@ -27,4 +29,19 @@ std::unique_ptr<ICapstone> ELFBuffer::CreateInstance(bool bDetailedInst)
     }
 
     return CapstoneFactory(archMode).CreateInstance(bDetailedInst);
+}
+
+IFarAddressResolver* ELFBuffer::GetFarAddressResolver(ICapstoneProvider* cstoneProvider)
+{
+    auto machine = mELF->GetTargetMachine();
+    bool bIs64 = mELF->Is64();
+    std::string key = fmt::format("{}{}{}", fmt::ptr(cstoneProvider), (int)machine, bIs64);
+
+    if (mFarAddressResolvers.find(key) != mFarAddressResolvers.end())
+        return mFarAddressResolvers[key].get();
+
+    if (machine == EELFMachine::ARM && !bIs64)
+        return (mFarAddressResolvers[key] = std::make_unique<ARM32FarAddressResolver>(cstoneProvider)).get();
+
+    return nullptr;
 }

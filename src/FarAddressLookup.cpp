@@ -12,6 +12,11 @@ FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* i
     , mDeref(bDeref)
 {}
 
+MetadataTarget* FarAddressLookup::GetTarget()
+{
+    return &mTarget;
+}
+
 void FarAddressLookup::Lookup()
 {
     if (mTarget.mHasResult)

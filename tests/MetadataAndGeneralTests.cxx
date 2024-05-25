@@ -293,14 +293,18 @@ public:
         IMetadataTargetProvider* metadataTargetProvider,
         IMultiMetadataIRProvider* metadataIRProvider,
         IRangeProvider* defaultScanRange,
+        IRelativeDispProvider* relDispCalculator,
         ICapstoneProvider* capstoneProvider,
+        IFarAddressResolverProvider* farAddressResolverProvider,
         INamespace* ns = nullptr
     )
         : mProvidersStorage(providersStorage)
         , mMetadataTargetProvider(metadataTargetProvider)
         , mMetadataIRProvider(metadataIRProvider)
         , mDefaultScanRange(defaultScanRange)
+        , mRelDispCalculator(relDispCalculator)
         , mCapstoneProvider(capstoneProvider)
+        , mFarAddressResolverProvider(farAddressResolverProvider)
         , mNs(ns)
     {}
 
@@ -332,7 +336,9 @@ public:
     IMetadataTargetProvider* mMetadataTargetProvider;
     IMultiMetadataIRProvider* mMetadataIRProvider;
     IRangeProvider* mDefaultScanRange;
+    IRelativeDispProvider* mRelDispCalculator;
     ICapstoneProvider* mCapstoneProvider;
+    IFarAddressResolverProvider* mFarAddressResolverProvider;
     INamespace* mNs;
 
     // Internal
@@ -355,6 +361,15 @@ private:
 
         if (lookup.mType == EMetadataLookup::INSN_IMMEDIATE)
             return CreateInsnImmLookupFromIR(target, *lookup.mInsnImmediate);
+
+        if (lookup.mType == EMetadataLookup::FAR_ADDRESS)
+            return CreateFarAddressLookupFromIR(target, *lookup.mFarAddress);
+
+        if (lookup.mType == EMetadataLookup::PATTERN_SINGLE_RESULT)
+            return CreatePatternSingleResultLookupFromIR(target, *lookup.mPatternSingleResult);
+
+        if (lookup.mType == EMetadataLookup::HARDCODED)
+            return CreateHardcodedLookupFromIR(target, *lookup.mHardcoded);
 
         return 0;
     }
@@ -383,6 +398,38 @@ private:
         ).get();
 
         return std::make_unique<InsnImmediateLookup>(target, addressesProvider, mCapstoneProvider, ir.mImmIndex);
+    }
+
+    std::unique_ptr<ILookableMetadata> CreateFarAddressLookupFromIR(MetadataTarget& target, FarAddressLookupIR& ir)
+    {
+        auto& scanCombo = ir.mScanCombo;
+        auto& scanCFG = scanCombo.mScanCFG;
+
+        IRangeProvider* scanRange = CreateScanRangeFromIR(scanCombo.mScanRange);
+        IAddressesProvider* addressesProvider = (IAddressesProvider*)mProvidersStorage.Store(
+            std::make_unique<PatternScanAddresses>(
+                scanRange,
+                PatternScanConfig(
+                    scanCFG.mPattern,
+                    scanCFG.mDisp
+                )
+            )
+        ).get();
+        IFarAddressResolver* farAddressResolver = mFarAddressResolverProvider->GetFarAddressResolver(mCapstoneProvider);
+
+        return std::make_unique<FarAddressLookup>(target, addressesProvider, farAddressResolver, mRelDispCalculator);
+    }
+
+    std::unique_ptr<ILookableMetadata> CreatePatternSingleResultLookupFromIR(MetadataTarget& target, PatternSingleResultLookupIR& ir)
+    {
+        IRangeProvider* scanRange = CreateScanRangeFromIR(ir.mScanCombo.mScanRange);
+
+        return std::make_unique<PatternSingleResultLookup>(target, scanRange, ir.mScanCombo.mScanCFG.mPattern);
+    }
+
+    std::unique_ptr<ILookableMetadata> CreateHardcodedLookupFromIR(MetadataTarget& target, MetadataResult& ir)
+    {
+        return std::make_unique<HardcodedLookup>(target, ir);
     }
 
     IRangeProvider* CreateMetadataScanRangeFromIR(MetadataIR& ir)
@@ -476,15 +523,17 @@ int main(int argc, const char** argv)
         CapstoneConcurrentProvider capstoneProvider(&elfBuffer);
         MetadataTargetFactory metadatTargets;
         Storage<std::unique_ptr<IProvider>> scanRanges;
-        FromIR2MetadataFactory multiMetadatasBuilder(
+        FromIR2MetadataFactory multiMetadatasFactory(
             scanRanges,
             &metadatTargets,
             &multiMetadataProvider,
             &fileView,
-            &capstoneProvider
+            &fileView,
+            &capstoneProvider,
+            &elfBuffer
         );
         
-        auto allMetadata = multiMetadatasBuilder.ProduceAll();
+        auto allMetadata = multiMetadatasFactory.ProduceAll();
     }
     catch (const std::exception& e)
     {

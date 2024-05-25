@@ -6,10 +6,11 @@
 #include <Provider/IAddresses.h>
 #include <Provider/IRelativeDisp.h>
 
-class FarAddressLookup : public ILookable {
+class FarAddressLookup : public ILookableMetadata {
 public:
     FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IRelativeDispProvider* dispCalculator, bool bDeref = false);
 
+    MetadataTarget* GetTarget() override;
     void Lookup() override;
 
     MetadataTarget& mTarget;

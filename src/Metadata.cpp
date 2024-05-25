@@ -213,3 +213,18 @@ std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespac
 
 	return result;
 }
+
+HardcodedLookup::HardcodedLookup(MetadataTarget& target, MetadataResult& hardcoded)
+	: mTarget(target)
+{
+	mTarget.TrySetResult(std::move(hardcoded));
+}
+
+void HardcodedLookup::Lookup()
+{
+}
+
+MetadataTarget* HardcodedLookup::GetTarget()
+{
+	return &mTarget;
+}

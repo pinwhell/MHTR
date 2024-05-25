@@ -167,4 +167,14 @@ public:
 	size_t mImmIndex;
 };
 
+class HardcodedLookup : public ILookableMetadata {
+public:
+	HardcodedLookup(MetadataTarget& target, MetadataResult& hardcoded);
+
+	MetadataTarget* GetTarget() override;
+	void Lookup() override;
+
+	MetadataTarget& mTarget;
+};
+
 std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespacedMap(const std::vector<MetadataTarget*>& targets);
