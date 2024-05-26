@@ -21,6 +21,7 @@
 
 class IMetadataLookupContextProvider {
 public:
+    virtual ~IMetadataLookupContextProvider() {}
     virtual void ContextProvide(std::function<void(IRelativeDispProvider*, IRangeProvider*, ICapstoneProvider*)> callback) = 0;
 };
 

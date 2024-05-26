@@ -4,6 +4,7 @@
 #include <FarAddressLookup.h>
 #include <fmt/core.h>
 #include <Provider/ProcedureRangeChain.h>
+#include <algorithm>
 
 FromIR2MetadataFactory::FromIR2MetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRProvider* metadataIRProvider, IRangeProvider* defaultScanRange, IRelativeDispProvider* relDispCalculator, ICapstoneProvider* capstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespace* ns)
     : mProvidersStorage(providersStorage)

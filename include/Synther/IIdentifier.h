@@ -5,4 +5,6 @@
 class IIdentifier {
 public:
     virtual std::string GetIdentifier() const = 0;
+
+    virtual ~IIdentifier() {}
 };

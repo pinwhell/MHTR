@@ -2,6 +2,5 @@
 
 class IProvider { // Annotation
 public:
-
 	virtual ~IProvider() {}
 };

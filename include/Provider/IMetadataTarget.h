@@ -7,4 +7,5 @@
 class IMetadataTargetProvider {
 public:
     virtual MetadataTarget* GetMetadataTarget(const std::string& name, INamespace* ns = nullptr) = 0;
+    virtual ~IMetadataTargetProvider() {}
 };

@@ -6,4 +6,5 @@
 class IFarAddressResolverProvider {
 public:
     virtual IFarAddressResolver* GetFarAddressResolver(ICapstoneProvider* cstoneProvider) = 0;
+    virtual ~IFarAddressResolverProvider() {}
 };
