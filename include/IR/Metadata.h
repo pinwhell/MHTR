@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <Metadata.h>
+#include <variant>
 
 struct PatternScanConfigIR {
     std::string mPattern;
@@ -16,21 +17,9 @@ struct MetadataScanRangeStageFunctionIR {
 };
 
 struct MetadataScanRangeStageIR {
-    MetadataScanRangeStageIR();
-    MetadataScanRangeStageIR(MetadataScanRangeStageIR&& other) noexcept;
-    MetadataScanRangeStageIR(const MetadataScanRangeStageIR&) = delete;
-    MetadataScanRangeStageIR& operator=(const MetadataScanRangeStageIR&) = delete;
-    ~MetadataScanRangeStageIR();
+    EMetadataScanRangeStage getType() const;
 
-    EMetadataScanRangeStage mType;
-
-    union {
-        MetadataScanRangeStageFunctionIR* mFunction;
-        void* mPtr;
-    };
-
-private:
-    void Reset();
+    std::variant<MetadataScanRangeStageFunctionIR> mStage;
 };
 
 struct MetadataScanRangePipelineIR {
@@ -38,23 +27,11 @@ struct MetadataScanRangePipelineIR {
 };
 
 struct ScanRangeIR {
+    struct Default {};
 
-    ScanRangeIR();
-    ScanRangeIR(ScanRangeIR&& other) noexcept;
-    ScanRangeIR(ScanRangeIR&) = delete;
-    ScanRangeIR& operator=(ScanRangeIR&) = delete;
-    ~ScanRangeIR();
+    EMetadataScanRange getType() const;
 
-    EMetadataScanRange mType;
-
-    union {
-        MetadataScanRangePipelineIR* mPipeline;
-        std::string* mRef;
-        void* mPtr;
-    };
-
-private:
-    void Reset();
+    std::variant<Default, MetadataScanRangePipelineIR, std::string> mScanRange;
 };
 
 struct MetadataScanRangeIR {
@@ -90,43 +67,14 @@ struct MetadataTargetIR {
 };
 
 struct MetadataLookupIR {
-    MetadataLookupIR();
-    MetadataLookupIR(MetadataLookupIR&& other);
-    ~MetadataLookupIR();
-    MetadataLookupIR(MetadataLookupIR&) = delete;
-    MetadataLookupIR& operator=(MetadataLookupIR&) = delete;
+    EMetadataLookup getType() const;
 
-    EMetadataLookup mType;
-
-    union {
-        PatternValidateLookupIR* mPatternValidate;
-        PatternSingleResultLookupIR* mPatternSingleResult;
-        InsnImmediateLookupIR* mInsnImmediate;
-        FarAddressLookupIR* mFarAddress;
-        MetadataResult* mHardcoded;
-        void* mPtr;
-    };
-
-private:
-    void Reset();
+    std::variant<PatternValidateLookupIR, PatternSingleResultLookupIR, InsnImmediateLookupIR, FarAddressLookupIR, MetadataResult> mLookup;
 };
 
 struct MetadataIR {
-
-    MetadataIR();
-    MetadataIR(MetadataIR&& other) noexcept;
-    MetadataIR(MetadataIR&) = delete;
-    MetadataIR& operator=(MetadataIR&) = delete;
+    EMetadata getType() const;
 
     MetadataTargetIR mTarget;
-    EMetadata mType;
-
-    union {
-        MetadataLookupIR* mLookup;
-        MetadataScanRangeIR* mScanRange;
-        void* mPtr;
-    };
-
-private:
-    void Reset();
+    std::variant<MetadataLookupIR, MetadataScanRangeIR> mMetadata;
 };

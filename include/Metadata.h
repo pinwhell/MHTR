@@ -1,5 +1,6 @@
 #pragma once
 
+#include <variant>
 #include <cstdint>
 #include <string>
 #include <atomic>
@@ -15,6 +16,7 @@
 #include <BufferView.h>
 
 #include <Provider/IRange.h>
+
 
 constexpr auto METADATA_OFFSET_INVALID = -1;
 constexpr auto METADATA_STRING_INVALID = "";
@@ -49,13 +51,13 @@ using OffsetMetadata = Metadata<uint64_t>;
 using PatternMetadata = Metadata<std::string>;
 
 enum class EMetadata {
-	NONE,
+	NONE = -1,
 	METADATA_LOOKUP,
 	METADATA_SCAN_RANGE
 };
 
 enum class EMetadataLookup {
-	NONE,
+	NONE = -1,
 	PATTERN_VALIDATE,
 	PATTERN_SINGLE_RESULT,
 	INSN_IMMEDIATE,
@@ -70,7 +72,7 @@ enum class EMetadataScanRange {
 };
 
 enum class EMetadataScanRangeStage {
-	NONE,
+	NONE = -1,
 	FUNCTION
 };
 
@@ -85,22 +87,13 @@ enum class EMetadataResult {
 };
 
 struct MetadataResult {
-
 	MetadataResult(uint64_t offset);
 	MetadataResult(const std::string& pattern);
-	MetadataResult(MetadataResult&) = default;
-	~MetadataResult();
-
-	MetadataResult& operator=(const MetadataResult& other);
 
 	std::string ToString() const;
+	EMetadataResult getType() const;
 
-	EMetadataResult mType;
-
-	union {
-		OffsetMetadata mOffset;
-		PatternMetadata mPattern;
-	};
+	std::variant<OffsetMetadata, PatternMetadata> mMetadata;
 };
 
 class MetadataLookupException : public std::runtime_error {
@@ -169,7 +162,7 @@ public:
 
 class HardcodedLookup : public ILookableMetadata {
 public:
-	HardcodedLookup(MetadataTarget& target, MetadataResult& hardcoded);
+	HardcodedLookup(MetadataTarget& target, const MetadataResult& hardcoded);
 
 	MetadataTarget* GetTarget() override;
 	void Lookup() override;

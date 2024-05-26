@@ -15,19 +15,15 @@ MetadataStaticLineSynther::MetadataStaticLineSynther(const MetadataTarget& targe
 
 std::string MetadataStaticLineSynther::Synth() const
 {
-    const auto& res = mTarget.mResult;
+    const auto& metadata = mTarget.mResult.mMetadata;
+    
+    if(std::holds_alternative<PatternMetadata>(metadata))
+        return fmt::format("constexpr auto {} = {};", mTarget.GetName(), Literal(std::get<PatternMetadata>(metadata).mValue));
 
-    switch (res.mType)
-    {
-    case EMetadataResult::PATTERN:
-        return fmt::format("constexpr auto {} = {};", mTarget.GetName(), Literal(res.mPattern.mValue));
+    if (std::holds_alternative<OffsetMetadata>(metadata))
+        return fmt::format("constexpr uint64_t {} = 0x{:X};", mTarget.GetName(), std::get<OffsetMetadata>(metadata).mValue);
 
-    case EMetadataResult::OFFSET:
-        return fmt::format("constexpr uint64_t {} = 0x{:X};", mTarget.GetName(), res.mOffset.mValue);
-
-    default:
-        throw std::logic_error("metadata line synthesizer not implemented");
-    }
+    throw std::logic_error("metadata line synthesizer not implemented");
 }
 
 MultiMetadataStaticSynther::MultiMetadataStaticSynther(std::vector<MetadataTarget*> targets, const std::string& ns)

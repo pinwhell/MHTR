@@ -1,27 +1,23 @@
 #include <iostream>
+#include <functional>
 #include <filesystem>
-#include <deque>
 
-#include <fmt/core.h>
-#include <BinFmt/ELF.h>
-#include <Provider/Range.h>
-#include <Provider/AsmExtractedProcedureEntry.h>
-#include <Provider/ProcedureRange.h>
+#include <Provider/IRange.h>
+#include <Provider/IRelativeDisp.h>
 #include <CStone/Provider.h>
-#include <Arch/ARM/32/Resolver/FarAddress.h>
+#include <IR/From/Json.h>
+#include <IR/ToMetadata.h>
 #include <Synther/Namespace.h>
+#include <BinFmt/ELF.h>
+#include <Arch/ARM/32/Resolver/FarAddress.h>
 
 #include <Metadata.h>
-#include <PatternScan.h>
-#include <FileBufferView.h>
-#include <FarAddressLookup.h>
 #include <MetadataSynthers.h>
-#include <Storage.h>
-#include <PatternScanConfig.h>
-#include <nlohmann/json.hpp>
-#include <IR/Metadata.h>
-#include <IR/From/Json.h>
-#include <Exception/UnexpectedLayout.h>
+#include <MetadataTargetFactory.h>
+#include <PatternScan.h>
+#include <FarAddressLookup.h>
+#include <FileBufferView.h>
+#include <Provider/ProcedureRangeChain.h>
 
 class IMetadataLookupContextProvider {
 public:
@@ -39,14 +35,12 @@ void BasicScan(IMetadataLookupContextProvider* metdtContextProvider)
 
             try {
                 lookup.Lookup();
-                std::cout << lookup.mTarget.mResult.mPattern.mValue << std::endl;
             }
             catch (PatternScanException& e)
             { std::cerr << e.what() << std::endl; }
 
             try {
                 lookup2.Lookup();
-                std::cout << std::hex << lookup2.mTarget.mResult.mOffset.mValue << std::endl;
             }
             catch (PatternScanException& e)
             { std::cerr << e.what() << std::endl; }
@@ -167,39 +161,6 @@ private:
     CapstoneConcurrentProvider mCapstoneProvider;
 };
 
-class ProcedureRangeProviderChain : public IRangeProvider {
-public:
-    ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<PatternScanConfig>& nestedProcedurePatterns)
-    {
-        mpRangeProviders.emplace_back(baseRangeProvider);
-
-        for (const auto& procPatternCfg : nestedProcedurePatterns)
-        {
-            auto addressesProv = (IAddressesProvider*)mProviders.Store(
-                std::make_unique<PatternScanAddresses>(mpRangeProviders.back(), procPatternCfg)
-            ).get();
-
-            auto procEntryProv = (IProcedureEntryProvider*)mProviders.Store(
-                std::make_unique<AsmExtractedProcedureEntryProvider>(cstoneInstanceProvider, addressesProv)
-            ).get();
-
-            auto procRangeProv = (IRangeProvider*)mProviders.Store(
-                std::make_unique<ProcedureRangeProvider>(cstoneInstanceProvider, procEntryProv)
-            ).get();
-
-            mpRangeProviders.push_back(procRangeProv);
-        }
-    }
-
-    BufferView GetRange() override
-    {
-        return mpRangeProviders.back()->GetRange();
-    }
-
-    Storage<std::unique_ptr<IProvider>> mProviders;
-    std::vector<IRangeProvider*> mpRangeProviders;
-};
-
 void RunMetadataTests()
 {
     try {
@@ -257,224 +218,6 @@ void TestNamespaces()
 
     std::cout << baz.GetFullIdentifier(true) << std::endl;
 }
-
-class IMetadataTargetProvider {
-public:
-    virtual MetadataTarget* GetMetadataTarget(const std::string& name, INamespace* ns = nullptr) = 0;
-};
-
-// Flygweight Metadata Target Factory Owninig & Providing
-// Centralized access to Metadata Targets
-
-class MetadataTargetFactory : public IMetadataTargetProvider {
-private:
-    // a map perfectly mapping the fully qualified name 
-    // from the metadata target to its metadata target object
-
-    std::unordered_map<std::string, std::unique_ptr<MetadataTarget>> mMetadataTargetMap;
-
-    MetadataTarget* GetMetadataTarget(const std::string& name, INamespace* ns = nullptr) override
-    {
-        std::string fullyQualifiedName = fmt::format("{}{}", ns ? ns->GetNamespace() + "::" : "", name);
-
-        if (mMetadataTargetMap.find(fullyQualifiedName) != mMetadataTargetMap.end())
-            return mMetadataTargetMap[fullyQualifiedName].get();
-
-        mMetadataTargetMap[fullyQualifiedName] = std::make_unique<MetadataTarget>(name, ns);
-
-        return mMetadataTargetMap[fullyQualifiedName].get();
-    }
-};
-
-class FromIR2MetadataFactory {
-public:
-    FromIR2MetadataFactory(
-        Storage<std::unique_ptr<IProvider>>& providersStorage,
-        IMetadataTargetProvider* metadataTargetProvider,
-        IMultiMetadataIRProvider* metadataIRProvider,
-        IRangeProvider* defaultScanRange,
-        IRelativeDispProvider* relDispCalculator,
-        ICapstoneProvider* capstoneProvider,
-        IFarAddressResolverProvider* farAddressResolverProvider,
-        INamespace* ns = nullptr
-    )
-        : mProvidersStorage(providersStorage)
-        , mMetadataTargetProvider(metadataTargetProvider)
-        , mMetadataIRProvider(metadataIRProvider)
-        , mDefaultScanRange(defaultScanRange)
-        , mRelDispCalculator(relDispCalculator)
-        , mCapstoneProvider(capstoneProvider)
-        , mFarAddressResolverProvider(farAddressResolverProvider)
-        , mNs(ns)
-    {}
-
-    std::vector<std::unique_ptr<ILookableMetadata>> ProduceAll() {
-        std::vector<MetadataIR> allMetadata = mMetadataIRProvider->GetAllMetadatas();
-
-        for (MetadataIR& metadata : allMetadata)
-        {
-            if (metadata.mType != EMetadata::METADATA_SCAN_RANGE)
-                continue;
-
-            CreateMetadataScanRangeFromIR(metadata);
-        }
-
-        std::vector<std::unique_ptr<ILookableMetadata>> result;
-
-        for (MetadataIR& metadata : allMetadata)
-        {
-            if (metadata.mType != EMetadata::METADATA_LOOKUP)
-                continue;
-
-            result.emplace_back(std::move(CreateMetadataLookupFromIR(metadata)));
-        }
-
-        return result;
-    }
-
-    Storage<std::unique_ptr<IProvider>>& mProvidersStorage;
-    IMetadataTargetProvider* mMetadataTargetProvider;
-    IMultiMetadataIRProvider* mMetadataIRProvider;
-    IRangeProvider* mDefaultScanRange;
-    IRelativeDispProvider* mRelDispCalculator;
-    ICapstoneProvider* mCapstoneProvider;
-    IFarAddressResolverProvider* mFarAddressResolverProvider;
-    INamespace* mNs;
-
-    // Internal
-    std::unordered_map<std::string, IRangeProvider*> mRangeProviderMap;
-
-private:
-    MetadataTarget* MetadataTargetFromIR(MetadataTargetIR& ir)
-    {
-        return mMetadataTargetProvider->GetMetadataTarget(ir.mName, mNs);
-    }
-
-    std::unique_ptr<ILookableMetadata> CreateMetadataLookupFromIR(MetadataIR& ir)
-    {
-        MetadataTarget& target = *MetadataTargetFromIR(ir.mTarget);
-
-        const auto& lookup = *ir.mLookup;
-
-        if (lookup.mType == EMetadataLookup::PATTERN_VALIDATE)
-            return CreatePatternValidateLookupFromIR(target, *lookup.mPatternValidate);
-
-        if (lookup.mType == EMetadataLookup::INSN_IMMEDIATE)
-            return CreateInsnImmLookupFromIR(target, *lookup.mInsnImmediate);
-
-        if (lookup.mType == EMetadataLookup::FAR_ADDRESS)
-            return CreateFarAddressLookupFromIR(target, *lookup.mFarAddress);
-
-        if (lookup.mType == EMetadataLookup::PATTERN_SINGLE_RESULT)
-            return CreatePatternSingleResultLookupFromIR(target, *lookup.mPatternSingleResult);
-
-        if (lookup.mType == EMetadataLookup::HARDCODED)
-            return CreateHardcodedLookupFromIR(target, *lookup.mHardcoded);
-
-        return 0;
-    }
-
-    std::unique_ptr<ILookableMetadata> CreatePatternValidateLookupFromIR(MetadataTarget& target, PatternValidateLookupIR& ir)
-    {
-        IRangeProvider* scanRange = CreateScanRangeFromIR(ir.mScanRange);
-
-        return std::make_unique<PatternCheckLookup>(target, scanRange, ir.mPattern, ir.mbUnique);
-    }
-
-    std::unique_ptr<ILookableMetadata> CreateInsnImmLookupFromIR(MetadataTarget& target, InsnImmediateLookupIR& ir)
-    {
-        auto& scanCombo = ir.mScanCombo;
-        auto& scanCFG = scanCombo.mScanCFG;
-
-        IRangeProvider* scanRange = CreateScanRangeFromIR(scanCombo.mScanRange);
-        IAddressesProvider* addressesProvider = (IAddressesProvider*) mProvidersStorage.Store(
-            std::make_unique<PatternScanAddresses>(
-                scanRange,
-                PatternScanConfig(
-                    scanCFG.mPattern,
-                    scanCFG.mDisp
-                )
-            )
-        ).get();
-
-        return std::make_unique<InsnImmediateLookup>(target, addressesProvider, mCapstoneProvider, ir.mImmIndex);
-    }
-
-    std::unique_ptr<ILookableMetadata> CreateFarAddressLookupFromIR(MetadataTarget& target, FarAddressLookupIR& ir)
-    {
-        auto& scanCombo = ir.mScanCombo;
-        auto& scanCFG = scanCombo.mScanCFG;
-
-        IRangeProvider* scanRange = CreateScanRangeFromIR(scanCombo.mScanRange);
-        IAddressesProvider* addressesProvider = (IAddressesProvider*)mProvidersStorage.Store(
-            std::make_unique<PatternScanAddresses>(
-                scanRange,
-                PatternScanConfig(
-                    scanCFG.mPattern,
-                    scanCFG.mDisp
-                )
-            )
-        ).get();
-        IFarAddressResolver* farAddressResolver = mFarAddressResolverProvider->GetFarAddressResolver(mCapstoneProvider);
-
-        return std::make_unique<FarAddressLookup>(target, addressesProvider, farAddressResolver, mRelDispCalculator);
-    }
-
-    std::unique_ptr<ILookableMetadata> CreatePatternSingleResultLookupFromIR(MetadataTarget& target, PatternSingleResultLookupIR& ir)
-    {
-        IRangeProvider* scanRange = CreateScanRangeFromIR(ir.mScanCombo.mScanRange);
-
-        return std::make_unique<PatternSingleResultLookup>(target, scanRange, ir.mScanCombo.mScanCFG.mPattern);
-    }
-
-    std::unique_ptr<ILookableMetadata> CreateHardcodedLookupFromIR(MetadataTarget& target, MetadataResult& ir)
-    {
-        return std::make_unique<HardcodedLookup>(target, ir);
-    }
-
-    IRangeProvider* CreateMetadataScanRangeFromIR(MetadataIR& ir)
-    {
-        if(mRangeProviderMap.find(ir.mTarget.mName) != mRangeProviderMap.end())
-            throw UnexpectedLayoutException(fmt::format("'{}':Metadata Scan Range duplicated detected."));
-
-        return mRangeProviderMap[ir.mTarget.mName] = CreateScanRangeFromIR(ir.mScanRange->mScanRange);
-    }
-
-    IRangeProvider* CreateScanRangeFromIR(ScanRangeIR& ir)
-    {
-        if (ir.mType == EMetadataScanRange::DEFAULT)
-            return mDefaultScanRange;
-
-        if (ir.mType == EMetadataScanRange::REFERENCE)
-        {
-            auto& key = *ir.mRef;
-
-            if (mRangeProviderMap.find(key) == mRangeProviderMap.end())
-                throw UnexpectedLayoutException(fmt::format("'{}':Scan Range Reference not found."));
-
-            return mRangeProviderMap[key];
-        }
-
-        return CreateScanRangePipelineFromIR(*ir.mPipeline);
-    }
-
-    IRangeProvider* CreateScanRangePipelineFromIR(MetadataScanRangePipelineIR& pipeline)
-    {
-        std::vector<PatternScanConfig> configs;
-
-        for (const auto& stage : pipeline.mStages)
-        {
-            const auto& scanCFG = stage.mFunction->mScanCFG;
-
-            configs.emplace_back(std::move(PatternScanConfig(
-                scanCFG.mPattern,
-                scanCFG.mDisp
-            )));
-        }
-
-        return (IRangeProvider*) mProvidersStorage.Store(std::make_unique<ProcedureRangeProviderChain>(mCapstoneProvider, mDefaultScanRange, configs)).get();
-    }
-};
 
 int main(int argc, const char** argv)
 {

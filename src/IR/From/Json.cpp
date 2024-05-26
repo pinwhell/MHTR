@@ -2,129 +2,19 @@
 #include <fmt/core.h>
 #include <Exception/UnexpectedLayout.h>
 
-MetadataScanRangeStageIR::MetadataScanRangeStageIR()
-    : mType(EMetadataScanRangeStage::NONE)
-    , mPtr(nullptr)
-{}
-
-MetadataScanRangeStageIR::~MetadataScanRangeStageIR()
+EMetadataScanRangeStage MetadataScanRangeStageIR::getType() const
 {
-    Reset();
+    return (EMetadataScanRangeStage) mStage.index();
 }
 
-void MetadataScanRangeStageIR::Reset()
+EMetadataLookup MetadataLookupIR::getType() const
 {
-    if (mPtr == nullptr)
-        return;
-
-    if (mType == EMetadataScanRangeStage::FUNCTION)
-        delete mFunction;
-
-    mPtr = nullptr;
+    return (EMetadataLookup)mLookup.index();
 }
 
-MetadataScanRangeStageIR::MetadataScanRangeStageIR(MetadataScanRangeStageIR&& other) noexcept
+EMetadata MetadataIR::getType() const
 {
-    Reset();
-
-    mType = other.mType;
-    mPtr = other.mPtr; other.mPtr = nullptr;
-}
-
-ScanRangeIR::ScanRangeIR()
-{}
-
-ScanRangeIR::~ScanRangeIR() {
-
-}
-
-void ScanRangeIR::Reset()
-{
-    if (mPtr == nullptr)
-        return;
-
-    if (mType == EMetadataScanRange::PIPELINE)
-        delete mPipeline;
-
-    else if (mType == EMetadataScanRange::REFERENCE)
-        delete mRef;
-
-    mPtr = nullptr;
-}
-
-ScanRangeIR::ScanRangeIR(ScanRangeIR&& other) noexcept {
-    mType = other.mType;
-    mPtr = other.mPtr; other.mPtr = nullptr;
-}
-
-MetadataLookupIR::MetadataLookupIR()
-    : mType(EMetadataLookup::NONE)
-{
-    mPtr = nullptr;
-}
-
-MetadataLookupIR::MetadataLookupIR(MetadataLookupIR&& other)
-{
-    Reset();
-
-    mType = other.mType;
-    mPtr = other.mPtr; other.mPtr = nullptr;
-}
-
-MetadataLookupIR::~MetadataLookupIR()
-{
-    Reset();
-}
-
-void MetadataLookupIR::Reset()
-{
-    if (mPtr == nullptr)
-        return;
-
-    if (mType == EMetadataLookup::HARDCODED)
-        delete mHardcoded;
-
-    else if (mType == EMetadataLookup::PATTERN_VALIDATE)
-        delete mPatternValidate;
-
-    else if (mType == EMetadataLookup::PATTERN_SINGLE_RESULT)
-        delete mPatternSingleResult;
-
-    else if (mType == EMetadataLookup::FAR_ADDRESS)
-        delete mFarAddress;
-
-    else if (mType == EMetadataLookup::INSN_IMMEDIATE)
-        delete mInsnImmediate;
-
-    mPtr = nullptr;
-}
-
-MetadataIR::MetadataIR()
-    : mType(EMetadata::NONE)
-    , mPtr(nullptr)
-{}
-
-MetadataIR::MetadataIR(MetadataIR&& other) noexcept
-{
-    Reset();
-
-    mTarget = std::move(other.mTarget);
-    mType = other.mType;
-    mPtr = other.mPtr; other.mPtr = nullptr;
-}
-
-void MetadataIR::Reset()
-{
-    if (!mPtr)
-        return;
-
-    if (mType == EMetadata::METADATA_LOOKUP)
-        delete mLookup;
-
-    else if (mType == EMetadata::METADATA_SCAN_RANGE)
-        delete mScanRange;
-
-    mPtr = nullptr;
+    return (EMetadata)mMetadata.index();
 }
 
 FromJsonMultiMetadataIRProvider::FromJsonMultiMetadataIRProvider(const std::string& jsonSrc)
@@ -146,17 +36,16 @@ MetadataIR FromJsonMetadataIRParser::Parse(const nlohmann::json& metadata)
     MetadataIR result;
 
     result.mTarget = std::move(ParseMetadataTarget(metadata));
-    result.mType = TryParseMetadataType(metadata);
 
     try {
-        switch (result.mType)
+        switch (TryParseMetadataType(metadata))
         {
         case EMetadata::METADATA_LOOKUP:
-            result.mLookup = new MetadataLookupIR(std::move(ParseMetadataLookup(metadata)));
+            result.mMetadata = MetadataLookupIR(std::move(ParseMetadataLookup(metadata)));
             break;
 
         case EMetadata::METADATA_SCAN_RANGE:
-            result.mScanRange = new MetadataScanRangeIR(std::move(ParseMetadataScanRange(metadata)));
+            result.mMetadata = MetadataScanRangeIR(std::move(ParseMetadataScanRange(metadata)));
             break;
         }
     }
@@ -195,9 +84,7 @@ MetadataScanRangeStageIR FromJsonMetadataIRParser::ParseMetadataScanRangeStage(c
 {
     MetadataScanRangeStageIR result;
 
-    result.mType = EMetadataScanRangeStage::FUNCTION;
-
-    result.mFunction = new MetadataScanRangeStageFunctionIR(
+    result.mStage = MetadataScanRangeStageFunctionIR(
         std::move(
             ParseMetadataScanRangeStageFunction(
                 stage
@@ -221,28 +108,29 @@ MetadataScanRangePipelineIR FromJsonMetadataIRParser::ParseMetadataScanRangePipe
     return result;
 }
 
+EMetadataScanRange ScanRangeIR::getType() const
+{
+    return (EMetadataScanRange) mScanRange.index();
+}
+
 ScanRangeIR FromJsonMetadataIRParser::ParseScanRange(const nlohmann::json& scanRange)
 {
     ScanRangeIR result;
 
-    result.mType = EMetadataScanRange::DEFAULT;
+    result.mScanRange = ScanRangeIR::Default{};
 
     if (scanRange.empty())
         return result;
 
     if (scanRange.is_array())
     {
-        result.mType = EMetadataScanRange::PIPELINE;
-        result.mPipeline = new MetadataScanRangePipelineIR(std::move(ParseMetadataScanRangePipeline(scanRange)));
-
+        result.mScanRange = MetadataScanRangePipelineIR(std::move(ParseMetadataScanRangePipeline(scanRange)));
         return result;
     }
 
     if (scanRange.is_string())
     {
-        result.mType = EMetadataScanRange::REFERENCE;
-        result.mRef = new std::string(scanRange.get<std::string>());
-
+        result.mScanRange = std::string(scanRange.get<std::string>());
         return result;
     }
 
@@ -365,28 +253,26 @@ MetadataLookupIR FromJsonMetadataIRParser::ParseMetadataLookup(const nlohmann::j
 {
     MetadataLookupIR result;
 
-    result.mType = TryParseMetadataLookupType(lookup);
-
-    switch (result.mType)
+    switch (TryParseMetadataLookupType(lookup))
     {
     case EMetadataLookup::PATTERN_VALIDATE:
-        result.mPatternValidate = new PatternValidateLookupIR(std::move(ParsePatternValidateLookup(lookup)));
+        result.mLookup = PatternValidateLookupIR(std::move(ParsePatternValidateLookup(lookup)));
         break;
 
     case EMetadataLookup::PATTERN_SINGLE_RESULT:
-        result.mPatternSingleResult = new PatternSingleResultLookupIR(std::move(ParsePatternSingleResultLookup(lookup)));
+        result.mLookup = PatternSingleResultLookupIR(std::move(ParsePatternSingleResultLookup(lookup)));
         break;
 
     case EMetadataLookup::INSN_IMMEDIATE:
-        result.mInsnImmediate = new InsnImmediateLookupIR(std::move(ParseInsnImmediateLookup(lookup)));
+        result.mLookup = InsnImmediateLookupIR(std::move(ParseInsnImmediateLookup(lookup)));
         break;
 
     case EMetadataLookup::FAR_ADDRESS:
-        result.mFarAddress = new FarAddressLookupIR(std::move(ParseFarAddressLookup(lookup)));
+        result.mLookup = FarAddressLookupIR(std::move(ParseFarAddressLookup(lookup)));
         break;
 
     case EMetadataLookup::HARDCODED:
-        result.mHardcoded = new MetadataResult(ParseHardcoded(lookup));
+        result.mLookup = MetadataResult(ParseHardcoded(lookup));
         break;
     }
 

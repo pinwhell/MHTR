@@ -30,46 +30,26 @@ void Metadata<uint64_t>::operator+=(const Metadata<uint64_t>& other) {
 }
 
 MetadataResult::MetadataResult(uint64_t offset)
-	: mType(EMetadataResult::OFFSET)
-	, mOffset(offset)
+	: mMetadata(offset)
 {}
 
 MetadataResult::MetadataResult(const std::string & pattern)
-	: mType(EMetadataResult::PATTERN)
-	, mPattern(pattern.c_str())
+	: mMetadata(pattern)
 {}
-
-MetadataResult::~MetadataResult()
-{}
-
-MetadataResult& MetadataResult::operator=(const MetadataResult& other)
-{
-	mType = other.mType;
-
-	switch (mType)
-	{
-	case EMetadataResult::OFFSET:
-		mOffset = other.mOffset;
-		break;
-
-	case EMetadataResult::PATTERN:
-		new (&mPattern) std::string(other.mPattern);
-		break;
-	}
-
-	return *this;
-}
 
 std::string MetadataResult::ToString() const {
-	switch (mType)
-	{
-	case EMetadataResult::PATTERN:
-		return mPattern.ToString();
-	case EMetadataResult::OFFSET:
-		return mOffset.ToString();
-	}
+	if (std::holds_alternative<OffsetMetadata>(mMetadata))
+		return std::get<OffsetMetadata>(mMetadata).ToString();
+
+	if (std::holds_alternative<PatternMetadata>(mMetadata))
+		return std::get<PatternMetadata>(mMetadata).ToString();
 
 	return "";
+}
+
+EMetadataResult MetadataResult::getType() const
+{
+	return (EMetadataResult)mMetadata.index();
 }
 
 MetadataTarget::MetadataTarget(const std::string& name, INamespace* ns)
@@ -214,7 +194,7 @@ std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespac
 	return result;
 }
 
-HardcodedLookup::HardcodedLookup(MetadataTarget& target, MetadataResult& hardcoded)
+HardcodedLookup::HardcodedLookup(MetadataTarget& target, const MetadataResult& hardcoded)
 	: mTarget(target)
 {
 	mTarget.TrySetResult(std::move(hardcoded));

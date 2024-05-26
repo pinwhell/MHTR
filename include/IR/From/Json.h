@@ -23,7 +23,6 @@ private:
     EMetadata TryParseMetadataType(const nlohmann::json& metadata);
     MetadataLookupIR ParseMetadataLookup(const nlohmann::json& lookup);
     MetadataScanRangeIR ParseMetadataScanRange(const nlohmann::json& metadata);
-
 };
 
 class FromJsonMultiMetadataIRProvider : public IMultiMetadataIRProvider {
