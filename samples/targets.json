@@ -1,0 +1,7 @@
+[
+  {
+    "binaryPath": "libdummy.so",
+    "namespace": "Dummy",
+    "metadataPath": "libdummy.json"
+  }
+]

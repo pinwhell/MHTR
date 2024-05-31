@@ -3,36 +3,39 @@
 #include <filesystem>
 
 #include <Provider/IRange.h>
-#include <Provider/IRelativeDisp.h>
+#include <Factory/MetadataTarget.h>
 #include <CStone/Provider.h>
 #include <IR/From/Json.h>
 #include <IR/ToMetadata.h>
 #include <Synther/Namespace.h>
-#include <BinFmt/ELF.h>
+#include <Binary/ELF.h>
+#include <Binary/Factory.h>
 #include <Arch/ARM/32/Resolver/FarAddress.h>
 
 #include <Metadata.h>
 #include <MetadataSynthers.h>
-#include <MetadataTargetFactory.h>
 #include <PatternScan.h>
 #include <FarAddressLookup.h>
-#include <FileBufferView.h>
+#include <Binary/File.h>
+#include <OffsetCalculator.h>
 #include <Provider/ProcedureRangeChain.h>
+#include <Provider/FromFileJson.h>
+
 
 class IMetadataLookupContextProvider {
 public:
     virtual ~IMetadataLookupContextProvider() {}
-    virtual void ContextProvide(std::function<void(IRelativeDispProvider*, IRangeProvider*, ICapstoneProvider*)> callback) = 0;
+    virtual void ContextProvide(std::function<void(IOffsetCalculator*, IRangeProvider*, ICapstoneProvider*)> callback) = 0;
 };
 
 void BasicScan(IMetadataLookupContextProvider* metdtContextProvider)
 {
-    metdtContextProvider->ContextProvide([](IRelativeDispProvider* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* _) {
+    metdtContextProvider->ContextProvide([](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* _) {
         try {
             MetadataTarget target1("Example1");
             MetadataTarget target2("Example2");
             PatternCheckLookup lookup(target1, scanRangeProvider, "7F", false);
-            PatternSingleResultLookup lookup2(target2, scanRangeProvider, "7F");
+            PatternSingleResultLookup lookup2(target2, scanRangeProvider, relDispCalculator, "7F");
 
             try {
                 lookup.Lookup();
@@ -55,23 +58,23 @@ void BasicScan(IMetadataLookupContextProvider* metdtContextProvider)
 
 void TestCapstone(IMetadataLookupContextProvider* metdtContextProvider)
 {
-    metdtContextProvider->ContextProvide([](IRelativeDispProvider* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* capstoneInstancer) {
+    metdtContextProvider->ContextProvide([](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* capstoneInstancer) {
         try {
-            BufferView bv = scanRangeProvider->GetRange();
-
-            std::thread t([capstoneInstancer, &bv] {
+            std::thread t([capstoneInstancer, scanRangeProvider] {
+                Range range = scanRangeProvider->GetRange();
                 // PoC Thread Safe Instancer
                 ICapstone* capstone = capstoneInstancer->GetInstance();
                 ICapstoneUtility* utility = capstone->getUtility();
-                CapstoneDismHandle dism = capstone->Disassemble(bv.start<char*>() + 0x12AA, 0x1000);
+                CapstoneDismHandle dism = capstone->Disassemble(range.GetStart<char*>() + 0x12AA, 0x1000);
                 //std::cout << std::boolalpha << utility->InsnHasRegister(dism.mpFirst, ARM_REG_R0) << std::endl;
                 //std::cout << utility->InsnGetImmByIndex(dism.mpFirst, 0) << std::endl;
 
                 });
 
+            Range range = scanRangeProvider->GetRange();
             ICapstone* capstone = capstoneInstancer->GetInstance();
             ICapstoneUtility* utility = capstone->getUtility();
-            CapstoneDismHandle dism = capstone->Disassemble(bv.start<char*>() + 0x12AA, 0x1000);
+            CapstoneDismHandle dism = capstone->Disassemble(range.GetStart<char*>() + 0x12AA, 0x1000);
 
             utility->InsnHasRegister(dism.mpFirst, ARM_REG_R0);
             utility->InsnGetImmByIndex(dism.mpFirst, 0);
@@ -100,7 +103,7 @@ void TestCapstone(IMetadataLookupContextProvider* metdtContextProvider)
 
 void TestImmediateLookup(IMetadataLookupContextProvider* metdtContextProvider)
 {
-    metdtContextProvider->ContextProvide([](IRelativeDispProvider* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* capstoneInstancer) {
+    metdtContextProvider->ContextProvide([](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* capstoneInstancer) {
         try {
             MetadataTarget target("Example");
             PatternScanAddresses addresses(scanRangeProvider, "?0 ?8 ?1 ?0", 0);
@@ -122,7 +125,7 @@ void TestImmediateLookup(IMetadataLookupContextProvider* metdtContextProvider)
 
 void FarAddressLookupTest(IMetadataLookupContextProvider* metdtContextProvider)
 {
-    metdtContextProvider->ContextProvide([](IRelativeDispProvider* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* capstoneInstancer) {
+    metdtContextProvider->ContextProvide([](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* capstoneInstancer) {
         try {
             MetadataTarget target("Example");
             PatternScanAddresses addressesProvider(scanRangeProvider, "B0 BD 0C 48 40 F2", 20);
@@ -145,19 +148,19 @@ void FarAddressLookupTest(IMetadataLookupContextProvider* metdtContextProvider)
 
 class TestMetadataLookupContextProvider : public IMetadataLookupContextProvider {
 public:
-    TestMetadataLookupContextProvider(IRelativeDispProvider* relDispCalculator, IRangeProvider* rangeProvider, ICapstoneFactory* factory)
+    TestMetadataLookupContextProvider(IOffsetCalculator* relDispCalculator, IRangeProvider* rangeProvider, ICapstoneFactory* factory)
         : mRelDispCalculator(relDispCalculator)
         , mRangeProvider(rangeProvider)
         , mCapstoneProvider(factory)
     {}
 
-    void ContextProvide(std::function<void(IRelativeDispProvider*, IRangeProvider*, ICapstoneProvider*)> callback) override
+    void ContextProvide(std::function<void(IOffsetCalculator*, IRangeProvider*, ICapstoneProvider*)> callback) override
     {
         callback(mRelDispCalculator, mRangeProvider, &mCapstoneProvider);
     }
 
 private:
-    IRelativeDispProvider* mRelDispCalculator;
+    IOffsetCalculator* mRelDispCalculator;
     IRangeProvider* mRangeProvider;
     CapstoneConcurrentProvider mCapstoneProvider;
 };
@@ -167,11 +170,11 @@ void RunMetadataTests()
     try {
         std::filesystem::current_path(MHR_SAMPLES_DIR);
 
-        FileBufferView fileView("libdummy.so");
-        ELFBuffer EflBuffer(fileView.mBufferView);
-        TestMetadataLookupContextProvider metdtContextProvider(&fileView, &fileView, &EflBuffer);
+        BinaryFile bin("libdummy.so");
+        OffsetCalculator binOffCalctor(&bin);
+        TestMetadataLookupContextProvider metdtContextProvider(&binOffCalctor, &bin, &bin);
 
-        metdtContextProvider.ContextProvide([&](IRelativeDispProvider* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* cStoneInstancer) {
+        metdtContextProvider.ContextProvide([&](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* cStoneInstancer) {
             ProcedureRangeProviderChain procedureRangeProviderChain(cStoneInstancer, scanRangeProvider, {
                 PatternScanConfig("00 F0 57 B9 D0 B5 02 AF 04 46", 0)  // buffView.start<uint64_t>() + 0x1AC8
                 });
@@ -220,64 +223,61 @@ void TestNamespaces()
     std::cout << baz.GetFullIdentifier(true) << std::endl;
 }
 
+#include <Provider/Json.h>
+#include <Provider/FromJsonSingleNamespace.h>
+#include <Provider/FromJsonPathJsonFile.h>
+#include <Factory/FromTargetBinJsonBinary.h>
+
 int main(int argc, const char** argv)
 {
     std::filesystem::current_path(MHR_SAMPLES_DIR);
+
+    MetadataTargetFactory metadataTargetProvider;
+    Storage<std::unique_ptr<IProvider>> scanRanges;
+    Storage<std::unique_ptr<ICapstoneProvider>> cstoneProviders;
+    Storage<std::unique_ptr<IBinary>> bins;
 
     //TestDumpMetadata();
     //TestNamespaces();
     //RunMetadataTests();
 
-    FromJsonMultiMetadataIRProvider multiMetadataProvider(R"(
-    [
-        {
-            "name" : "Bar",               
-            "scanRange" : [             
-                {
-                    "defFnSize" : 10,   
-                    "pattern" : {
-                        "pattern" : "AA BB C? D? ? E?",
-                        "disp" : -10    
-                    }
-                },
-                {
-                    "defFnSize" : 10,   
-                    "pattern" : {
-                        "pattern" : "AA BB C? D? ? E?",
-                        "disp" : -10    
-                    }
-                }
-            ]
-        },
-        {
-            "name" : "Foo",
-            "type" : "INSN_IMM",        
-            "immIndex" : 1,             
-            "pattern" : "AA BB CC",
-            "disp" : -5,               
- 
-            "scanRange" : "Bar"
-        }
-    ]
-)");
-
     try {
-        FileBufferView fileView("libdummy.so");
-        ELFBuffer elfBuffer(fileView.mBufferView);
-        CapstoneConcurrentProvider capstoneProvider(&elfBuffer);
-        MetadataTargetFactory metadatTargets;
-        Storage<std::unique_ptr<IProvider>> scanRanges;
-        FromIR2MetadataFactory multiMetadatasFactory(
-            scanRanges,
-            &metadatTargets,
-            &multiMetadataProvider,
-            &fileView,
-            &fileView,
-            &capstoneProvider,
-            &elfBuffer
-        );
-        
-        auto allMetadata = multiMetadatasFactory.ProduceAll();
+        FromFileJsonProvider targetsJsonProvider("targets.json");
+        const auto& targets = (*targetsJsonProvider.GetJson());
+        std::vector<std::vector<std::unique_ptr<ILookableMetadata>>> allVecLookables;
+
+        std::transform(targets.begin(), targets.end(), std::back_inserter(allVecLookables), [&](const auto& target) {
+            JsonProvider binTargetJsonProvider(target);
+            FromJsonPathJsonFileProvider metadataIrJsonProvider(&binTargetJsonProvider, "metadataPath");
+            FromJsonSingleNamespaceProvider nsProvider(&binTargetJsonProvider);
+            FromJsonMultiMetadataIRFactory irFactory(&metadataIrJsonProvider);
+            IBinary* bin = bins.Store(FromTargetBinJsonBinaryFactory(&binTargetJsonProvider).CreateBinary()).get();
+            IOffsetCalculator* offsetCalculator = bin->GetOffsetCalculator();
+            ICapstoneProvider* capstoneProvider = cstoneProviders.Store(std::make_unique<CapstoneConcurrentProvider>(bin)).get();
+
+            return FromIRMultiMetadataFactory(
+                scanRanges,
+                &metadataTargetProvider,
+                &irFactory,
+                bin,
+                offsetCalculator,
+                capstoneProvider,
+                bin,
+                &nsProvider
+            ).ProduceAll();
+            });
+
+        std::vector<std::unique_ptr<ILookableMetadata>> allLookables;
+
+        for (auto& lookableVec : allVecLookables)
+        {
+            allLookables.reserve(allLookables.size() + lookableVec.size());
+            std::move(std::make_move_iterator(lookableVec.begin()), std::make_move_iterator(lookableVec.end()), std::back_inserter(allLookables));
+            lookableVec.clear();
+        }
+
+        for (auto& lookable : allLookables)
+            lookable->Lookup();
     }
     catch (const std::exception& e)
     {

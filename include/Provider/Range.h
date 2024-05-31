@@ -4,9 +4,9 @@
 
 class RangeProvider : public IRangeProvider {
 public:
-    RangeProvider(const BufferView& buffView);
+    RangeProvider(const Range& buffView);
 
-    BufferView GetRange() override;
+    Range GetRange() override;
 
-    BufferView mBuffView;
+    Range mBuffView;
 };

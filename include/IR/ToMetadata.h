@@ -2,38 +2,37 @@
 
 #include <Storage.h>
 #include <Provider/IMetadataTarget.h>
-#include <IR/IProvider.h>
-#include <Provider/IRelativeDisp.h>
-#include <CStone/IProvider.h>
-#include <Provider/IFarAddress.h> 
-#include <vector>
-#include <unordered_map>
 #include <Provider/IRange.h>
-#include <Synther/INamespace.h>
+#include <Provider/IFarAddress.h> 
+#include <Provider/INamespace.h>
+#include <Factory/IMultiMetadata.h>
+#include <IR/IFactory.h>
+#include <IOffsetCalculator.h>
+#include <CStone/IProvider.h>
 
-class FromIR2MetadataFactory {
+class FromIRMultiMetadataFactory : public IMultiMetadataFactory {
 public:
-    FromIR2MetadataFactory(
+    FromIRMultiMetadataFactory(
         Storage<std::unique_ptr<IProvider>>& providersStorage,
         IMetadataTargetProvider* metadataTargetProvider,
-        IMultiMetadataIRProvider* metadataIRProvider,
+        IMultiMetadataIRFactory* metadataIRFactory,
         IRangeProvider* defaultScanRange,
-        IRelativeDispProvider* relDispCalculator,
+        IOffsetCalculator* offsetCalculator,
         ICapstoneProvider* capstoneProvider,
         IFarAddressResolverProvider* farAddressResolverProvider,
-        INamespace* ns = nullptr
+        INamespaceProvider* nsProvider = nullptr
     );
 
-    std::vector<std::unique_ptr<ILookableMetadata>> ProduceAll();
+    std::vector<std::unique_ptr<ILookableMetadata>> ProduceAll() override;
 
     Storage<std::unique_ptr<IProvider>>& mProvidersStorage;
     IMetadataTargetProvider* mMetadataTargetProvider;
-    IMultiMetadataIRProvider* mMetadataIRProvider;
+    IMultiMetadataIRFactory* mMetadataIRProvider;
     IRangeProvider* mDefaultScanRange;
-    IRelativeDispProvider* mRelDispCalculator;
+    IOffsetCalculator* mOffsetCalculator;
     ICapstoneProvider* mCapstoneProvider;
     IFarAddressResolverProvider* mFarAddressResolverProvider;
-    INamespace* mNs;
+    INamespaceProvider* mNsProvider;
 
     // Internal
     std::unordered_map<std::string, IRangeProvider*> mRangeProviderMap;

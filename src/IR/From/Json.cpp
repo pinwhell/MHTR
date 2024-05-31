@@ -17,15 +17,14 @@ EMetadata MetadataIR::getType() const
     return (EMetadata)mMetadata.index();
 }
 
-FromJsonMultiMetadataIRProvider::FromJsonMultiMetadataIRProvider(const std::string& jsonSrc)
-    : mJsonSrc(jsonSrc)
+FromJsonMultiMetadataIRFactory::FromJsonMultiMetadataIRFactory(IJsonProvider* jsonProvider)
+    : mJson(*jsonProvider->GetJson())
 {}
 
-std::vector<MetadataIR> FromJsonMultiMetadataIRProvider::GetAllMetadatas() {
-    auto multiMetadataJsonObj = nlohmann::json::parse(mJsonSrc);
+std::vector<MetadataIR> FromJsonMultiMetadataIRFactory::GetAllMetadatas() {
     std::vector<MetadataIR> result;
 
-    for (const auto& metadata : multiMetadataJsonObj)
+    for (const auto& metadata : mJson)
         result.emplace_back(std::move(mParser.Parse(metadata)));
 
     return result;

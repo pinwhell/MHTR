@@ -108,9 +108,10 @@ void PatternCheckLookup::Check()
 	mTarget.TrySetResult(MetadataResult(mPattern));
 }
 
-PatternSingleResultLookup::PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern)
+PatternSingleResultLookup::PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, IOffsetCalculator* offsetCalculator, const std::string& pattern)
 	: mTarget(target)
 	, mScanRange(scanRange)
+	, mOffsetCalculator(offsetCalculator)
 	, mPattern(pattern)
 {}
 
@@ -119,12 +120,10 @@ void PatternSingleResultLookup::Lookup()
 	if (mTarget.mHasResult)
 		return;
 
-	BufferView bv = mScanRange->GetRange();
-
 	TBS::Pattern::Results res;
 	PatternScanOrExceptWithName(mTarget.mFullIdentifier.GetFullIdentifier(), mScanRange, mPattern, res, true);
 
-	mTarget.TrySetResult(MetadataResult(bv.OffsetFromBase(res[0])));
+	mTarget.TrySetResult(MetadataResult(mOffsetCalculator->ComputeOffset(res[0])));
 }
 
 MetadataTarget* PatternSingleResultLookup::GetTarget() {

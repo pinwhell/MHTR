@@ -4,11 +4,11 @@
 
 #include <Resolver/IFarAddress.h>
 #include <Provider/IAddresses.h>
-#include <Provider/IRelativeDisp.h>
+#include <IOffsetCalculator.h>
 
 class FarAddressLookup : public ILookableMetadata {
 public:
-    FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IRelativeDispProvider* dispCalculator, bool bDeref = false);
+    FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IOffsetCalculator* offsetCalculator, bool bDeref = false);
 
     MetadataTarget* GetTarget() override;
     void Lookup() override;
@@ -16,6 +16,6 @@ public:
     MetadataTarget& mTarget;
     IAddressesProvider* mInsnAddressesProvider;
     IFarAddressResolver* mFarAddressResolver;
-    IRelativeDispProvider* mDispCalculator;
+    IOffsetCalculator* mOffsetCalculator;
     bool mDeref;
 };

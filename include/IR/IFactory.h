@@ -3,8 +3,8 @@
 #include <vector>
 #include <IR/Metadata.h>
 
-class IMultiMetadataIRProvider {
+class IMultiMetadataIRFactory {
 public:
     virtual std::vector<MetadataIR> GetAllMetadatas() = 0;
-	virtual ~IMultiMetadataIRProvider() {}
+	virtual ~IMultiMetadataIRFactory() {}
 };

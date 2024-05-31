@@ -7,9 +7,9 @@ PatternScanException::PatternScanException(const std::string& what)
 
 void PatternScanOrExcept(IRangeProvider* scanRangeProvider, const std::string& pattern, TBS::Pattern::Results& results, bool bUniqueLookup)
 {
-	BufferView bv = scanRangeProvider->GetRange();
+	Range range = scanRangeProvider->GetRange();
 
-	if (!TBS::Light::Scan(bv.start(), bv.end(), results, pattern.c_str()))
+	if (!TBS::Light::Scan(range.GetStart(), range.GetEnd(), results, pattern.c_str()))
 		throw PatternScanException(fmt::format("'{}' not found.", pattern));
 
 	if (bUniqueLookup && results.size() != 1)

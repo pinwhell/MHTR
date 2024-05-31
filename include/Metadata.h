@@ -13,9 +13,11 @@
 #include <Synther/NamespacedIdentifier.h>
 
 #include <ILookable.h>
-#include <BufferView.h>
+#include <Range.h>
 
 #include <Provider/IRange.h>
+
+#include <IOffsetCalculator.h>
 
 
 constexpr auto METADATA_OFFSET_INVALID = -1;
@@ -137,13 +139,14 @@ private:
 
 class PatternSingleResultLookup : public ILookableMetadata {
 public:
-	PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern);
+	PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, IOffsetCalculator* offsetCalculator, const std::string& pattern);
 
 	void Lookup() override;
 	MetadataTarget* GetTarget() override;
 
 	MetadataTarget& mTarget;
 	IRangeProvider* mScanRange;
+	IOffsetCalculator* mOffsetCalculator;
 	std::string mPattern;
 };
 

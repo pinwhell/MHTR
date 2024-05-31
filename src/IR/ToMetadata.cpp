@@ -5,48 +5,55 @@
 #include <fmt/core.h>
 #include <Provider/ProcedureRangeChain.h>
 #include <algorithm>
+#include <iterator>
 
-FromIR2MetadataFactory::FromIR2MetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRProvider* metadataIRProvider, IRangeProvider* defaultScanRange, IRelativeDispProvider* relDispCalculator, ICapstoneProvider* capstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespace* ns)
+FromIRMultiMetadataFactory::FromIRMultiMetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRFactory* metadataIRFactory, IRangeProvider* defaultScanRange, IOffsetCalculator* offsetCalculator, ICapstoneProvider* capstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespaceProvider* nsProvider)
     : mProvidersStorage(providersStorage)
     , mMetadataTargetProvider(metadataTargetProvider)
-    , mMetadataIRProvider(metadataIRProvider)
+    , mMetadataIRProvider(metadataIRFactory)
     , mDefaultScanRange(defaultScanRange)
-    , mRelDispCalculator(relDispCalculator)
+    , mOffsetCalculator(offsetCalculator)
     , mCapstoneProvider(capstoneProvider)
     , mFarAddressResolverProvider(farAddressResolverProvider)
-    , mNs(ns)
+    , mNsProvider(nsProvider)
 {}
 
-std::vector<std::unique_ptr<ILookableMetadata>> FromIR2MetadataFactory::ProduceAll() {
+std::vector<std::unique_ptr<ILookableMetadata>> FromIRMultiMetadataFactory::ProduceAll() {
     std::vector<MetadataIR> allMetadata = mMetadataIRProvider->GetAllMetadatas();
+    std::vector<MetadataIR*> allMetadataPtr;
 
-    for (MetadataIR& metadata : allMetadata)
-    {
-        if (metadata.getType() != EMetadata::METADATA_SCAN_RANGE)
-            continue;
+    std::transform(allMetadata.begin(), allMetadata.end(), std::back_inserter(allMetadataPtr), [](MetadataIR& ir) {
+        return &ir;
+        });
 
-        CreateMetadataScanRangeFromIR(metadata);
-    }
+    std::sort(allMetadataPtr.begin(), allMetadataPtr.end(), [](MetadataIR* first, MetadataIR* second /*the functio ask, "is this order right?"*/) {
+        return (unsigned)first->getType() > (unsigned)second->getType();
+        });
 
     std::vector<std::unique_ptr<ILookableMetadata>> result;
 
-    for (MetadataIR& metadata : allMetadata)
+    for (MetadataIR* metadata : allMetadataPtr)
     {
-        if (metadata.getType() != EMetadata::METADATA_LOOKUP)
+        if (metadata->getType() == EMetadata::METADATA_SCAN_RANGE)
+        {
+            CreateMetadataScanRangeFromIR(*metadata);
             continue;
+        }
 
-        result.emplace_back(std::move(CreateMetadataLookupFromIR(metadata)));
+        result.emplace_back(CreateMetadataLookupFromIR(*metadata));
     }
 
     return result;
 }
 
-MetadataTarget* FromIR2MetadataFactory::MetadataTargetFromIR(const MetadataTargetIR& ir)
+MetadataTarget* FromIRMultiMetadataFactory::MetadataTargetFromIR(const MetadataTargetIR& ir)
 {
-    return mMetadataTargetProvider->GetMetadataTarget(ir.mName, mNs);
+    INamespace* ns = mNsProvider ? mNsProvider->GetNamespace() : nullptr;
+
+    return mMetadataTargetProvider->GetMetadataTarget(ir.mName, ns);
 }
 
-std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateMetadataLookupFromIR(const MetadataIR& ir)
+std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateMetadataLookupFromIR(const MetadataIR& ir)
 {
     MetadataTarget& target = *MetadataTargetFromIR(ir.mTarget);
 
@@ -70,14 +77,14 @@ std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateMetadataLookupF
     return 0;
 }
 
-std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreatePatternValidateLookupFromIR(MetadataTarget& target, const PatternValidateLookupIR& ir)
+std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreatePatternValidateLookupFromIR(MetadataTarget& target, const PatternValidateLookupIR& ir)
 {
     IRangeProvider* scanRange = CreateScanRangeFromIR(ir.mScanRange);
 
     return std::make_unique<PatternCheckLookup>(target, scanRange, ir.mPattern, ir.mbUnique);
 }
 
-std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateInsnImmLookupFromIR(MetadataTarget& target, const InsnImmediateLookupIR& ir)
+std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateInsnImmLookupFromIR(MetadataTarget& target, const InsnImmediateLookupIR& ir)
 {
     auto& scanCombo = ir.mScanCombo;
     auto& scanCFG = scanCombo.mScanCFG;
@@ -96,7 +103,7 @@ std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateInsnImmLookupFr
     return std::make_unique<InsnImmediateLookup>(target, addressesProvider, mCapstoneProvider, ir.mImmIndex);
 }
 
-std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateFarAddressLookupFromIR(MetadataTarget& target, const FarAddressLookupIR& ir)
+std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateFarAddressLookupFromIR(MetadataTarget& target, const FarAddressLookupIR& ir)
 {
     auto& scanCombo = ir.mScanCombo;
     auto& scanCFG = scanCombo.mScanCFG;
@@ -113,22 +120,22 @@ std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateFarAddressLooku
     ).get();
     IFarAddressResolver* farAddressResolver = mFarAddressResolverProvider->GetFarAddressResolver(mCapstoneProvider);
 
-    return std::make_unique<FarAddressLookup>(target, addressesProvider, farAddressResolver, mRelDispCalculator);
+    return std::make_unique<FarAddressLookup>(target, addressesProvider, farAddressResolver, mOffsetCalculator);
 }
 
-std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreatePatternSingleResultLookupFromIR(MetadataTarget& target, const PatternSingleResultLookupIR& ir)
+std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreatePatternSingleResultLookupFromIR(MetadataTarget& target, const PatternSingleResultLookupIR& ir)
 {
     IRangeProvider* scanRange = CreateScanRangeFromIR(ir.mScanCombo.mScanRange);
 
-    return std::make_unique<PatternSingleResultLookup>(target, scanRange, ir.mScanCombo.mScanCFG.mPattern);
+    return std::make_unique<PatternSingleResultLookup>(target, scanRange, mOffsetCalculator, ir.mScanCombo.mScanCFG.mPattern);
 }
 
-std::unique_ptr<ILookableMetadata> FromIR2MetadataFactory::CreateHardcodedLookupFromIR(MetadataTarget& target, const MetadataResult& ir)
+std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateHardcodedLookupFromIR(MetadataTarget& target, const MetadataResult& ir)
 {
     return std::make_unique<HardcodedLookup>(target, ir);
 }
 
-IRangeProvider* FromIR2MetadataFactory::CreateMetadataScanRangeFromIR(const MetadataIR& ir)
+IRangeProvider* FromIRMultiMetadataFactory::CreateMetadataScanRangeFromIR(const MetadataIR& ir)
 {
     if (mRangeProviderMap.find(ir.mTarget.mName) != mRangeProviderMap.end())
         throw UnexpectedLayoutException(fmt::format("'{}':Metadata Scan Range duplicated detected."));
@@ -136,7 +143,7 @@ IRangeProvider* FromIR2MetadataFactory::CreateMetadataScanRangeFromIR(const Meta
     return mRangeProviderMap[ir.mTarget.mName] = CreateScanRangeFromIR(std::get<MetadataScanRangeIR>(ir.mMetadata).mScanRange);
 }
 
-IRangeProvider* FromIR2MetadataFactory::CreateScanRangeFromIR(const ScanRangeIR& ir)
+IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangeFromIR(const ScanRangeIR& ir)
 {
     if (std::holds_alternative<MetadataScanRangePipelineIR>(ir.mScanRange))
         return CreateScanRangePipelineFromIR(std::get<MetadataScanRangePipelineIR>(ir.mScanRange));
@@ -154,7 +161,7 @@ IRangeProvider* FromIR2MetadataFactory::CreateScanRangeFromIR(const ScanRangeIR&
     return mDefaultScanRange;
 }
 
-IRangeProvider* FromIR2MetadataFactory::CreateScanRangePipelineFromIR(const MetadataScanRangePipelineIR& pipeline)
+IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangePipelineFromIR(const MetadataScanRangePipelineIR& pipeline)
 {
     std::vector<PatternScanConfig> configs;
 

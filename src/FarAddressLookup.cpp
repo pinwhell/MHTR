@@ -4,11 +4,11 @@
 #include <FarAddressLookup.h>
 #include <unordered_set>
 
-FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IRelativeDispProvider* dispCalculator, bool bDeref)
+FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IOffsetCalculator* offsetCalculator, bool bDeref)
     : mTarget(target)
     , mInsnAddressesProvider(insnAddrsProvider)
     , mFarAddressResolver(farAddrResolver)
-    , mDispCalculator(dispCalculator)
+    , mOffsetCalculator(offsetCalculator)
     , mDeref(bDeref)
 {}
 
@@ -31,7 +31,7 @@ void FarAddressLookup::Lookup()
     {
         try {
             auto farAddr = mFarAddressResolver->TryResolve(insnAddr, mDeref);
-            addrRes.insert(mDispCalculator->OffsetFromBase(farAddr));
+            addrRes.insert(mOffsetCalculator->ComputeOffset(farAddr));
         }
         catch (const std::exception& e)
         {

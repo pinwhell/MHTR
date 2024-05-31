@@ -10,7 +10,7 @@ class ProcedureRangeProviderChain : public IRangeProvider {
 public:
     ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<PatternScanConfig>& nestedProcedurePatterns);
 
-    BufferView GetRange() override;
+    Range GetRange() override;
 
     Storage<std::unique_ptr<IProvider>> mProviders;
     std::vector<IRangeProvider*> mpRangeProviders;

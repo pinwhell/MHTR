@@ -1,5 +1,4 @@
-#include <MetadataTargetFactory.h>
-
+#include <Factory/MetadataTarget.h>
 #include <fmt/format.h>
 
 MetadataTarget* MetadataTargetFactory::GetMetadataTarget(const std::string& name, INamespace* ns)

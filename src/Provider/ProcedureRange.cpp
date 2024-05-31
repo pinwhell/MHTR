@@ -1,5 +1,4 @@
 #include <Provider/ProcedureRange.h>
-
 #include <stdexcept>
 
 ProcedureRangeProvider::ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider)
@@ -7,7 +6,7 @@ ProcedureRangeProvider::ProcedureRangeProvider(ICapstoneProvider* cstoneProvider
     , mProcEntryProvider(procEntryProvider)
 {}
 
-BufferView ProcedureRangeProvider::GetRange() {
+Range ProcedureRangeProvider::GetRange() {
     uint64_t procEntry = mProcEntryProvider->GetEntry();
     uint64_t procEnd = 0;
     ICapstone* cstone = mCStoneProvider->GetInstance();
@@ -36,5 +35,5 @@ BufferView ProcedureRangeProvider::GetRange() {
     if (!procEnd)
         throw std::runtime_error("procedure end lookup failed");
 
-    return BufferView((void*)procEntry, procEnd - procEntry);
+    return Range((void*)procEntry, procEnd - procEntry);
 }

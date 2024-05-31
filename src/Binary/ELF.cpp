@@ -1,14 +1,15 @@
-#include <BinFmt/ELF.h>
+#include <Binary/ELF.h>
 #include <CStone/Factory.h>
 #include <fmt/core.h>
 #include <Arch/ARM/32/Resolver/FarAddress.h>
 
-ELFBuffer::ELFBuffer(const BufferView& view)
-    : mView(view)
-    , mELF(ELFPP::FromBuffer(view.start()))
+ELFBinary::ELFBinary(const void* entry)
+    : mEntry(entry)
+    , mELF(ELFPP::FromBuffer(mEntry))
+    , mDefaultCalculator(this)
 {}
 
-std::unique_ptr<ICapstone> ELFBuffer::CreateInstance(bool bDetailedInst)
+std::unique_ptr<ICapstone> ELFBinary::CreateInstance(bool bDetailedInst)
 {
     auto machine = mELF->GetTargetMachine();
     ECapstoneArchMode archMode{ ECapstoneArchMode::UNDEFINED };
@@ -31,7 +32,7 @@ std::unique_ptr<ICapstone> ELFBuffer::CreateInstance(bool bDetailedInst)
     return CapstoneFactory(archMode).CreateInstance(bDetailedInst);
 }
 
-IFarAddressResolver* ELFBuffer::GetFarAddressResolver(ICapstoneProvider* cstoneProvider)
+IFarAddressResolver* ELFBinary::GetFarAddressResolver(ICapstoneProvider* cstoneProvider)
 {
     auto machine = mELF->GetTargetMachine();
     bool bIs64 = mELF->Is64();
@@ -44,4 +45,16 @@ IFarAddressResolver* ELFBuffer::GetFarAddressResolver(ICapstoneProvider* cstoneP
         return (mFarAddressResolvers[key] = std::make_unique<ARM32FarAddressResolver>(cstoneProvider)).get();
 
     return nullptr;
+}
+
+Range ELFBinary::GetRange()
+{
+    return Range(mEntry, 0x0);
+}
+
+// Inherited via IBinary
+
+IOffsetCalculator* ELFBinary::GetOffsetCalculator()
+{
+    return &mDefaultCalculator;
 }

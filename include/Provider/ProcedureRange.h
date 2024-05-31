@@ -9,7 +9,7 @@ class ProcedureRangeProvider : public IRangeProvider {
 public:
     ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider);
 
-    BufferView GetRange() override;
+    Range GetRange() override;
 
     ICapstoneProvider* mCStoneProvider;
     IProcedureEntryProvider* mProcEntryProvider;

@@ -27,7 +27,7 @@ ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* csto
     }
 }
 
-BufferView ProcedureRangeProviderChain::GetRange()
+Range ProcedureRangeProviderChain::GetRange()
 {
     return mpRangeProviders.back()->GetRange();
 }

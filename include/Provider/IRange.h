@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <Provider/IProvider.h>
-#include <BufferView.h>
+#include <Range.h>
 
 class IRangeProvider : public IProvider {
 public:
-    virtual BufferView GetRange() = 0;
+    virtual Range GetRange() = 0;
 };

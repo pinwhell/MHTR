@@ -1,10 +1,10 @@
 #include <Provider/Range.h>
 
-RangeProvider::RangeProvider(const BufferView& buffView)
+RangeProvider::RangeProvider(const Range& buffView)
     : mBuffView(buffView)
 {}
 
-BufferView RangeProvider::GetRange()
+Range RangeProvider::GetRange()
 {
     return mBuffView;
 }

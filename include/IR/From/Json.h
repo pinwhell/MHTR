@@ -1,7 +1,7 @@
 #pragma once
 
-#include <IR/IProvider.h>
-#include <nlohmann/json.hpp>
+#include <Provider/IJson.h>
+#include <IR/IFactory.h>
 
 class FromJsonMetadataIRParser {
 public:
@@ -25,13 +25,13 @@ private:
     MetadataScanRangeIR ParseMetadataScanRange(const nlohmann::json& metadata);
 };
 
-class FromJsonMultiMetadataIRProvider : public IMultiMetadataIRProvider {
+class FromJsonMultiMetadataIRFactory : public IMultiMetadataIRFactory {
 public:
 
-    FromJsonMultiMetadataIRProvider(const std::string& jsonSrc);
+    FromJsonMultiMetadataIRFactory(IJsonProvider* jsonProvider);
 
     std::vector<MetadataIR> GetAllMetadatas() override;
 
+    nlohmann::json mJson;
     FromJsonMetadataIRParser mParser;
-    std::string mJsonSrc;
 };

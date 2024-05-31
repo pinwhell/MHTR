@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Foo",
+    "type": "INSN_IMM",
+    "immIndex": 1,
+    "pattern": "AA BB CC",
+    "disp": -5,
+
+    "scanRange": "Bar"
+  },
+  {
+    "name": "Bar",
+    "scanRange": [
+      {
+        "defFnSize": 10,
+        "pattern": {
+          "pattern": "AA BB C? D? ? E?",
+          "disp": -10
+        }
+      },
+      {
+        "defFnSize": 10,
+        "pattern": {
+          "pattern": "AA BB C? D? ? E?",
+          "disp": -10
+        }
+      }
+    ]
+  }
+]
