@@ -1,3 +1,3 @@
 add_executable(MHunterCLI main.cpp)
 
-target_link_libraries(MHunterCLI MetadataHunter)
+target_link_libraries(MHunterCLI MetadataHunter cxxopts)

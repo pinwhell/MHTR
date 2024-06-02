@@ -1,9 +1,3 @@
-[submodule "vendor/ThunderByteScan"]
-	path = vendor/ThunderByteScan
-	url = https://github.com/pinwhell/ThunderByteScan
-[submodule "vendor/cxxopts"]
-	path = vendor/cxxopts
-	url = https://github.com/jarro2783/cxxopts
 [submodule "vendor/doctest"]
 	path = vendor/doctest
 	url = https://github.com/doctest/doctest
@@ -25,3 +19,6 @@
 [submodule "vendor/CStone"]
 	path = vendor/CStone
 	url = https://github.com/pinwhell/CStone
+[submodule "vendor/cxxopts"]
+	path = vendor/cxxopts
+	url = https://github.com/jarro2783/cxxopts
