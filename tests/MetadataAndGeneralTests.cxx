@@ -228,10 +228,8 @@ void TestNamespaces()
 #include <Provider/FromJsonPathJsonFile.h>
 #include <Factory/FromTargetBinJsonBinary.h>
 
-int main(int argc, const char** argv)
+int TestCreationAndMetadataLookup()
 {
-    std::filesystem::current_path(MHR_SAMPLES_DIR);
-
     MetadataTargetFactory metadataTargetProvider;
     Storage<std::unique_ptr<IProvider>> scanRanges;
     Storage<std::unique_ptr<ICapstoneProvider>> cstoneProviders;
@@ -283,6 +281,15 @@ int main(int argc, const char** argv)
     {
         std::cout << e.what() << std::endl;
     }
+
+    return 0;
+}
+
+int main(int argc, const char** argv)
+{
+    std::filesystem::current_path(MHR_SAMPLES_DIR);
+
+    //TestCreationAndMetadataLookup();
 
     return 0;
 }

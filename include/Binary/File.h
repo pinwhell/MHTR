@@ -2,7 +2,7 @@
 
 #include <Binary/IBinary.h>
 #include <Binary/Factory.h>
-#include <FileView.h>
+#include <File/View.h>
 #include <OffsetCalculator.h>
 
 class BinaryFile : public IBinary {

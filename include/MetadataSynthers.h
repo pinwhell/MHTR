@@ -34,3 +34,23 @@ public:
 
     std::vector<MetadataTarget*> mTargets;
 };
+
+class MultiMetadataReportSynther : public IMultiLineSynthesizer
+{
+public:
+    MultiMetadataReportSynther(std::vector<MetadataTarget*> targets, const std::string& ns = METADATA_NULL_NS);
+
+    std::vector<std::string> Synth() const override;
+
+    std::string mNamespace;
+    std::vector<MetadataTarget*> mTargets;
+};
+
+class MultiNsMultiMetadataReportSynther : public IMultiLineSynthesizer {
+public:
+    MultiNsMultiMetadataReportSynther(const std::vector<MetadataTarget*>& targets);
+
+    std::vector<std::string> Synth() const override;
+
+    std::vector<MetadataTarget*> mTargets;
+};

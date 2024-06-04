@@ -22,3 +22,6 @@
 [submodule "vendor/cxxopts"]
 	path = vendor/cxxopts
 	url = https://github.com/jarro2783/cxxopts
+[submodule "vendor/thread-pool"]
+	path = vendor/thread-pool
+	url = https://github.com/bshoshany/thread-pool.git

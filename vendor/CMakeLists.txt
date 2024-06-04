@@ -10,3 +10,6 @@ add_subdirectory(capstone)
 add_subdirectory(ELFPP)
 add_subdirectory(CStone)
 add_subdirectory(cxxopts)
+
+add_library(BSThreadPool INTERFACE)
+target_include_directories(BSThreadPool INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include)

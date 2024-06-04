@@ -1,3 +1,3 @@
-add_executable(MHunterCLI main.cpp)
+add_executable(MHCLI main.cpp)
 
-target_link_libraries(MHunterCLI MetadataHunter cxxopts)
+target_link_libraries(MHCLI MetadataHunter cxxopts BSThreadPool)
