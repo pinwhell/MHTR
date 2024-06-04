@@ -152,6 +152,6 @@ int MHunterMain(int argc, const char** argv)
     return 0; // we should not get here
 }
 
-//int main(int argc, const char* argv[]) {
-//    return MHunterMain(argc, argv);
-//}
+int main(int argc, const char* argv[]) {
+    return MHunterMain(argc, argv);
+}
