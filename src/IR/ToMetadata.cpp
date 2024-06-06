@@ -179,7 +179,7 @@ IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangePipelineFromIR(const 
                 scanCFG.mPattern,
                 scanCFG.mDisp
             ),             
-                fnStage.mDefFnSize
+                size_t(fnStage.mDefFnSize)
             }));
     }
 

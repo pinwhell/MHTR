@@ -5,6 +5,7 @@
 #include <string>
 #include <atomic>
 #include <mutex>
+#include <unordered_map>
 
 #include <CStone/IProvider.h>
 

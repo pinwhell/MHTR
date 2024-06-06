@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <IRange.h>
 
 struct Range : public IRange {

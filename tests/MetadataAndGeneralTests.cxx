@@ -176,7 +176,7 @@ void RunMetadataTests()
 
         metdtContextProvider.ContextProvide([&](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* cStoneInstancer) {
             ProcedureRangeProviderChain procedureRangeProviderChain(cStoneInstancer, scanRangeProvider, {
-                PatternScanConfig("00 F0 57 B9 D0 B5 02 AF 04 46", 0)  // buffView.start<uint64_t>() + 0x1AC8
+                {PatternScanConfig("00 F0 57 B9 D0 B5 02 AF 04 46", 0), 0}  // buffView.start<uint64_t>() + 0x1AC8
                 });
 
             procedureRangeProviderChain.GetRange();
