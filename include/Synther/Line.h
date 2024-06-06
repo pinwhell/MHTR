@@ -9,5 +9,7 @@ public:
     // Inherited via ILineSynthesizer
     std::string Synth() const override;
 
+    static Line Empty();
+
     std::string mLine;
 };

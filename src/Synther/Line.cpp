@@ -8,3 +8,8 @@ std::string Line::Synth() const
 {
     return mLine;
 }
+
+Line Line::Empty()
+{
+    return Line("");
+}

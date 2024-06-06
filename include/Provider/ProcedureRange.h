@@ -7,10 +7,11 @@
 
 class ProcedureRangeProvider : public IRangeProvider {
 public:
-    ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider);
+    ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider, size_t defProcSize = 0);
 
     Range GetRange() override;
 
     ICapstoneProvider* mCStoneProvider;
     IProcedureEntryProvider* mProcEntryProvider;
+    size_t mDefProcSize;
 };

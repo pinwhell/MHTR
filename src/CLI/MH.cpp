@@ -23,6 +23,7 @@ MHCLI::MHCLI(int argc, const char** argv)
 {
     mCLIOptions.add_options()
         ("r,report", "Output result report", cxxopts::value<std::string>(), "[output path]")
+        ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]")
         ("t,targets", "JSON targets path", cxxopts::value<std::string>())
         ("j,threads", "Number of threads", cxxopts::value<int>(DEFAULT_NTHREADS)->default_value("1"))
         ("h,help", "Print help");
@@ -90,6 +91,12 @@ int MHCLI::Run()
         return ptr.get();
         });
 
+    std::unordered_set<MetadataTarget*> allTargets;
+
+    std::transform(allLookablesPtr.begin(), allLookablesPtr.end(), std::inserter(allTargets, allTargets.end()), [](ILookableMetadata* metadata) {
+        return metadata->GetTarget();
+        });
+
     {
         BS::thread_pool pool(nThreads);
 
@@ -106,7 +113,7 @@ int MHCLI::Run()
             }
             catch (const std::exception& e)
             {
-                std::cerr << fmt::format("warning: '{}':{}\n", lookable->GetTarget()->GetFullName(), e.what());
+                std::cerr << fmt::format("'{}':{}\n", lookable->GetTarget()->GetFullName(), e.what());
             }
             });
     }
@@ -124,6 +131,14 @@ int MHCLI::Run()
         MultiNsMultiMetadataReportSynther reportSynther(foundTargetVec);
         FileWrite(mCLIParseRes["report"].as<std::string>(), &reportSynther);
     }
+
+    if (mCLIParseRes.count("report-hpp"))
+    {
+        HppStaticReport report(foundTargetVec);
+        FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &report);
+    }
+
+    std::cout << fmt::format("{}/{} targets successful.", foundTargets.size(), allTargets.size()) << std::endl;
 
     return 0;
 }

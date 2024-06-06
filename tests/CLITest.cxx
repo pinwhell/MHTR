@@ -6,8 +6,11 @@ int main() {
 	std::filesystem::current_path(MHR_SAMPLES_DIR);
 
 	const char* argv[] = {
-		"", "-j4",
-		"--targets", "targets.json"
+		""/*Zeroth for dummy file-path*/,
+		"-j4",
+		"--targets", "targets.json",
+		"--report", "test.report.txt",
+		"--rhpp", "test.report.hpp"
 	};
 
 	try { return MHCLI(sizeof(argv) / sizeof(argv[0]), argv).Run(); } 

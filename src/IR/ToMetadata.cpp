@@ -31,6 +31,7 @@ std::vector<std::unique_ptr<ILookableMetadata>> FromIRMultiMetadataFactory::Prod
         });
 
     std::vector<std::unique_ptr<ILookableMetadata>> result;
+    std::unordered_set<std::string> uids;
 
     for (MetadataIR* metadata : allMetadataPtr)
     {
@@ -163,19 +164,23 @@ IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangeFromIR(const ScanRang
 
 IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangePipelineFromIR(const MetadataScanRangePipelineIR& pipeline)
 {
-    std::vector<PatternScanConfig> configs;
+    std::vector<FunctionScanConfig> configs;
 
     for (const auto& stage : pipeline.mStages)
     {
         if (!std::holds_alternative<MetadataScanRangeStageFunctionIR>(stage.mStage))
             throw std::logic_error(fmt::format("Unimplemented Stage detected"));
 
-        const auto& scanCFG = std::get<MetadataScanRangeStageFunctionIR>(stage.mStage).mScanCFG;
+        const auto& fnStage = std::get<MetadataScanRangeStageFunctionIR>(stage.mStage);
+        const auto& scanCFG = fnStage.mScanCFG;
 
-        configs.emplace_back(std::move(PatternScanConfig(
-            scanCFG.mPattern,
-            scanCFG.mDisp
-        )));
+        configs.emplace_back(std::move(FunctionScanConfig{
+            PatternScanConfig(
+                scanCFG.mPattern,
+                scanCFG.mDisp
+            ),             
+                fnStage.mDefFnSize
+            }));
     }
 
     return (IRangeProvider*)mProvidersStorage.Store(std::make_unique<ProcedureRangeProviderChain>(mCapstoneProvider, mDefaultScanRange, configs)).get();

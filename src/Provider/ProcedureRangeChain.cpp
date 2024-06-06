@@ -5,14 +5,14 @@
 #include <Provider/AsmExtractedProcedureEntry.h>
 #include <Provider/ProcedureRange.h>
 
-ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<PatternScanConfig>& nestedProcedurePatterns)
+ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns)
 {
     mpRangeProviders.emplace_back(baseRangeProvider);
 
     for (const auto& procPatternCfg : nestedProcedurePatterns)
     {
         auto addressesProv = (IAddressesProvider*)mProviders.Store(
-            std::make_unique<PatternScanAddresses>(mpRangeProviders.back(), procPatternCfg)
+            std::make_unique<PatternScanAddresses>(mpRangeProviders.back(), procPatternCfg.mScanConfig)
         ).get();
 
         auto procEntryProv = (IProcedureEntryProvider*)mProviders.Store(
@@ -20,7 +20,7 @@ ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* csto
         ).get();
 
         auto procRangeProv = (IRangeProvider*)mProviders.Store(
-            std::make_unique<ProcedureRangeProvider>(cstoneInstanceProvider, procEntryProv)
+            std::make_unique<ProcedureRangeProvider>(cstoneInstanceProvider, procEntryProv, procPatternCfg.mDefSize)
         ).get();
 
         mpRangeProviders.push_back(procRangeProv);

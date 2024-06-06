@@ -54,3 +54,12 @@ public:
 
     std::vector<MetadataTarget*> mTargets;
 };
+
+class HppStaticReport : public IMultiLineSynthesizer {
+public:
+    HppStaticReport(const std::vector<MetadataTarget*>& targets);
+
+    std::vector<std::string> Synth() const override;
+
+    std::vector<MetadataTarget*> mTargets;
+};

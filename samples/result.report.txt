@@ -1,0 +1,8 @@
+Dummy:
+{
+    BarPattern: "42 00 ? B9"
+    BarPatternResult: 0x1a94
+    Baz: 0x2640
+    Foo: 0x15b0
+    Bar: 0x42
+}
