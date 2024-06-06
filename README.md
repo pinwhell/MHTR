@@ -20,7 +20,7 @@ To use MHTR, follow these steps:
 
 Here's an example of how to use the MHCLI:
 ```bash
-MHCLI -j4 --targets metadata_targets.json --report output_report.txt
+MHCLI -j4 --targets metadata_targets.json --report output_report.txt --report-hpp output_report.hpp
 ```
 ## License
 
