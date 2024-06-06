@@ -5,6 +5,7 @@
 #include <iterator>
 #include <Synther/Line.h>
 #include <algorithm>
+#include <Synther/MultiLineGroup.h>
 
 template<typename T>
 std::string Literal(T str)
@@ -91,11 +92,16 @@ std::vector<std::string> MultiMetadataReportSynther::Synth() const {
     std::vector<Line> content;
 
     std::transform(mTargets.begin(), mTargets.end(), std::back_inserter(content), [](MetadataTarget* target) {
+        const auto& result = target->mResult;
+        bool bIsPattern = std::holds_alternative<PatternMetadata>(result.mMetadata);
+        auto resultStr = target->mResult.ToString(); resultStr = bIsPattern ? Literal(resultStr) : resultStr;
+
         return fmt::format(
             "{}: {}",
             target->GetName(),
             target->mHasResult
-            ? target->mResult.ToString()
+            ? resultStr
+
             : "Not found."
         );
         });
@@ -134,4 +140,29 @@ std::vector<std::string> MultiNsMultiMetadataReportSynther::Synth() const {
     }
 
     return result;
+}
+
+HppStaticReport::HppStaticReport(const std::vector<MetadataTarget*>& targets)
+    : mTargets(targets)
+{}
+
+std::vector<std::string> HppStaticReport::Synth() const
+{
+    Line pragmaOnce("#pragma once");
+    Line emptyLine(Line::Empty());
+    Line includeCstdint("#include <cstdint>");
+    LineSynthesizerGroup headerGroup({
+        &pragmaOnce,
+        &emptyLine,
+        &includeCstdint,
+        &emptyLine
+        });
+    MultiNsMultiMetadataStaticSynther allNsSynther(mTargets);
+
+    MultiLineSynthesizerGroup synthGroup({
+        &headerGroup,
+        &allNsSynther,
+        });
+
+    return synthGroup.Synth();
 }

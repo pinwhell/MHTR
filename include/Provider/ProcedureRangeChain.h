@@ -3,12 +3,12 @@
 #include <Storage.h>
 #include <Provider/IRange.h>
 #include <CStone/IProvider.h>
-#include <PatternScanConfig.h>
+#include <FunctionScanConfig.h>
 #include <vector>
 
 class ProcedureRangeProviderChain : public IRangeProvider {
 public:
-    ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<PatternScanConfig>& nestedProcedurePatterns);
+    ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns);
 
     Range GetRange() override;
 

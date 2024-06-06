@@ -1,28 +1,62 @@
 [
   {
-    "name": "Foo",
+    "name": "Bar",
     "type": "INSN_IMM",
-    "immIndex": 1,
-    "pattern": "AA BB CC",
-    "disp": -5,
+    "pattern": "42 00 ? B9",
+    "disp": -2,
+    "immIndex": 0,
 
-    "scanRange": "Bar"
+    "scanRange": "FooFuncRange"
   },
   {
-    "name": "Bar",
+    "name": "BarPattern",
+    "type": "PATTERN_VALIDATE",
+    "pattern": "42 00 ? B9",
+    "disp": -2,
+
+    "scanRange": "FooFuncRange"
+  },
+  {
+    "name": "BarPatternResult",
+    "type": "PATTERN_SINGLE_RESULT",
+    "pattern": "42 00 ? B9",
+    "disp": -2,
+
+    "scanRange": "FooFuncRange"
+  },
+  {
+    "name": "Baz",
+    "type": "FAR_ADDR",
+    "pattern": "49 78 44 ? 4A ? 4B",
+    "disp": -1,
+
+    "scanRange": "FooFuncRange"
+  },
+  {
+    "name": "Foo",
+    "type": "PATTERN_SINGLE_RESULT",
+    "pattern": "20 0B C0 EC",
+
+    "scanRange": "BarRange"
+  },
+  {
+    "name": "FooFuncRange",
     "scanRange": [
       {
-        "defFnSize": 10,
+        "defFnSize": 162,
         "pattern": {
-          "pattern": "AA BB C? D? ? E?",
-          "disp": -10
+          "pattern": "08 30 00 F0 57 B9",
+          "disp": 2
         }
-      },
+      }
+    ]
+  },
+  {
+    "name": "BarRange",
+    "scanRange": [
       {
-        "defFnSize": 10,
         "pattern": {
-          "pattern": "AA BB C? D? ? E?",
-          "disp": -10
+          "pattern": "FF F7 8C ED 10 E0"
         }
       }
     ]

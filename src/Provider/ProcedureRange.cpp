@@ -1,13 +1,20 @@
 #include <Provider/ProcedureRange.h>
 #include <stdexcept>
 
-ProcedureRangeProvider::ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider)
+ProcedureRangeProvider::ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider, size_t defProcSize)
     : mCStoneProvider(cstoneProvider)
     , mProcEntryProvider(procEntryProvider)
+    , mDefProcSize(defProcSize)
 {}
 
 Range ProcedureRangeProvider::GetRange() {
+    
     uint64_t procEntry = mProcEntryProvider->GetEntry();
+
+    if (mDefProcSize != 0)
+        // Procedure size seems already known
+        return Range((void*)mProcEntryProvider->GetEntry(), mDefProcSize);
+
     uint64_t procEnd = 0;
     ICapstone* cstone = mCStoneProvider->GetInstance();
     ICapstoneHeuristic* heuristic = cstone->getHeuristic();
