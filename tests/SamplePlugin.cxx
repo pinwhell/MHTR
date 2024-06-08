@@ -1,4 +1,5 @@
 #include <Plugin/IPlugin.h>
+#include <iostream>
 
 class SampleReportPlugin : public IPlugin {
 public:
@@ -6,12 +7,18 @@ public:
 
 	void Init(int argc = 0, const char* argv[] = nullptr) override
 	{
+		if (!argc)
+			return;
 
+		std::cout << "SampleReportPlugin Initialized with " << argc << " Command Line Arguments...\n";
 	}
 
 	void OnResult(const std::vector<MetadataTarget*>& result) override
 	{
+		if (result.empty())
+			return;
 
+		std::cout << "SampleReportPlugin Processing " << result.size() << " Results ...\n";
 	}
 };
 
