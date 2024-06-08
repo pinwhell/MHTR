@@ -2,6 +2,7 @@
 #include <functional>
 #include <filesystem>
 
+#include <Pltform.h>
 #include <Provider/IRange.h>
 #include <Factory/MetadataTarget.h>
 #include <CStone/Provider.h>
@@ -285,7 +286,10 @@ int TestCreationAndMetadataLookup()
     return 0;
 }
 
-int main(int argc, const char** argv)
+#include <Factory/FromPluginFolderMultiPlugin.h>
+#include <fmt/core.h>
+
+int main(int argc, const char* argv[])
 {
     std::filesystem::current_path(MHR_SAMPLES_DIR);
 

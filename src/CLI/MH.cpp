@@ -15,22 +15,42 @@
 #include <MetadataSynthers.h>
 #include <SyntherFileOp.h>
 #include <BS_thread_pool.hpp>
+#include <Factory/FromPluginFolderMultiPlugin.h>
 
 static auto DEFAULT_NTHREADS = 1;
 
-MHCLI::MHCLI(int argc, const char** argv)
-    : mCLIOptions("Metadata Hunter CLI", "Robust Binary Analizis Framework.")
+std::string FromCmdlineExecutableDirGet(const char* argv[])
+{
+    return std::filesystem::path(argv[0]).parent_path().string();
+}
+
+std::filesystem::path MHTRFromCmdlinePluginDirGet(const char* argv[])
+{
+    return std::filesystem::path(FromCmdlineExecutableDirGet(argv)) / "plugins";
+}
+
+MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
+    : mAllPluginsFactory(pluginsFactory)
+    , mCLIOptions("Metadata Hunter CLI", "Robust Binary Analizis Framework.")
 {
     mCLIOptions.add_options()
         ("r,report", "Output result report", cxxopts::value<std::string>(), "[output path]")
         ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]")
         ("t,targets", "JSON targets path", cxxopts::value<std::string>())
         ("j,threads", "Number of threads", cxxopts::value<int>(DEFAULT_NTHREADS)->default_value("1"))
+        ("plugin-dir", "Directory path containing Plugins", cxxopts::value<std::string>()->default_value(MHTRFromCmdlinePluginDirGet(argv).string()))
         ("h,help", "Print help");
 
     mCLIOptions.allow_unrecognised_options();
 
     mCLIParseRes = mCLIOptions.parse(argc, argv);
+
+    mAllPlugins = mAllPluginsFactory ?
+        mAllPluginsFactory->CreatePlugins() :
+        FromPluginFolderMultiPluginFactory(mCLIParseRes["plugin-dir"].as<std::string>(), argc, argv).CreatePlugins();
+
+    for (auto& plugin : mAllPlugins)
+        std::cout << fmt::format("'{}' Loaded\n", plugin->GetName());
 }
 
 int MHCLI::Run()
@@ -125,6 +145,9 @@ int MHCLI::Run()
         });
 
     std::vector<MetadataTarget*> foundTargetVec(foundTargets.begin(), foundTargets.end());
+
+    for (auto& plugin : mAllPlugins)
+        plugin->OnResult(foundTargetVec);
 
     if (mCLIParseRes.count("report"))
     {

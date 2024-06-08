@@ -6,6 +6,12 @@ option(BUILD_TESTS "Build tests" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include(cmake/build_helper.cmake)
+include(cmake/platform_info.cmake)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT})
+set(CMAKE_PDB_OUTPUT_DIRECTORY ${BIN_OUTPUT})
+
 add_subdirectory(vendor)
 add_subdirectory(src)
 

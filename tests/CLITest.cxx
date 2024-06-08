@@ -2,11 +2,11 @@
 #include <filesystem>
 #include <CLI/MH.h>
 
-int main() {
+int main(int argc, const char** realArgv) {
 	std::filesystem::current_path(MHR_SAMPLES_DIR);
 
 	const char* argv[] = {
-		""/*Zeroth for dummy file-path*/,
+		realArgv[0],
 		"-j4",
 		"--targets", "targets.json",
 		"--report", "test.report.txt",

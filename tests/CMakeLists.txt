@@ -13,3 +13,15 @@ target_link_libraries(MetadataAndGeneralTests MetadataHunter)
 
 add_executable(CLITest CLITest.cxx ${CMAKE_CURRENT_SOURCE_DIR}/../src/CLI/MH.cpp)
 target_link_libraries(CLITest MetadataHunter BSThreadPool cxxopts)
+
+
+#####################
+#	 Plugin Test	#
+#####################
+
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/plugins)
+
+add_library(SamplePlugin SHARED SamplePlugin.cxx)
+
+target_link_libraries(SamplePlugin MetadataHunter)
