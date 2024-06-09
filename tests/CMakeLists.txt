@@ -28,6 +28,7 @@ target_link_libraries(CLITest MetadataHunter BSThreadPool cxxopts)
 
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/test/cli/plugins)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT}/test/cli/plugins)
 
 add_library(SamplePlugin SHARED SamplePlugin.cxx)
 

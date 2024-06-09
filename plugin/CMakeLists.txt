@@ -1,11 +1,12 @@
 ###############
-#  PluginSDK  #
+#  Plugin SDK #
 ###############
 
 add_library(MHTRPluginSDK STATIC)
 target_link_libraries(MHTRPluginSDK PUBLIC Metadata MetadataSynthers)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/plugins)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT}/plugins)
 
 ###############
 #	Plugins	  #

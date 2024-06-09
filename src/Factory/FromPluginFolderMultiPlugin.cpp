@@ -16,7 +16,7 @@ FromPluginFolderMultiPluginFactory::FromPluginFolderMultiPluginFactory(const std
 std::vector<std::unique_ptr<IPlugin>> FromPluginFolderMultiPluginFactory::CreatePlugins()
 {
     std::vector<std::unique_ptr<IPlugin>> result;
-    std::unordered_set<std::filesystem::path> loadedLibs;
+    std::unordered_set<std::string> loadedLibs;
     std::unordered_set<std::string> loadedPlugins;
 
     for (std::filesystem::path currFile : std::filesystem::directory_iterator(mPluginDirPath))
@@ -26,14 +26,16 @@ std::vector<std::unique_ptr<IPlugin>> FromPluginFolderMultiPluginFactory::Create
 
         // At this point, this is an actual module ...
 
-        if (loadedLibs.count(currFile.filename()))
+        std::string currFilePath = currFile.filename().string();
+
+        if (loadedLibs.count(currFilePath))
             continue;
 
         // At this point, a plugin with this file-name hasnt been loaded yet ...
 
-        loadedLibs.insert(currFile.filename());
+        loadedLibs.insert(currFilePath);
 
-        std::unique_ptr<IPlugin> thisPlugin = PluginFactory(Library::Load(currFile.string().c_str())).CreatePlugin();
+        std::unique_ptr<IPlugin> thisPlugin = PluginFactory(Library::Load(currFilePath.c_str())).CreatePlugin();
         std::string thisPluginName = thisPlugin->GetName();
 
         if (loadedPlugins.count(thisPluginName))

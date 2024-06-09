@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <Storage.h>
 #include <Provider/IMetadataTarget.h>
 #include <Provider/IRange.h>

@@ -10,6 +10,7 @@ include(cmake/build_helper.cmake)
 include(cmake/platform_info.cmake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT})
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${BIN_OUTPUT})
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
