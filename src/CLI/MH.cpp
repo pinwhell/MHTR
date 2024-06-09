@@ -146,19 +146,22 @@ int MHCLI::Run()
 
     std::vector<MetadataTarget*> foundTargetVec(foundTargets.begin(), foundTargets.end());
 
-    for (auto& plugin : mAllPlugins)
-        plugin->OnResult(foundTargetVec);
-
-    if (mCLIParseRes.count("report"))
     {
-        MultiNsMultiMetadataReportSynther reportSynther(foundTargetVec);
-        FileWrite(mCLIParseRes["report"].as<std::string>(), &reportSynther);
-    }
+        BS::thread_pool pool(nThreads);
 
-    if (mCLIParseRes.count("report-hpp"))
-    {
-        HppStaticReport report(foundTargetVec);
-        FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &report);
+        if (mCLIParseRes.count("report")) pool.submit_task([this, &foundTargetVec] {
+            MultiNsMultiMetadataReportSynther reportSynther(foundTargetVec);
+            FileWrite(mCLIParseRes["report"].as<std::string>(), &reportSynther);
+            });
+
+        if (mCLIParseRes.count("report-hpp")) pool.submit_task([this, &foundTargetVec] {
+            HppStaticReport report(foundTargetVec);
+            FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &report);
+            });
+
+        pool.submit_loop((size_t)0, mAllPlugins.size(), [this, &foundTargetVec](size_t idx) {
+            mAllPlugins[idx]->OnResult(foundTargetVec);
+            });
     }
 
     std::cout << fmt::format("{}/{} targets successful.", foundTargets.size(), allTargets.size()) << std::endl;
