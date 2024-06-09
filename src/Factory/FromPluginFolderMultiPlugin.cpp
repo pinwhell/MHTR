@@ -4,7 +4,7 @@
 #include <Pltform.h>
 
 FromPluginFolderMultiPluginFactory::FromPluginFolderMultiPluginFactory(const std::string& pluginDirPath, int argc, const char* argv[])
-    : mPluginDirPath(pluginDirPath)
+    : mPluginDirPath(std::filesystem::absolute(pluginDirPath).string())
     , mArgc(argc)
     , mArgv(argv)
 {}
@@ -47,7 +47,7 @@ std::vector<std::unique_ptr<IPlugin>> FromPluginFolderMultiPluginFactory::Create
             continue;
         }
 
-        // At  this point, we succesfully initialized it ...
+        // At this point, we succesfully initialized it ...
 
         loadedPlugins.insert(thisPluginName);
         result.emplace_back(std::move(thisPlugin));

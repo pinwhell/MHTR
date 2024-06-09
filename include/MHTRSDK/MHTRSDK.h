@@ -10,7 +10,14 @@ namespace MHTR {
     using Metadata = std::variant<std::string, uint64_t>;
     using MetadataMap = std::unordered_map<std::string, Metadata>;
 
-    class MetadataProvider {
+    class IMetadataProvider {
+    public:
+        virtual ~IMetadataProvider() = default;
+        virtual uint64_t GetOffset(const std::string& key) = 0;
+        virtual std::string GetPattern(const std::string& key) = 0;
+    };
+
+    class MetadataProvider : public IMetadataProvider {
     public:
         inline MetadataProvider()
         {}
@@ -23,12 +30,12 @@ namespace MHTR {
             mMetadatas = std::move(other.mMetadatas);
         }
 
-        inline uint64_t GetOffset(const std::string& key)
+        inline uint64_t GetOffset(const std::string& key) override
         {
             return std::get<uint64_t>(mMetadatas[key]);
         }
 
-        inline std::string GetPattern(const std::string& key)
+        inline std::string GetPattern(const std::string& key) override
         {
             return std::get<std::string>(mMetadatas[key]);
         }

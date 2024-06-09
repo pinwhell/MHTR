@@ -11,6 +11,13 @@ endforeach()
 add_executable(MetadataAndGeneralTests MetadataAndGeneralTests.cxx)
 target_link_libraries(MetadataAndGeneralTests MetadataHunter)
 
+#####################
+#	   CLI Test		#
+#####################
+
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/test/cli)
+
 add_executable(CLITest CLITest.cxx ${CMAKE_CURRENT_SOURCE_DIR}/../src/CLI/MH.cpp)
 target_link_libraries(CLITest MetadataHunter BSThreadPool cxxopts)
 
@@ -20,7 +27,7 @@ target_link_libraries(CLITest MetadataHunter BSThreadPool cxxopts)
 #####################
 
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/plugins)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/test/cli/plugins)
 
 add_library(SamplePlugin SHARED SamplePlugin.cxx)
 

@@ -50,7 +50,7 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
         FromPluginFolderMultiPluginFactory(mCLIParseRes["plugin-dir"].as<std::string>(), argc, argv).CreatePlugins();
 
     for (auto& plugin : mAllPlugins)
-        std::cout << fmt::format("'{}' Loaded\n", plugin->GetName());
+        std::cout << fmt::format("Loaded:'{}'\n", plugin->GetName());
 }
 
 int MHCLI::Run()
@@ -149,17 +149,17 @@ int MHCLI::Run()
     {
         BS::thread_pool pool(nThreads);
 
-        if (mCLIParseRes.count("report")) pool.submit_task([this, &foundTargetVec] {
+        if (mCLIParseRes.count("report")) pool.detach_task([this, &foundTargetVec] {
             MultiNsMultiMetadataReportSynther reportSynther(foundTargetVec);
             FileWrite(mCLIParseRes["report"].as<std::string>(), &reportSynther);
             });
 
-        if (mCLIParseRes.count("report-hpp")) pool.submit_task([this, &foundTargetVec] {
+        if (mCLIParseRes.count("report-hpp")) pool.detach_task([this, &foundTargetVec] {
             HppStaticReport report(foundTargetVec);
             FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &report);
             });
 
-        pool.submit_loop((size_t)0, mAllPlugins.size(), [this, &foundTargetVec](size_t idx) {
+        pool.detach_loop((size_t)0, mAllPlugins.size(), [this, &foundTargetVec](size_t idx) {
             mAllPlugins[idx]->OnResult(foundTargetVec);
             });
     }

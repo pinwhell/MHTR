@@ -10,7 +10,8 @@ int main(int argc, const char** realArgv) {
 		"-j4",
 		"--targets", "targets.json",
 		"--report", "test.report.txt",
-		"--rhpp", "test.report.hpp"
+		"--rhpp", "test.report.hpp",
+		"--rhpprt", "test.report.rt.hpp"
 	};
 
 	try { return MHCLI(sizeof(argv) / sizeof(argv[0]), argv).Run(); } 

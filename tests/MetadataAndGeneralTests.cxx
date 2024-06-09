@@ -286,13 +286,41 @@ int TestCreationAndMetadataLookup()
     return 0;
 }
 
-#include <Factory/FromPluginFolderMultiPlugin.h>
-#include <fmt/core.h>
+void DummyResultMake(std::function<void(const std::vector<MetadataTarget*>&)> callback)
+{
+    Namespace fooNs("Foo");
+    MetadataTarget foofooTarget("FooTarget", &fooNs); foofooTarget.TrySetResult(MetadataResult(0x10));
+    MetadataTarget foobarTarget("BarTarget", &fooNs); foobarTarget.TrySetResult(MetadataResult(0x16));
+    MetadataTarget foobazTarget("BazTarget", &fooNs); foobazTarget.TrySetResult(MetadataResult(0x9));
+
+    Namespace barNs("Bar");
+    MetadataTarget barfooTarget("FooTarget", &barNs); barfooTarget.TrySetResult(MetadataResult("AA ?B ?C"));
+    MetadataTarget barbarTarget("BarTarget", &barNs); barbarTarget.TrySetResult(MetadataResult(0x25));
+    MetadataTarget barbazTarget("BazTarget", &barNs); barbazTarget.TrySetResult(MetadataResult("AA ?B ?C"));
+
+    std::vector<MetadataTarget*> dummyResults = {
+        &foofooTarget,
+        &foobarTarget,
+        &foobazTarget,
+        &barfooTarget,
+        &barbarTarget,
+        &barbazTarget
+    };
+
+    callback(dummyResults);
+}
 
 int main(int argc, const char* argv[])
 {
     std::filesystem::current_path(MHR_SAMPLES_DIR);
 
+    DummyResultMake([](const std::vector<MetadataTarget*>& results) {
+        MultiNsMultiMetadataStaticAssignFunction fn(results);
+
+        for (const std::string& line : fn.Synth())
+            std::cout << line << "\n";
+        });
+    
     //TestCreationAndMetadataLookup();
 
     return 0;

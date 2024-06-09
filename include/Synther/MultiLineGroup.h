@@ -4,7 +4,7 @@
 
 class MultiLineSynthesizerGroup : public IMultiLineSynthesizer {
 public:
-    MultiLineSynthesizerGroup(const  std::vector<IMultiLineSynthesizer*>& multiLineSynthers = {});
+    MultiLineSynthesizerGroup(const std::vector<IMultiLineSynthesizer*>& multiLineSynthers = {});
 
     std::vector<std::string> Synth() const override;
 
