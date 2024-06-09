@@ -3,9 +3,10 @@
 #include <Synther/Line.h>
 #include <Synther/NamespaceBlock.h>
 #include <Synther/LineGroup.h>
-#include <SyntherFileOp.h>
+#include <Synther/FileOperations.h>
 #include <Synther/MultiLineGroup.h>
-#include <MetadataSynthers.h>
+#include <Metadata/Synthers.h>
+#include <Metadata/Utility.h>
 
 class HPPRTReportWriter : public IPlugin {
 public:

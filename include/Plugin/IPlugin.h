@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <Metadata.h>
+#include <Metadata/Target.h>
 #include <Api.h>
 
 class IPlugin {

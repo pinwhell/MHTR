@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include <Metadata.h>
+#include <ILookableMetadata.h>
 
 class IMultiMetadataFactory {
 public:

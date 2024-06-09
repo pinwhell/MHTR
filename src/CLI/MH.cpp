@@ -2,18 +2,18 @@
 #include <iostream>
 #include <Provider/FromFileJson.h>
 #include <Provider/Json.h>
-#include <Metadata.h>
 #include <Provider/FromJsonPathJsonFile.h>
 #include <Provider/FromJsonSingleNamespace.h>
+#include <CStone/Provider.h>
+#include <Metadata/Metadata.h>
+#include <Metadata/Synthers.h>
+#include <Synther/FileOperations.h>
+#include <IR/ToMetadata.h>
+#include <Factory/MetadataTarget.h>
 #include <IR/From/Json.h>
 #include <Binary/IBinary.h>
 #include <Factory/FromTargetBinJsonBinary.h>
-#include <IR/ToMetadata.h>
-#include <Factory/MetadataTarget.h>
-#include <CStone/Provider.h>
 #include <fmt/core.h>
-#include <MetadataSynthers.h>
-#include <SyntherFileOp.h>
 #include <BS_thread_pool.hpp>
 #include <Factory/FromPluginFolderMultiPlugin.h>
 

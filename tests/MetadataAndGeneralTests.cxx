@@ -13,14 +13,15 @@
 #include <Binary/Factory.h>
 #include <Arch/ARM/32/Resolver/FarAddress.h>
 
-#include <Metadata.h>
-#include <MetadataSynthers.h>
+#include <Metadata/Metadata.h>
+#include <Metadata/Synthers.h>
 #include <PatternScan.h>
 #include <FarAddressLookup.h>
 #include <Binary/File.h>
 #include <OffsetCalculator.h>
 #include <Provider/ProcedureRangeChain.h>
 #include <Provider/FromFileJson.h>
+#include <Metadata/Lookups.h>
 
 
 class IMetadataLookupContextProvider {

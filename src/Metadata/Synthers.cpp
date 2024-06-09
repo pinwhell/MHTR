@@ -1,4 +1,4 @@
-#include <MetadataSynthers.h>
+#include <Metadata/Synthers.h>
 #include <fmt/format.h>
 #include <Synther/LineGroup.h>
 #include <Synther/NamespaceBlock.h>
@@ -6,6 +6,7 @@
 #include <Synther/Line.h>
 #include <algorithm>
 #include <Synther/MultiLineGroup.h>
+#include <Metadata/Utility.h>
 
 template<typename T>
 inline std::string Literal(T str)

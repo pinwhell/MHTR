@@ -3,8 +3,10 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-#include <Metadata.h>
 #include <variant>
+
+#include <Metadata/EMetadata.h>
+#include <Metadata/Result.h>
 
 struct PatternScanConfigIR {
     std::string mPattern;

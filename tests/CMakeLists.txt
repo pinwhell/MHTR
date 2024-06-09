@@ -31,4 +31,4 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/test/cli/plugins)
 
 add_library(SamplePlugin SHARED SamplePlugin.cxx)
 
-target_link_libraries(SamplePlugin MetadataHunter)
+target_link_libraries(SamplePlugin MHTRPluginSDK)

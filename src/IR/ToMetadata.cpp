@@ -1,4 +1,5 @@
 #include <IR/ToMetadata.h>
+#include <Metadata/Lookups.h>
 #include <Exception/UnexpectedLayout.h>
 #include <PatternScan.h>
 #include <FarAddressLookup.h>

@@ -1,84 +1,8 @@
-#include <Metadata.h>
-#include <sstream>
-#include <TBS.hpp>
 #include <fmt/core.h>
+#include <Metadata/Lookups.h>
 #include <PatternScan.h>
-#include <iostream>
-
 #include <CStone/CStone.h>
-
-template<>
-std::string Metadata<uint64_t>::ToString() const {
-	std::stringstream ss;
-	ss << std::hex << "0x" << mValue;
-	return ss.str();
-}
-
-template<>
-std::string Metadata<std::string>::ToString() const {
-	return mValue;
-}
-
-template<>
-Metadata<uint64_t> Metadata<uint64_t>::operator+(const Metadata<uint64_t>& other) const {
-	return Metadata<uint64_t>(mValue + other.mValue);
-}
-
-template<>
-void Metadata<uint64_t>::operator+=(const Metadata<uint64_t>& other) {
-	mValue += other.mValue;
-}
-
-MetadataResult::MetadataResult(uint64_t offset)
-	: mMetadata(offset)
-{}
-
-MetadataResult::MetadataResult(const std::string & pattern)
-	: mMetadata(pattern)
-{}
-
-std::string MetadataResult::ToString() const {
-	if (std::holds_alternative<OffsetMetadata>(mMetadata))
-		return std::get<OffsetMetadata>(mMetadata).ToString();
-
-	if (std::holds_alternative<PatternMetadata>(mMetadata))
-		return std::get<PatternMetadata>(mMetadata).ToString();
-
-	return "";
-}
-
-EMetadataResult MetadataResult::getType() const
-{
-	return (EMetadataResult)mMetadata.index();
-}
-
-MetadataTarget::MetadataTarget(const std::string& name, INamespace* ns)
-	: mFullIdentifier(name, ns)
-	, mResult(0)
-	, mHasResult(false)
-{}
-
-bool MetadataTarget::TrySetResult(const MetadataResult&& result)
-{
-	bool _false = false;
-
-	if (mHasResult.compare_exchange_strong(_false, true) == false)
-		return false;
-
-	mResult = result;
-
-	return true;
-}
-
-std::string MetadataTarget::GetName() const
-{
-	return mFullIdentifier.mIdentifier;
-}
-
-std::string MetadataTarget::GetFullName() const
-{
-	return mFullIdentifier.GetFullIdentifier();
-}
+#include <iostream>
 
 MetadataLookupException::MetadataLookupException(const std::string& what)
 	: std::runtime_error(what)
@@ -154,11 +78,11 @@ void InsnImmediateLookup::Lookup()
 		}
 		catch (DismFailedException& e)
 		{
-			std::cout << fmt::format("'{}' diassembly failed\n", mTarget.GetFullName());
+			std::cerr << fmt::format("'{}' diassembly failed\n", mTarget.GetFullName());
 		}
 		catch (std::exception& e)
 		{
-			std::cout << fmt::format("'{}':{}\n", mTarget.GetFullName(), e.what());
+			std::cerr << fmt::format("'{}':{}\n", mTarget.GetFullName(), e.what());
 		}
 	}
 
@@ -173,24 +97,6 @@ void InsnImmediateLookup::Lookup()
 
 MetadataTarget* InsnImmediateLookup::GetTarget() {
 	return &mTarget;
-}
-
-std::unordered_map<std::string, std::vector<MetadataTarget*>> TargetsGetNamespacedMap(const std::vector<MetadataTarget*>& targets)
-{
-	std::unordered_map<std::string, std::vector<MetadataTarget*>> result;
-
-	for (auto* target : targets)
-	{
-		const INamespace* targetNs = target->mFullIdentifier.mNamespace;
-		std::string targetNsStr = targetNs ? targetNs->GetNamespace() : METADATA_NULL_NS;
-
-		if (result.find(targetNsStr) == result.end())
-			result[targetNsStr] = std::vector<MetadataTarget*>();
-
-		result[targetNsStr].push_back(target);
-	}
-
-	return result;
 }
 
 HardcodedLookup::HardcodedLookup(MetadataTarget& target, const MetadataResult& hardcoded)

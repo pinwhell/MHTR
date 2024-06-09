@@ -1,10 +1,9 @@
 #pragma once
 
-#include <Metadata.h>
-
 #include <Resolver/IFarAddress.h>
 #include <Provider/IAddresses.h>
 #include <IOffsetCalculator.h>
+#include <ILookableMetadata.h>
 
 class FarAddressLookup : public ILookableMetadata {
 public:

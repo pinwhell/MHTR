@@ -1,6 +1,7 @@
 #include <fmt/core.h>
 #include <Exception/Multi.h>
-
+#include <Metadata/Target.h>
+#include <Metadata/Lookups.h>
 #include <FarAddressLookup.h>
 #include <unordered_set>
 

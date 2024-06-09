@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Metadata.h>
+#include <Metadata/Target.h>
 #include <string>
 #include <Synther/INamespace.h>
 
