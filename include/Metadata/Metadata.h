@@ -5,7 +5,7 @@
 
 constexpr auto METADATA_OFFSET_INVALID = -1;
 constexpr auto METADATA_STRING_INVALID = "";
-constexpr auto METADATA_NULL_NS = "";
+constexpr auto METADATA_NS_NULL = "";
 
 template<typename T>
 struct Metadata {

@@ -1,12 +1,12 @@
 #include <Plugin/IPlugin.h>
 #include <cxxopts.hpp>
 #include <Synther/Line.h>
-#include <Synther/NamespaceBlock.h>
 #include <Synther/LineGroup.h>
-#include <Synther/FileOperations.h>
 #include <Synther/MultiLineGroup.h>
-#include <Metadata/Synthers.h>
+#include <Synther/NamespaceBlock.h>
+#include <Synther/FileOperations.h>
 #include <Metadata/Utility.h>
+#include <Metadata/Synthers.h>
 
 class HPPRTReportWriter : public IPlugin {
 public:
@@ -36,7 +36,7 @@ public:
 		// At this point there is result available & user requested a
 		// report from the plugin
 
-		std::unordered_map<std::string, std::vector<MetadataTarget*>> namespacedMap = TargetsGetNamespacedMap(result);
+		std::unordered_map<std::string, std::vector<MetadataTarget*>> namespacedMap = NsMultiMetadataMapFromMultiMetadata(result);
 		std::vector<std::string> listNamespaces;
 
 		std::transform(namespacedMap.begin(), namespacedMap.end(), std::back_inserter(listNamespaces), [](const auto& kv) {
@@ -50,20 +50,27 @@ public:
 		for (const std::string& ns : listNamespaces)
 			reportNsName += ns;
 
-		MultiNsMultiMetadataStaticAssignFunction multiFn(result);
+		Line empty = Line::Empty();
+		LineSynthesizerGroup newLineMultiLineSynther({ &empty });
 		Line pragmaOnce("#pragma once");
 		Line includeSdk("#include <MHTRSDK.h>");
-		Line empty = Line::Empty();
 		LineSynthesizerGroup hppHeader({
 			&pragmaOnce,
 			&empty,
 			&includeSdk,
 			&empty
 			});
-		NamespaceBlock nsBlock(&multiFn, reportNsName);
+		MultiNsMultiMetadataStaticAssignFunction multiFn(result);
+		MultiMetadataProviderMergerFunction multiProviderMerger(result);
+		MultiLineSynthesizerGroup multiFnAndMerger({
+			&multiFn,
+			&newLineMultiLineSynther,
+			&multiProviderMerger
+			});
+		NamespaceBlock fullNsBlock(&multiFnAndMerger, reportNsName);
 		MultiLineSynthesizerGroup fullHpp({
 			&hppHeader,
-			&nsBlock
+			&fullNsBlock
 			});
 		FileWrite(mCLIParseRes["report-hpprt"].as<std::string>(), &fullHpp);
 	}

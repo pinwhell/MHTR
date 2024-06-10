@@ -16,17 +16,48 @@
 #include <fmt/core.h>
 #include <BS_thread_pool.hpp>
 #include <Factory/FromPluginFolderMultiPlugin.h>
+#include <Pltform.h>
 
 static auto DEFAULT_NTHREADS = 1;
 
-std::string FromCmdlineExecutableDirGet(const char* argv[])
-{
-    return std::filesystem::path(argv[0]).parent_path().string();
+#ifdef WINDOWS
+#include <Windows.h>
+#else
+#include <unistd.h>
+#include <limits.h>
+#endif
+
+std::string GetExecutablePath() {
+#ifdef WINDOWS
+    char buffer[MAX_PATH];
+    DWORD length = GetModuleFileNameA(NULL, buffer, MAX_PATH);
+    if (length == 0) {
+        // Handle error
+        throw std::runtime_error("Failed getting MHCLI executable path");
+    }
+    return std::string(buffer);
+#elif defined (LINUX)
+    char buffer[PATH_MAX];
+    ssize_t length = readlink("/proc/self/exe", buffer, sizeof(buffer) - 1);
+    if (length == -1) {
+        // Handle error
+        throw std::runtime_error("Failed getting MHCLI executable path");
+    }
+    buffer[length] = '\0';
+    return std::string(buffer);
+#else
+    static_assert(false, "Getting Current Executable Path Not Supported For This Platform");
+#endif
 }
 
-std::filesystem::path MHTRFromCmdlinePluginDirGet(const char* argv[])
+std::filesystem::path MHTRFromExePathPluginDirGet(const std::string& exePath)
 {
-    return std::filesystem::path(FromCmdlineExecutableDirGet(argv)) / "plugins";
+    return std::filesystem::path(exePath).parent_path() / "plugins";
+}
+
+std::filesystem::path MHTRFromCurrentExePathPluginDirGet()
+{
+    return MHTRFromExePathPluginDirGet(GetExecutablePath());
 }
 
 MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
@@ -38,7 +69,7 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
         ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]")
         ("t,targets", "JSON targets path", cxxopts::value<std::string>())
         ("j,threads", "Number of threads", cxxopts::value<int>(DEFAULT_NTHREADS)->default_value("1"))
-        ("plugin-dir", "Directory path containing Plugins", cxxopts::value<std::string>()->default_value(MHTRFromCmdlinePluginDirGet(argv).string()))
+        ("plugin-dir", "Directory path containing Plugins", cxxopts::value<std::string>());
         ("h,help", "Print help");
 
     mCLIOptions.allow_unrecognised_options();
@@ -47,7 +78,7 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
 
     mAllPlugins = mAllPluginsFactory ?
         mAllPluginsFactory->CreatePlugins() :
-        FromPluginFolderMultiPluginFactory(mCLIParseRes["plugin-dir"].as<std::string>(), argc, argv).CreatePlugins();
+        FromPluginFolderMultiPluginFactory(mCLIParseRes.count("plugin-dir") ? mCLIParseRes["plugin-dir"].as<std::string>() : MHTRFromCurrentExePathPluginDirGet(), argc, argv).CreatePlugins();
 
     for (auto& plugin : mAllPlugins)
         std::cout << fmt::format("Loaded:'{}'\n", plugin->GetName());

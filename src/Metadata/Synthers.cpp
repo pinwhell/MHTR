@@ -54,7 +54,7 @@ std::vector<std::string> MultiMetadataStaticSynther::Synth() const
 
     LineSynthesizerGroup constObjLines(targetIfaceSynthers);
 
-    if (mNamespace != METADATA_NULL_NS)
+    if (mNamespace != METADATA_NS_NULL)
         return NamespaceBlock(&constObjLines, mNamespace).Synth();
 
     return constObjLines.Synth();
@@ -67,7 +67,7 @@ MultiNsMultiMetadataStaticSynther::MultiNsMultiMetadataStaticSynther(const std::
 std::vector<std::string> MultiNsMultiMetadataStaticSynther::Synth() const
 {
     std::vector<std::string> result;
-    std::unordered_map<std::string, std::vector<MetadataTarget*>> nsTargetsMap = TargetsGetNamespacedMap(mTargets);
+    std::unordered_map<std::string, std::vector<MetadataTarget*>> nsTargetsMap = NsMultiMetadataMapFromMultiMetadata(mTargets);
     int n = 0;
 
     for (const auto& kvNsTargets : nsTargetsMap)
@@ -126,7 +126,7 @@ MultiNsMultiMetadataReportSynther::MultiNsMultiMetadataReportSynther(const std::
 
 std::vector<std::string> MultiNsMultiMetadataReportSynther::Synth() const {
     std::vector<std::string> result;
-    std::unordered_map<std::string, std::vector<MetadataTarget*>> nsTargetsMap = TargetsGetNamespacedMap(mTargets);
+    std::unordered_map<std::string, std::vector<MetadataTarget*>> nsTargetsMap = NsMultiMetadataMapFromMultiMetadata(mTargets);
 
     int n = 0;
 
@@ -223,7 +223,7 @@ MultiNsMultiMetadataStaticAssignFunction::MultiNsMultiMetadataStaticAssignFuncti
 std::vector<std::string> MultiNsMultiMetadataStaticAssignFunction::Synth() const
 {
     std::vector<std::string> result;
-    std::unordered_map<std::string, std::vector<MetadataTarget*>> nsTargetsMap = TargetsGetNamespacedMap(mResults);
+    std::unordered_map<std::string, std::vector<MetadataTarget*>> nsTargetsMap = NsMultiMetadataMapFromMultiMetadata(mResults);
 
     int n = 0;
 
@@ -240,3 +240,51 @@ std::vector<std::string> MultiNsMultiMetadataStaticAssignFunction::Synth() const
     return result;
 }
 
+MultiMetadataProviderMergerFunctionBody::MultiMetadataProviderMergerFunctionBody(const std::unordered_set<std::string>& allNs)
+    : mAllNs(allNs)
+{}
+
+std::vector<std::string> MultiMetadataProviderMergerFunctionBody::Synth() const
+{
+    Line allProvider("MHTR::MetadataProvider all;");
+    std::unordered_set<std::string> allProviderFnName = FromNsAllFnNames();
+    std::vector<Line> allEveryOtherAddition;
+    std::transform(allProviderFnName.begin(), allProviderFnName.end(), std::back_inserter(allEveryOtherAddition), [](const std::string& providerFnName) {
+        return Line("all += " + providerFnName + "();");
+        });
+    Line returnStatement("return  all;");
+    std::vector<ILineSynthesizer*> allHppLines = {
+        &allProvider
+    };
+    std::transform(allEveryOtherAddition.begin(), allEveryOtherAddition.end(), std::back_inserter(allHppLines), [](Line& ln) {
+        return &ln;
+        });
+    allHppLines.push_back(&returnStatement);
+    return LineSynthesizerGroup(allHppLines).Synth();
+}
+
+std::unordered_set<std::string> MultiMetadataProviderMergerFunctionBody::FromNsAllFnNames() const
+{
+    std::unordered_set<std::string> result;
+
+    std::transform(mAllNs.begin(), mAllNs.end(), std::inserter(result, result.end()), [](const std::string& ns) {
+        return ns + "Create";
+        });
+
+    return result;
+}
+
+MultiMetadataProviderMergerFunction::MultiMetadataProviderMergerFunction(const std::unordered_set<std::string>& allNs, std::string fnIndent)
+    : mEmptyLine(Line::Empty())
+    , mBody(allNs)
+    , mFunction("AllCreate", &mBody, &mEmptyLine, fnIndent)
+{}
+
+MultiMetadataProviderMergerFunction::MultiMetadataProviderMergerFunction(const std::vector<MetadataTarget*>& allResult, std::string fnIndent)
+    : MultiMetadataProviderMergerFunction(AllNsFromMultiMetadataTarget(allResult), fnIndent)
+{}
+
+std::vector<std::string> MultiMetadataProviderMergerFunction::Synth() const
+{
+    return mFunction.Synth();
+}

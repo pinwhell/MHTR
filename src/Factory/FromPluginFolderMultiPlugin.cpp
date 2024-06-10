@@ -26,14 +26,15 @@ std::vector<std::unique_ptr<IPlugin>> FromPluginFolderMultiPluginFactory::Create
 
         // At this point, this is an actual module ...
 
-        std::string currFilePath = currFile.filename().string();
+        std::string currFilename = currFile.filename().string();
+        std::string currFilePath = currFile.string();
 
-        if (loadedLibs.count(currFilePath))
+        if (loadedLibs.count(currFilename))
             continue;
 
         // At this point, a plugin with this file-name hasnt been loaded yet ...
 
-        loadedLibs.insert(currFilePath);
+        loadedLibs.insert(currFilename);
 
         std::unique_ptr<IPlugin> thisPlugin = PluginFactory(Library::Load(currFilePath.c_str())).CreatePlugin();
         std::string thisPluginName = thisPlugin->GetName();
