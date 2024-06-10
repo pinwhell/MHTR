@@ -181,18 +181,18 @@ int MHCLI::Run()
         return metadata->GetTarget();
         });
 
-    std::vector<MetadataTarget*> foundTargetVec(foundTargets.begin(), foundTargets.end());
+    MetadataTargetSet foundTargetVec(foundTargets.begin(), foundTargets.end());
 
     {
         BS::thread_pool pool(nThreads);
 
         if (mCLIParseRes.count("report")) pool.detach_task([this, &foundTargetVec] {
-            MultiNsMultiMetadataReportSynther reportSynther(foundTargetVec);
+            MultiNsMultiMetadataSynther<TextReportSynther> reportSynther(foundTargetVec);
             FileWrite(mCLIParseRes["report"].as<std::string>(), &reportSynther);
             });
 
         if (mCLIParseRes.count("report-hpp")) pool.detach_task([this, &foundTargetVec] {
-            HppStaticReport report(foundTargetVec);
+            HppConstAssignSynther report(foundTargetVec);
             FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &report);
             });
 

@@ -28,7 +28,7 @@ public:
 		mCLIParseRes = mCLIOptions.parse(argc, argv);
 	}
 
-	void OnResult(const std::vector<MetadataTarget*>& result) override
+	void OnResult(const MetadataTargetSet& result) override
 	{
 		if (result.empty() || !mCLIParseRes.count("report-hpprt"))
 			return;
@@ -36,18 +36,10 @@ public:
 		// At this point there is result available & user requested a
 		// report from the plugin
 
-		std::unordered_map<std::string, std::vector<MetadataTarget*>> namespacedMap = NsMultiMetadataMapFromMultiMetadata(result);
-		std::vector<std::string> listNamespaces;
+		NamespaceMetadataTargetSetMap namespacedMap = NsMultiMetadataMapFromMultiMetadata(result);
+		NamespaceSet allNs = AllNsFromMultiMetadataTarget(result);
 
-		std::transform(namespacedMap.begin(), namespacedMap.end(), std::back_inserter(listNamespaces), [](const auto& kv) {
-			return kv.first;
-			});
-
-		std::sort(listNamespaces.begin(), listNamespaces.end());
-
-		std::string reportNsName = "";
-
-		for (const std::string& ns : listNamespaces)
+		std::string reportNsName = ""; for (const std::string& ns : allNs)
 			reportNsName += ns;
 
 		Line empty = Line::Empty();
@@ -60,8 +52,8 @@ public:
 			&includeSdk,
 			&empty
 			});
-		MultiNsMultiMetadataStaticAssignFunction multiFn(result);
-		MultiMetadataProviderMergerFunction multiProviderMerger(result);
+		MultiNsMultiMetadataSynther<ProviderAssignFunctionSynther> multiFn(result);
+		MetadataProviderMergerFunction multiProviderMerger(result);
 		MultiLineSynthesizerGroup multiFnAndMerger({
 			&multiFn,
 			&newLineMultiLineSynther,

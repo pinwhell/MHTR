@@ -1,33 +1,33 @@
 #pragma once
 
-#include <unordered_map>
-#include <unordered_set>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iterator>
+#include <set>
 
+#include <Metadata/Container.h>
 #include <Metadata/Target.h>
 
-static std::unordered_map<std::string, std::vector<MetadataTarget*>> NsMultiMetadataMapFromMultiMetadata(const std::vector<MetadataTarget*>& targets)
+using NamespaceSet = std::set<std::string>;
+
+static NamespaceMetadataTargetSetMap NsMultiMetadataMapFromMultiMetadata(const MetadataTargetSet& targets)
 {
-	std::unordered_map<std::string, std::vector<MetadataTarget*>> result;
+	NamespaceMetadataTargetSetMap result;
 
 	for (auto* target : targets)
 	{
 		const INamespace* targetNs = target->mFullIdentifier.mNamespace;
 		std::string targetNsStr = targetNs ? targetNs->GetNamespace() : METADATA_NS_NULL;
-
-		if (result.find(targetNsStr) == result.end())
-			result[targetNsStr] = std::vector<MetadataTarget*>();
-
-		result[targetNsStr].push_back(target);
+		result[targetNsStr].insert(target);
 	}
 
 	return result;
 }
 
-static std::unordered_set<std::string> AllNsFromMultiMetadataTarget(const std::vector<MetadataTarget*>& targets)
+static NamespaceSet AllNsFromMultiMetadataTarget(const MetadataTargetSet& targets)
 {
-	std::unordered_set<std::string> result;
+	NamespaceSet result;
 
 	std::transform(targets.begin(), targets.end(), std::inserter(result, result.end()), [](MetadataTarget* target) {
 		INamespace* ns = target->mFullIdentifier.mNamespace;

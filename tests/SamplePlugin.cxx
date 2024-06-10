@@ -13,7 +13,7 @@ public:
 		std::cout << "SampleReportPlugin Initialized with " << argc << " Command Line Arguments...\n";
 	}
 
-	void OnResult(const std::vector<MetadataTarget*>& result) override
+	void OnResult(const MetadataTargetSet& result) override
 	{
 		if (result.empty())
 			return;

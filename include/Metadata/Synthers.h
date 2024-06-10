@@ -2,68 +2,67 @@
 
 #include <unordered_set>
 #include <Metadata/Target.h>
+#include <Metadata/Utility.h>
 #include <Synther/ILine.h>
 #include <Synther/IMultiLine.h>
 #include <Synther/FunctionBlock.h>
 #include <Synther/Line.h>
 
-class MetadataStaticLineSynther : public ILineSynthesizer {
+template<typename T>
+class MultiNsMultiMetadataSynther : public IMultiLineSynthesizer {
 public:
-    MetadataStaticLineSynther(const MetadataTarget& target);
+    using SyntherT = T;
 
-    std::string Synth() const override;
+    inline MultiNsMultiMetadataSynther(const MetadataTargetSet& targets, std::string indent = IndentMake())
+        : mTargets(targets)
+        , mIndent(indent)
+    {}
 
-    const MetadataTarget& mTarget;
+    inline std::vector<std::string> Synth() const override
+    {
+        std::vector<std::string> result;
+        NamespaceMetadataTargetSetMap nsTargetsMap = NsMultiMetadataMapFromMultiMetadata(mTargets);
+        int n = 0;
+
+        for (const auto& kvNsTargets : nsTargetsMap)
+        {
+            std::vector<std::string> currNsRes = SyntherT::Synth(kvNsTargets.first, kvNsTargets.second, mIndent);
+
+            result.insert(result.end(), currNsRes.begin(), currNsRes.end());
+
+            if (n++ < nsTargetsMap.size() - 1)
+                result.push_back(""); // Empty line separating Namespaces
+        }
+
+        return result;
+    }
+
+    MetadataTargetSet mTargets;
+    std::string mIndent;
 };
 
-class MultiMetadataStaticSynther : public IMultiLineSynthesizer
-{
+class ConstAssignSynther {
 public:
-    MultiMetadataStaticSynther(std::vector<MetadataTarget*> targets, const std::string& ns = METADATA_NS_NULL);
+    static std::vector<std::string> Synth(const std::string& ns, const MetadataTargetSet& targets, const std::string& indent);
+};
+
+class TextReportSynther {
+public:
+    static std::vector<std::string> Synth(const std::string& ns, const MetadataTargetSet& targets, const std::string& indent);
+};
+
+class ProviderAssignFunctionSynther {
+public:
+    static std::vector<std::string> Synth(const std::string& ns, const MetadataTargetSet& targets, const std::string& indent);
+};
+
+class HppConstAssignSynther : public IMultiLineSynthesizer {
+public:
+    HppConstAssignSynther(const MetadataTargetSet& targets);
 
     std::vector<std::string> Synth() const override;
 
-    std::string mNamespace;
-    std::vector<MetadataTarget*> mTargets;
-};
-
-class MultiNsMultiMetadataStaticSynther : public IMultiLineSynthesizer {
-public:
-
-    MultiNsMultiMetadataStaticSynther(const std::vector<MetadataTarget*>& targets);
-
-    std::vector<std::string> Synth() const override;
-
-    std::vector<MetadataTarget*> mTargets;
-};
-
-class MultiMetadataReportSynther : public IMultiLineSynthesizer
-{
-public:
-    MultiMetadataReportSynther(std::vector<MetadataTarget*> targets, const std::string& ns = METADATA_NS_NULL);
-
-    std::vector<std::string> Synth() const override;
-
-    std::string mNamespace;
-    std::vector<MetadataTarget*> mTargets;
-};
-
-class MultiNsMultiMetadataReportSynther : public IMultiLineSynthesizer {
-public:
-    MultiNsMultiMetadataReportSynther(const std::vector<MetadataTarget*>& targets);
-
-    std::vector<std::string> Synth() const override;
-
-    std::vector<MetadataTarget*> mTargets;
-};
-
-class HppStaticReport : public IMultiLineSynthesizer {
-public:
-    HppStaticReport(const std::vector<MetadataTarget*>& targets);
-
-    std::vector<std::string> Synth() const override;
-
-    std::vector<MetadataTarget*> mTargets;
+    MetadataTargetSet mTargets;
 };
 
 class MetadataProviderFunction : public IMultiLineSynthesizer {
@@ -74,66 +73,34 @@ public:
         ILineSynthesizer* fnArgLn,
         std::string fnIndent = IndentMake());
 
-
     std::vector<std::string> Synth() const override;
 
     FunctionBlock mFunction;
 };
 
-class MultiStaticAssignFunctionBody : public IMultiLineSynthesizer {
+class MetadataProviderMergerFunctionBody : public IMultiLineSynthesizer {
 public:
-    MultiStaticAssignFunctionBody(std::vector<MetadataTarget*> results);
+    MetadataProviderMergerFunctionBody(const NamespaceSet& allNs);
 
     std::vector<std::string> Synth() const override;
 
-    std::vector<MetadataTarget*> mResults;
-};
-
-class MetadataStaticAssignFunction : public IMultiLineSynthesizer {
-public:
-    MetadataStaticAssignFunction(const std::vector<MetadataTarget*>& results, const std::string& ns, std::string indent = IndentMake());
-
-    std::vector<std::string> Synth() const override;
-
-    std::string mNamespace;
-    std::vector<MetadataTarget*> mResults;
-    std::string mIndent;
-};
-
-class MultiNsMultiMetadataStaticAssignFunction : public IMultiLineSynthesizer {
-public:
-
-    MultiNsMultiMetadataStaticAssignFunction(const std::vector<MetadataTarget*>& results, std::string indent = IndentMake());
-
-    std::vector<std::string> Synth() const override;
-
-    std::vector<MetadataTarget*> mResults;
-    std::string mIndent;
-};
-
-class MultiMetadataProviderMergerFunctionBody : public IMultiLineSynthesizer {
-public:
-    MultiMetadataProviderMergerFunctionBody(const std::unordered_set<std::string>& allNs);
-
-    std::vector<std::string> Synth() const override;
-
-    std::unordered_set<std::string> mAllNs;
+    NamespaceSet mAllNs;
 
 private:
 
-    std::unordered_set<std::string> FromNsAllFnNames() const;
+    std::set<std::string> FromNsAllFnNames() const;
 };
 
-class MultiMetadataProviderMergerFunction : public IMultiLineSynthesizer {
+class MetadataProviderMergerFunction : public IMultiLineSynthesizer {
 public:
-    MultiMetadataProviderMergerFunction(const std::unordered_set<std::string>& allNs, std::string fnIndent = IndentMake());
-    MultiMetadataProviderMergerFunction(const std::vector<MetadataTarget*>& allResult, std::string fnIndent = IndentMake());
+    MetadataProviderMergerFunction(const NamespaceSet& allNs, std::string fnIndent = IndentMake());
+    MetadataProviderMergerFunction(const MetadataTargetSet& allResult, std::string fnIndent = IndentMake());
 
     std::vector<std::string> Synth() const override;
 private:
     Line mEmptyLine;
 
 public:
-    MultiMetadataProviderMergerFunctionBody mBody;
+    MetadataProviderMergerFunctionBody mBody;
     MetadataProviderFunction mFunction;
 };

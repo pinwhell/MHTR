@@ -113,7 +113,7 @@ void TestImmediateLookup(IMetadataLookupContextProvider* metdtContextProvider)
 
             immLookup.Lookup();
 
-            auto lines = MultiNsMultiMetadataStaticSynther({ &target }).Synth();
+            auto lines = MultiNsMultiMetadataSynther<ConstAssignSynther>({ &target }).Synth();
 
             for (const auto& line : lines)
                 std::cout << line << std::endl;
@@ -136,7 +136,7 @@ void FarAddressLookupTest(IMetadataLookupContextProvider* metdtContextProvider)
 
             stackCheckGuardAddr.Lookup();
 
-            auto lines = MultiNsMultiMetadataStaticSynther({ &target }).Synth();
+            auto lines = MultiNsMultiMetadataSynther<ConstAssignSynther>({ &target }).Synth();
 
             for (const auto& line : lines)
                 std::cout << line << std::endl;
@@ -203,12 +203,12 @@ void TestDumpMetadata()
     MetadataTarget r1("foo", &n1); r1.TrySetResult(MetadataResult("AA BB CC"));
     MetadataTarget r2("bar", &n2); r2.TrySetResult(MetadataResult(0x10));
 
-    std::vector<MetadataTarget*> targets{
+    MetadataTargetSet targets = {
         &r1,
         &r2
     };
 
-    auto lines = MultiNsMultiMetadataStaticSynther(targets).Synth();
+    auto lines = MultiNsMultiMetadataSynther<ConstAssignSynther>(targets).Synth();
 
     for (const auto& line : lines)
         std::cout << line << std::endl;
@@ -287,7 +287,7 @@ int TestCreationAndMetadataLookup()
     return 0;
 }
 
-void DummyResultMake(std::function<void(const std::vector<MetadataTarget*>&)> callback)
+void DummyResultMake(std::function<void(const MetadataTargetSet&)> callback)
 {
     Namespace fooNs("Foo");
     MetadataTarget foofooTarget("FooTarget", &fooNs); foofooTarget.TrySetResult(MetadataResult(0x10));
@@ -299,7 +299,7 @@ void DummyResultMake(std::function<void(const std::vector<MetadataTarget*>&)> ca
     MetadataTarget barbarTarget("BarTarget", &barNs); barbarTarget.TrySetResult(MetadataResult(0x25));
     MetadataTarget barbazTarget("BazTarget", &barNs); barbazTarget.TrySetResult(MetadataResult("AA ?B ?C"));
 
-    std::vector<MetadataTarget*> dummyResults = {
+    MetadataTargetSet dummyResults = {
         &foofooTarget,
         &foobarTarget,
         &foobazTarget,
@@ -315,8 +315,8 @@ int main(int argc, const char* argv[])
 {
     std::filesystem::current_path(MHR_SAMPLES_DIR);
 
-    DummyResultMake([](const std::vector<MetadataTarget*>& results) {
-        MultiNsMultiMetadataStaticAssignFunction fn(results);
+    DummyResultMake([](const MetadataTargetSet& results) {
+        MultiNsMultiMetadataSynther<ProviderAssignFunctionSynther> fn(results);
 
         for (const std::string& line : fn.Synth())
             std::cout << line << "\n";
