@@ -127,6 +127,13 @@ namespace Dummy {
         result["Dummy::BarPattern"] = "42 00 ? B9";
         return MHTR::MetadataProvider(std::move(result));
     }
+
+    MHTR::MetadataProvider AllCreate()
+    {
+        MHTR::MetadataProvider all;
+        all += DummyCreate();
+        return  all;
+    }
 }
 ```
 This report format leverages the `MHTRSDK` to generate a metadata provider function, which encapsulates the metadata values in a format suitable for integration with the `MHTR` framework. This allows seamless usage of metadata within `MHTR`-enabled environments.
