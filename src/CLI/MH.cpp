@@ -78,7 +78,13 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
 
     mAllPlugins = mAllPluginsFactory ?
         mAllPluginsFactory->CreatePlugins() :
-        FromPluginFolderMultiPluginFactory(mCLIParseRes.count("plugin-dir") ? mCLIParseRes["plugin-dir"].as<std::string>() : MHTRFromCurrentExePathPluginDirGet(), argc, argv).CreatePlugins();
+        FromPluginFolderMultiPluginFactory(
+            mCLIParseRes.count("plugin-dir") ?
+            std::filesystem::path(
+                mCLIParseRes["plugin-dir"].as<std::string>()
+            ) :
+            MHTRFromCurrentExePathPluginDirGet()
+            , argc, argv).CreatePlugins();
 
     for (auto& plugin : mAllPlugins)
         std::cout << fmt::format("Loaded:'{}'\n", plugin->GetName());
