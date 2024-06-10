@@ -65,10 +65,10 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
     , mCLIOptions("Metadata Hunter CLI", "Robust Binary Analizis Framework.")
 {
     mCLIOptions.add_options()
-        ("r,report", "Output result report", cxxopts::value<std::string>(), "[output path]")
-        ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]")
         ("t,targets", "JSON targets path", cxxopts::value<std::string>())
         ("j,threads", "Number of threads", cxxopts::value<int>(DEFAULT_NTHREADS)->default_value("1"))
+        ("r,report", "Output result report", cxxopts::value<std::string>(), "[output path]")
+        ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]")
         ("plugin-dir", "Directory path containing Plugins", cxxopts::value<std::string>());
         ("h,help", "Print help");
 
