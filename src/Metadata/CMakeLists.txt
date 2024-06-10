@@ -1,5 +1,5 @@
 add_library(Metadata INTERFACE)
-target_sources(Metadata INTERFACE Metadata.cpp Target.cpp Result.cpp)
+target_sources(Metadata INTERFACE Metadata.cpp Target.cpp Result.cpp Utility.cpp)
 
 add_library(MetadataLookups INTERFACE)
 target_sources(MetadataLookups INTERFACE Lookups.cpp)
