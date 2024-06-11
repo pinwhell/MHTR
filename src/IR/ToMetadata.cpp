@@ -1,12 +1,12 @@
-#include <IR/ToMetadata.h>
-#include <Metadata/Lookups.h>
-#include <Exception/UnexpectedLayout.h>
-#include <PatternScan.h>
-#include <FarAddressLookup.h>
 #include <fmt/core.h>
-#include <Provider/ProcedureRangeChain.h>
 #include <algorithm>
 #include <iterator>
+#include <MHTR/IR/ToMetadata.h>
+#include <MHTR/Metadata/Lookups.h>
+#include <MHTR/Exception/UnexpectedLayout.h>
+#include <MHTR/PatternScan.h>
+#include <MHTR/FarAddressLookup.h>
+#include <MHTR/Provider/ProcedureRangeChain.h>
 
 FromIRMultiMetadataFactory::FromIRMultiMetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRFactory* metadataIRFactory, IRangeProvider* defaultScanRange, IOffsetCalculator* offsetCalculator, ICapstoneProvider* capstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespaceProvider* nsProvider)
     : mProvidersStorage(providersStorage)

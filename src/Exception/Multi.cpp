@@ -1,5 +1,5 @@
-#include <Exception/Multi.h>
 #include <sstream>
+#include <MHTR/Exception/Multi.h>
 
 MultiException::MultiException(const std::vector<std::string>& exceptions)
     : std::runtime_error(""), mExceptions(exceptions) {}

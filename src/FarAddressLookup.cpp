@@ -1,9 +1,9 @@
-#include <fmt/core.h>
-#include <Exception/Multi.h>
-#include <Metadata/Target.h>
-#include <Metadata/Lookups.h>
-#include <FarAddressLookup.h>
 #include <unordered_set>
+#include <fmt/core.h>
+#include <MHTR/Exception/Multi.h>
+#include <MHTR/Metadata/Target.h>
+#include <MHTR/Metadata/Lookups.h>
+#include <MHTR/FarAddressLookup.h>
 
 FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IOffsetCalculator* offsetCalculator, bool bDeref)
     : mTarget(target)

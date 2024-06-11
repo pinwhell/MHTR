@@ -1,8 +1,8 @@
-#include <Synther/FunctionBlock.h>
-#include <Synther/Line.h>
-#include <Synther/LineGroup.h>
-#include <Synther/ScopeBlock.h>
-#include <Synther/MultiLineGroup.h>
+#include <MHTR/Synther/FunctionBlock.h>
+#include <MHTR/Synther/Line.h>
+#include <MHTR/Synther/LineGroup.h>
+#include <MHTR/Synther/ScopeBlock.h>
+#include <MHTR/Synther/MultiLineGroup.h>
 
 FunctionBlock::FunctionBlock(const std::string& fnName, IMultiLineSynthesizer* fnContentSynther, ILineSynthesizer* argLnSynther, const std::string& returnType, std::string indent)
     : mName(fnName)

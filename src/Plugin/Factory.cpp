@@ -1,4 +1,4 @@
-#include <Plugin/Factory.h>
+#include <MHTR/Plugin/Factory.h>
 
 PluginFactory::PluginFactory(Library&& lib)
     : mLibrary(std::move(lib))

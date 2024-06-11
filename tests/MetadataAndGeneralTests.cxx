@@ -2,26 +2,25 @@
 #include <functional>
 #include <filesystem>
 
-#include <Pltform.h>
-#include <Provider/IRange.h>
-#include <Factory/MetadataTarget.h>
 #include <CStone/Provider.h>
-#include <IR/From/Json.h>
-#include <IR/ToMetadata.h>
-#include <Synther/Namespace.h>
-#include <Binary/ELF.h>
-#include <Binary/Factory.h>
-#include <Arch/ARM/32/Resolver/FarAddress.h>
-
-#include <Metadata/Metadata.h>
-#include <Metadata/Synthers.h>
-#include <PatternScan.h>
-#include <FarAddressLookup.h>
-#include <Binary/File.h>
-#include <OffsetCalculator.h>
-#include <Provider/ProcedureRangeChain.h>
-#include <Provider/FromFileJson.h>
-#include <Metadata/Lookups.h>
+#include <MHTR/Pltform.h>
+#include <MHTR/IR/From/Json.h>
+#include <MHTR/IR/ToMetadata.h>
+#include <MHTR/Factory/MetadataTarget.h>
+#include <MHTR/Metadata/Metadata.h>
+#include <MHTR/Metadata/Synthers.h>
+#include <MHTR/Synther/Namespace.h>
+#include <MHTR/Binary/ELF.h>
+#include <MHTR/Binary/Factory.h>
+#include <MHTR/Binary/File.h>
+#include <MHTR/Arch/ARM/32/Resolver/FarAddress.h>
+#include <MHTR/PatternScan.h>
+#include <MHTR/FarAddressLookup.h>
+#include <MHTR/OffsetCalculator.h>
+#include <MHTR/Provider/IRange.h>
+#include <MHTR/Provider/ProcedureRangeChain.h>
+#include <MHTR/Provider/FromFileJson.h>
+#include <MHTR/Metadata/Lookups.h>
 
 
 class IMetadataLookupContextProvider {
@@ -225,10 +224,10 @@ void TestNamespaces()
     std::cout << baz.GetFullIdentifier(true) << std::endl;
 }
 
-#include <Provider/Json.h>
-#include <Provider/FromJsonSingleNamespace.h>
-#include <Provider/FromJsonPathJsonFile.h>
-#include <Factory/FromTargetBinJsonBinary.h>
+#include <MHTR/Provider/Json.h>
+#include <MHTR/Provider/FromJsonSingleNamespace.h>
+#include <MHTR/Provider/FromJsonPathJsonFile.h>
+#include <MHTR/Factory/FromTargetBinJsonBinary.h>
 
 int TestCreationAndMetadataLookup()
 {

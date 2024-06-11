@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <CLI/MH.h>
+#include <MHTR/CLI/MH.h>
 
 int MHunterMain(int argc, const char** argv)
 {

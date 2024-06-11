@@ -1,6 +1,6 @@
 #include <iostream>
 #include <filesystem>
-#include <CLI/MH.h>
+#include <MHTR/CLI/MH.h>
 
 int main(int argc, const char** realArgv) {
 	std::filesystem::current_path(MHR_SAMPLES_DIR);

@@ -1,6 +1,6 @@
-#include <Metadata/Utility.h>
 #include <algorithm>
 #include <iterator>
+#include <MHTR/Metadata/Utility.h>
 
 NamespaceMetadataTargetSetMap NsMultiMetadataMapFromMultiMetadata(const MetadataTargetSet& targets)
 {

@@ -1,5 +1,5 @@
-#include <Binary/File.h>
-#include <Binary/Factory.h>
+#include <MHTR/Binary/File.h>
+#include <MHTR/Binary/Factory.h>
 
 BinaryFile::BinaryFile(const char* filePath)
 	: mFileView(filePath)

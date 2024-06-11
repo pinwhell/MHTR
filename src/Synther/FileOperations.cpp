@@ -1,6 +1,6 @@
-#include <Synther/FileOperations.h>
-#include <Synther/Utility.h>
 #include <fstream>
+#include <MHTR/Synther/FileOperations.h>
+#include <MHTR/Synther/Utility.h>
 
 void FileWrite(const std::string& path, IMultiLineSynthesizer* multiLineSynther) {
     std::ofstream outFile(path);

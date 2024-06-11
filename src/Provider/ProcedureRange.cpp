@@ -1,4 +1,4 @@
-#include <Provider/ProcedureRange.h>
+#include <MHTR/Provider/ProcedureRange.h>
 #include <stdexcept>
 
 ProcedureRangeProvider::ProcedureRangeProvider(ICapstoneProvider* cstoneProvider, IProcedureEntryProvider* procEntryProvider, size_t defProcSize)

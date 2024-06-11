@@ -1,12 +1,12 @@
-#include <Metadata/Synthers.h>
 #include <fmt/format.h>
-#include <Synther/LineGroup.h>
-#include <Synther/NamespaceBlock.h>
 #include <iterator>
-#include <Synther/Line.h>
 #include <algorithm>
-#include <Synther/MultiLineGroup.h>
-#include <Metadata/Utility.h>
+#include <MHTR/Metadata/Synthers.h>
+#include <MHTR/Synther/LineGroup.h>
+#include <MHTR/Synther/NamespaceBlock.h>
+#include <MHTR/Synther/Line.h>
+#include <MHTR/Synther/MultiLineGroup.h>
+#include <MHTR/Metadata/Utility.h>
 
 template<typename T>
 inline std::string Literal(T str)

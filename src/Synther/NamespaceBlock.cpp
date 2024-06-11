@@ -1,4 +1,4 @@
-#include <Synther/NamespaceBlock.h>
+#include <MHTR/Synther/NamespaceBlock.h>
 
 NamespaceBlock::NamespaceBlock(IMultiLineSynthesizer* blockContentSynther, const std::string& name, std::string indent)
     : mName(name)

@@ -1,7 +1,7 @@
-#include <Factory/FromPluginFolderMultiPlugin.h>
-#include <Plugin/Factory.h>
 #include <unordered_set>
-#include <Pltform.h>
+#include <MHTR/Factory/FromPluginFolderMultiPlugin.h>
+#include <MHTR/Plugin/Factory.h>
+#include <MHTR/Pltform.h>
 
 FromPluginFolderMultiPluginFactory::FromPluginFolderMultiPluginFactory(const std::string& pluginDirPath, int argc, const char* argv[])
     : mPluginDirPath(std::filesystem::absolute(pluginDirPath).string())

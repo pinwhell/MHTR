@@ -1,4 +1,4 @@
-#include <Synther/ScopeBlock.h>
+#include <MHTR/Synther/ScopeBlock.h>
 
 ScopeBlock::ScopeBlock(IMultiLineSynthesizer* contentSynther, std::string indent)
     : mContentSynther(contentSynther)

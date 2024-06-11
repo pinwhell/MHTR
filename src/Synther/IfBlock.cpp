@@ -1,4 +1,4 @@
-#include <Synther/IfBlock.h>
+#include <MHTR/Synther/IfBlock.h>
 
 IfBlock::IfBlock(ILineSynthesizer* conditionSynther, IMultiLineSynthesizer* blockContentSynther, std::string indent)
     : mConditionSynther(conditionSynther)

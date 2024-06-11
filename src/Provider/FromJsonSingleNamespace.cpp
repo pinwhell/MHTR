@@ -1,4 +1,4 @@
-#include <Provider/FromJsonSingleNamespace.h>
+#include <MHTR/Provider/FromJsonSingleNamespace.h>
 
 FromJsonSingleNamespaceProvider::FromJsonSingleNamespaceProvider(IJsonProvider* jsonProvider)
     : mNs(jsonProvider->GetJson()->contains("namespace") ? (*jsonProvider->GetJson())["namespace"].get<std::string>() : "")

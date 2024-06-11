@@ -1,6 +1,6 @@
-#include <IR/From/Json.h>
 #include <fmt/core.h>
-#include <Exception/UnexpectedLayout.h>
+#include <MHTR/IR/From/Json.h>
+#include <MHTR/Exception/UnexpectedLayout.h>
 
 EMetadataScanRangeStage MetadataScanRangeStageIR::getType() const
 {

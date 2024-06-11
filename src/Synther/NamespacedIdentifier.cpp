@@ -1,4 +1,4 @@
-#include <Synther/NamespacedIdentifier.h>
+#include <MHTR/Synther/NamespacedIdentifier.h>
 
 NamespacedIdentifier::NamespacedIdentifier(const std::string& identifier, INamespace* ns)
     : mIdentifier(identifier)

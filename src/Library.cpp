@@ -1,7 +1,7 @@
-#include <Library.h>
-#include <Pltform.h>
 #include <stdexcept>
 #include <fmt/format.h>
+#include <MHTR/Library.h>
+#include <MHTR/Pltform.h>
 
 #include WIN_LINUX(<Windows.h>, <dlfcn.h>)
 

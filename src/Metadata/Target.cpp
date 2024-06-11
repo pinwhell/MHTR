@@ -1,4 +1,4 @@
-#include <Metadata/Target.h>
+#include <MHTR/Metadata/Target.h>
 
 MetadataTarget::MetadataTarget(const std::string& name, INamespace* ns)
 	: mFullIdentifier(name, ns)

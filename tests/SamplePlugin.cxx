@@ -1,5 +1,5 @@
-#include <Plugin/IPlugin.h>
 #include <iostream>
+#include <MHTR/Plugin/IPlugin.h>
 
 class SampleReportPlugin : public IPlugin {
 public:

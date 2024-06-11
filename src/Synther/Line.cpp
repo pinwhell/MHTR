@@ -1,4 +1,4 @@
-#include <Synther/Line.h>
+#include <MHTR/Synther/Line.h>
 
 Line::Line(const std::string& line)
     : mLine(line)

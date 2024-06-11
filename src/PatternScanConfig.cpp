@@ -1,4 +1,4 @@
-#include <PatternScanConfig.h>
+#include <MHTR/PatternScanConfig.h>
 
 PatternScanConfig::PatternScanConfig() : mPattern(""), mResDisp(0) {}
 

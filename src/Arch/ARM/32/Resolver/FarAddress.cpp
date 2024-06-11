@@ -1,5 +1,5 @@
-#include <Arch/ARM/32/Resolver/FarAddress.h>
 #include <CStone/Arch/ARM/32/Utility.h>
+#include <MHTR/Arch/ARM/32/Resolver/FarAddress.h>
 
 ARM32FarAddressResolver::ARM32FarAddressResolver(ICapstoneProvider* cstoneProvider)
     : mCStoneProvider(cstoneProvider)

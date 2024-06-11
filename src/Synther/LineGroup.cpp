@@ -1,4 +1,4 @@
-#include <Synther/LineGroup.h>
+#include <MHTR/Synther/LineGroup.h>
 
 LineSynthesizerGroup::LineSynthesizerGroup(const std::vector<ILineSynthesizer*>& lineSynthers)
     : mLineSynthers(lineSynthers)

@@ -1,4 +1,4 @@
-#include <Synther/Namespace.h>
+#include <MHTR/Synther/Namespace.h>
 
 Namespace::Namespace(const std::string& nsName, INamespace* nsParent)
     : mNsParent(nsParent)

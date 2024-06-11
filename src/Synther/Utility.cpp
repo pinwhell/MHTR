@@ -1,5 +1,5 @@
-#include <Synther/Utility.h>
 #include <sstream>
+#include <MHTR/Synther/Utility.h>
 
 std::string SingleLinefy(const IMultiLineSynthesizer* contentProvider, const std::string& delimiter) {
     if (!contentProvider) {

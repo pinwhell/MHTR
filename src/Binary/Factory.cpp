@@ -1,7 +1,7 @@
-#include <Binary/Factory.h>
-#include <Binary/ELF.h>
-#include <Binary/Unknown.h>
-#include <Binary/File.h>
+#include <MHTR/Binary/Factory.h>
+#include <MHTR/Binary/ELF.h>
+#include <MHTR/Binary/Unknown.h>
+#include <MHTR/Binary/File.h>
 #include <ELFPP.hpp>
 
 FromMemoryBinaryFactory::FromMemoryBinaryFactory(const void* entry)

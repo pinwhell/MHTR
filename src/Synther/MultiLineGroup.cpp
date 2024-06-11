@@ -1,4 +1,4 @@
-#include <Synther/MultiLineGroup.h>
+#include <MHTR/Synther/MultiLineGroup.h>
 
 MultiLineSynthesizerGroup::MultiLineSynthesizerGroup(const std::vector<IMultiLineSynthesizer*>& multiLineSynthers)
     : mMultiLinesSynthers(multiLineSynthers)

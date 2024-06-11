@@ -1,4 +1,4 @@
-#include <Synther/Identifier.h>
+#include <MHTR/Synther/Identifier.h>
 
 Identifier::Identifier(const std::string& identifier)
     : mIdentifier(identifier)

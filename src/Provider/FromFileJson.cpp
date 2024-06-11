@@ -1,7 +1,5 @@
-#pragma once
-
-#include <Provider/FromFileJson.h>
 #include <fstream>
+#include <MHTR/Provider/FromFileJson.h>
 
 FromFileJsonProvider::FromFileJsonProvider(const std::string& filePath)
     : mJson(nlohmann::json::parse(std::ifstream(filePath)))

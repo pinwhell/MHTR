@@ -1,12 +1,12 @@
-#include <Plugin/IPlugin.h>
 #include <cxxopts.hpp>
-#include <Synther/Line.h>
-#include <Synther/LineGroup.h>
-#include <Synther/MultiLineGroup.h>
-#include <Synther/NamespaceBlock.h>
-#include <Synther/FileOperations.h>
-#include <Metadata/Utility.h>
-#include <Metadata/Synthers.h>
+#include <MHTR/Plugin/IPlugin.h>
+#include <MHTR/Synther/Line.h>
+#include <MHTR/Synther/LineGroup.h>
+#include <MHTR/Synther/MultiLineGroup.h>
+#include <MHTR/Synther/NamespaceBlock.h>
+#include <MHTR/Synther/FileOperations.h>
+#include <MHTR/Metadata/Utility.h>
+#include <MHTR/Metadata/Synthers.h>
 
 class HPPRTReportWriter : public IPlugin {
 public:

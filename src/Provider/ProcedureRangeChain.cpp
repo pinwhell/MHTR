@@ -1,9 +1,9 @@
-#include <Provider/ProcedureRangeChain.h>
-#include <Provider/IAddresses.h>
-#include <Provider/IProcedureEntry.h>
-#include <PatternScan.h>
-#include <Provider/AsmExtractedProcedureEntry.h>
-#include <Provider/ProcedureRange.h>
+#include <MHTR/PatternScan.h>
+#include <MHTR/Provider/ProcedureRangeChain.h>
+#include <MHTR/Provider/IAddresses.h>
+#include <MHTR/Provider/IProcedureEntry.h>
+#include <MHTR/Provider/AsmExtractedProcedureEntry.h>
+#include <MHTR/Provider/ProcedureRange.h>
 
 ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns)
 {
