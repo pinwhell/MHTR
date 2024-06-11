@@ -1,18 +1,21 @@
 cmake_minimum_required(VERSION 3.15)
 
-project (MetadataHunter)
+project (MHTR)
 
 option(BUILD_TESTS "Build tests" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include(cmake/build_helper.cmake)
-include(cmake/platform_info.cmake)
+include(cmake/BuildHelper.cmake)
+include(cmake/PlatformInfo.cmake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT})
 set(CMAKE_PDB_OUTPUT_DIRECTORY ${BIN_OUTPUT})
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+set(IFACE_INCLUDE_DIR $<BUILD_INTERFACE:${INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
+set(MHTR_INCLUDE_DIR ${INCLUDE_DIR}/MHTR)
+
 
 add_subdirectory(vendor)
 add_subdirectory(src)
@@ -21,3 +24,18 @@ add_subdirectory(plugin)
 if(BUILD_TESTS)
 	add_subdirectory(tests)
 endif()
+
+#####################
+#	Export Targets	#
+#####################
+
+install(FILES 
+${MHTR_INCLUDE_DIR}/Pltform.h 
+${MHTR_INCLUDE_DIR}/Api.h 
+DESTINATION include/MHTR)
+
+configure_file(cmake/MHTRConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/MHTRConfig.cmake @ONLY)
+
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/MHTRConfig.cmake
+        DESTINATION lib/cmake/MHTR)

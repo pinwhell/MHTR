@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+include(${CMAKE_CURRENT_LIST_DIR}/MHTRPluginMetadataTargets.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/MHTRPluginSDKTargets.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/MHTRSynthesizerTargets.cmake)
+
+find_package(fmt REQUIRED PATHS ${CMAKE_CURRENT_LIST_DIR}/../fmt)
+
+set(MHTR_FOUND TRUE)

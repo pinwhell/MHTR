@@ -1,4 +1,5 @@
 if(BUILD_TESTS)
+	set(DOCTEST_NO_INSTALL ON)
 	add_subdirectory(doctest)
 endif()
 
@@ -23,10 +24,12 @@ set(CAPSTONE_EVM_SUPPORT OFF)
 
 add_subdirectory(capstone)
 
+set(FMT_INSTALL ON)
+add_subdirectory(fmt)
+
 set (TBS_MT OFF)
 add_subdirectory(TBS)
 add_subdirectory(json)
-add_subdirectory(fmt)
 add_subdirectory(ELFPP)
 add_subdirectory(CStone)
 add_subdirectory(cxxopts)
