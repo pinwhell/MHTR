@@ -3,8 +3,10 @@
 #include <memory>
 #include <MHTR/Synther/INamespace.h>
 
-class INamespaceFactory {
-public:
-	virtual ~INamespaceFactory() {}
-	virtual std::unique_ptr<INamespace> MakeNamespace() = 0;
-};
+namespace MHTR {
+	class INamespaceFactory {
+	public:
+		virtual ~INamespaceFactory() {}
+		virtual std::unique_ptr<INamespace> MakeNamespace() = 0;
+	};
+}

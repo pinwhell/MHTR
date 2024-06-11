@@ -3,6 +3,8 @@
 #include <MHTR/Arch/ARM/32/Resolver/FarAddress.h>
 #include <CStone/Factory.h>
 
+using namespace MHTR;
+
 ELFBinary::ELFBinary(const void* entry)
     : mEntry(entry)
     , mELF(ELFPP::FromBuffer(mEntry))

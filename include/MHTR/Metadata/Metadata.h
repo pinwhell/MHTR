@@ -3,34 +3,38 @@
 #include <cstdint>
 #include <string>
 
-constexpr auto METADATA_OFFSET_INVALID = -1;
-constexpr auto METADATA_STRING_INVALID = "";
-constexpr auto METADATA_NS_NULL = "";
+namespace MHTR {
 
-template<typename T>
-struct Metadata {
-	Metadata(T val)
-		: mValue(val)
-	{}
+	constexpr auto METADATA_OFFSET_INVALID = -1;
+	constexpr auto METADATA_STRING_INVALID = "";
+	constexpr auto METADATA_NS_NULL = "";
 
-	Metadata<T> operator+(const Metadata<T>& other) const = delete;
-	void operator+=(const Metadata<T>& other) = delete;
+	template<typename T>
+	struct Metadata {
+		Metadata(T val)
+			: mValue(val)
+		{}
 
-	std::string ToString() const;
+		Metadata<T> operator+(const Metadata<T>& other) const = delete;
+		void operator+=(const Metadata<T>& other) = delete;
 
-	Metadata<T>& operator=(const T&& val)
-	{
-		mValue = val;
-		return *this;
-	}
+		std::string ToString() const;
 
-	operator T() const
-	{
-		return mValue;
-	}
+		Metadata<T>& operator=(const T&& val)
+		{
+			mValue = val;
+			return *this;
+		}
 
-	T mValue;
-};
+		operator T() const
+		{
+			return mValue;
+		}
 
-using OffsetMetadata = Metadata<uint64_t>;
-using PatternMetadata = Metadata<std::string>;
+		T mValue;
+	};
+
+	using OffsetMetadata = Metadata<uint64_t>;
+	using PatternMetadata = Metadata<std::string>;
+
+}

@@ -3,6 +3,8 @@
 #include <MHTR/Exception/UnexpectedLayout.h>
 #include <MHTR/Binary/File.h>
 
+using namespace MHTR;
+
 FromTargetBinJsonBinaryFactory::FromTargetBinJsonBinaryFactory(IJsonProvider* _json)
 {
     const auto& json = (*_json->GetJson());

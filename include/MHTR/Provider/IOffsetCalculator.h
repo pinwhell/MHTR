@@ -2,8 +2,10 @@
 
 #include <MHTR/IOffsetCalculator.h>
 
-class IOffsetCalculatorProvider {
-public:
-	virtual ~IOffsetCalculatorProvider() {}
-	virtual IOffsetCalculator* GetOffsetCalculator() = 0;
-};
+namespace MHTR {
+	class IOffsetCalculatorProvider {
+	public:
+		virtual ~IOffsetCalculatorProvider() {}
+		virtual IOffsetCalculator* GetOffsetCalculator() = 0;
+	};
+}

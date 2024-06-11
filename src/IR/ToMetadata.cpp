@@ -8,6 +8,8 @@
 #include <MHTR/FarAddressLookup.h>
 #include <MHTR/Provider/ProcedureRangeChain.h>
 
+using namespace MHTR;
+
 FromIRMultiMetadataFactory::FromIRMultiMetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRFactory* metadataIRFactory, IRangeProvider* defaultScanRange, IOffsetCalculator* offsetCalculator, ICapstoneProvider* capstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespaceProvider* nsProvider)
     : mProvidersStorage(providersStorage)
     , mMetadataTargetProvider(metadataTargetProvider)

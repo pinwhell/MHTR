@@ -5,17 +5,19 @@
 #include <MHTR/File/View.h>
 #include <MHTR/OffsetCalculator.h>
 
-class BinaryFile : public IBinary {
-public:
-	BinaryFile(const char* filePath);
+namespace MHTR {
+	class BinaryFile : public IBinary {
+	public:
+		BinaryFile(const char* filePath);
 
-	Range GetRange() override;
-	std::unique_ptr<ICapstone> CreateInstance(bool bDetailedInst = true) override;
-	IFarAddressResolver* GetFarAddressResolver(ICapstoneProvider* cstoneProvider) override;
-	IOffsetCalculator* GetOffsetCalculator() override;
+		Range GetRange() override;
+		std::unique_ptr<ICapstone> CreateInstance(bool bDetailedInst = true) override;
+		IFarAddressResolver* GetFarAddressResolver(ICapstoneProvider* cstoneProvider) override;
+		IOffsetCalculator* GetOffsetCalculator() override;
 
-private:
-	FileView mFileView;
-	std::unique_ptr<IBinary> mFormatedBinary;
-	OffsetCalculator mOffsetCalculator;
-};
+	private:
+		FileView mFileView;
+		std::unique_ptr<IBinary> mFormatedBinary;
+		OffsetCalculator mOffsetCalculator;
+	};
+}

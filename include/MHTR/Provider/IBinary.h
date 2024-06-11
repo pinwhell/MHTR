@@ -2,8 +2,12 @@
 
 #include <MHTR/Binary/IBinary.h>
 
-class IBinaryProvider {
-public:
-	virtual ~IBinaryProvider() {}
-	virtual IBinary* GetBinary() = 0;
-};
+namespace MHTR {
+
+	class IBinaryProvider {
+	public:
+		virtual ~IBinaryProvider() {}
+		virtual IBinary* GetBinary() = 0;
+	};
+
+}

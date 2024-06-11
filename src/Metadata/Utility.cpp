@@ -2,7 +2,9 @@
 #include <iterator>
 #include <MHTR/Metadata/Utility.h>
 
-NamespaceMetadataTargetSetMap NsMultiMetadataMapFromMultiMetadata(const MetadataTargetSet& targets)
+using namespace MHTR;
+
+NamespaceMetadataTargetSetMap MHTR::NsMultiMetadataMapFromMultiMetadata(const MetadataTargetSet& targets)
 {
 	NamespaceMetadataTargetSetMap result;
 
@@ -16,7 +18,7 @@ NamespaceMetadataTargetSetMap NsMultiMetadataMapFromMultiMetadata(const Metadata
 	return result;
 }
 
-NamespaceSet AllNsFromMultiMetadataTarget(const MetadataTargetSet& targets)
+NamespaceSet MHTR::AllNsFromMultiMetadataTarget(const MetadataTargetSet& targets)
 {
 	NamespaceSet result;
 

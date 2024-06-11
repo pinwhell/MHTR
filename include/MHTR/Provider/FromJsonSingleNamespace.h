@@ -4,11 +4,15 @@
 #include <MHTR/Provider/INamespace.h>
 #include <MHTR/Synther/Namespace.h>
 
-class FromJsonSingleNamespaceProvider : public INamespaceProvider {
-public:
-    FromJsonSingleNamespaceProvider(IJsonProvider* jsonProvider);
+namespace MHTR {
 
-    INamespace* GetNamespace() override;
+    class FromJsonSingleNamespaceProvider : public INamespaceProvider {
+    public:
+        FromJsonSingleNamespaceProvider(IJsonProvider* jsonProvider);
 
-    Namespace mNs;
-};
+        INamespace* GetNamespace() override;
+
+        Namespace mNs;
+    };
+
+}

@@ -3,6 +3,8 @@
 #include <MHTR/Library.h>
 #include <MHTR/Pltform.h>
 
+using namespace MHTR;
+
 #include WIN_LINUX(<Windows.h>, <dlfcn.h>)
 
 Library::Library(void* handle)

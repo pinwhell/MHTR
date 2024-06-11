@@ -4,6 +4,8 @@
 #include <MHTR/PatternScan.h>
 #include <CStone/CStone.h>
 
+using namespace MHTR;
+
 MetadataLookupException::MetadataLookupException(const std::string& what)
 	: std::runtime_error(what)
 {}

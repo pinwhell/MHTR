@@ -1,6 +1,8 @@
 #include <MHTR/Binary/File.h>
 #include <MHTR/Binary/Factory.h>
 
+using namespace MHTR;
+
 BinaryFile::BinaryFile(const char* filePath)
 	: mFileView(filePath)
 	, mFormatedBinary(FromMemoryBinaryFactory(mFileView).CreateBinary())

@@ -1,6 +1,8 @@
 #include <fstream>
 #include <MHTR/File/Operation.h>
 
+using namespace MHTR;
+
 void FileWrite(const std::string& path, const std::string& fullContent) {
     std::ofstream outFile(path);
 

@@ -2,8 +2,10 @@
 
 #include <MHTR/Range.h>
 
-class IRangeBuilder {
-public:
-    virtual ~IRangeBuilder() {};
-    virtual Range CreateRange() = 0;
-};
+namespace MHTR {
+    class IRangeBuilder {
+    public:
+        virtual ~IRangeBuilder() {};
+        virtual Range CreateRange() = 0;
+    };
+}

@@ -4,6 +4,8 @@
 #include <MHTR/Binary/File.h>
 #include <ELFPP.hpp>
 
+using namespace MHTR;
+
 FromMemoryBinaryFactory::FromMemoryBinaryFactory(const void* entry)
     : mEntry(entry)
 {}

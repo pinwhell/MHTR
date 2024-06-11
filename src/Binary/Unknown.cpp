@@ -1,6 +1,8 @@
 #include <MHTR/Binary/Unknown.h>
 #include <stdexcept>
 
+using namespace MHTR;
+
 std::unique_ptr<ICapstone> UnknownBinary::CreateInstance(bool bDetailedInst)
 {
     throw std::logic_error("CreateInstance is not implemented for UnknownBinary.");

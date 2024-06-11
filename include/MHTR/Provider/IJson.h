@@ -2,8 +2,10 @@
 
 #include <nlohmann/json.hpp>
 
-class IJsonProvider {
-public:
-    virtual ~IJsonProvider() {}
-    virtual nlohmann::json* GetJson() = 0;
-};
+namespace MHTR {
+    class IJsonProvider {
+    public:
+        virtual ~IJsonProvider() {}
+        virtual nlohmann::json* GetJson() = 0;
+    };
+}

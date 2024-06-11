@@ -1,6 +1,8 @@
 #include <CStone/Arch/ARM/32/Utility.h>
 #include <MHTR/Arch/ARM/32/Resolver/FarAddress.h>
 
+using namespace MHTR;
+
 ARM32FarAddressResolver::ARM32FarAddressResolver(ICapstoneProvider* cstoneProvider)
     : mCStoneProvider(cstoneProvider)
 {}

@@ -1,11 +1,13 @@
 #include <fmt/core.h>
 #include <MHTR/PatternScan.h>
 
+using namespace MHTR;
+
 PatternScanException::PatternScanException(const std::string& what)
 	: std::runtime_error(what)
 {}
 
-void PatternScanOrExcept(IRangeProvider* scanRangeProvider, const std::string& pattern, TBS::Pattern::Results& results, bool bUniqueLookup)
+void MHTR::PatternScanOrExcept(IRangeProvider* scanRangeProvider, const std::string& pattern, TBS::Pattern::Results& results, bool bUniqueLookup)
 {
 	Range range = scanRangeProvider->GetRange();
 
@@ -16,7 +18,7 @@ void PatternScanOrExcept(IRangeProvider* scanRangeProvider, const std::string& p
 		throw PatternScanException(fmt::format("'{}' not unique with {} results.", pattern, results.size()));
 }
 
-void PatternScanOrExceptWithName(const std::string& name, IRangeProvider* scanRangeProvider, const std::string& pattern, TBS::Pattern::Results& results, bool bUniqueLookup)
+void MHTR::PatternScanOrExceptWithName(const std::string& name, IRangeProvider* scanRangeProvider, const std::string& pattern, TBS::Pattern::Results& results, bool bUniqueLookup)
 {
 	try {
 		PatternScanOrExcept(scanRangeProvider, pattern, results, bUniqueLookup);

@@ -11,44 +11,46 @@
 #include <MHTR/IR/IFactory.h>
 #include <MHTR/IOffsetCalculator.h>
 
-class FromIRMultiMetadataFactory : public IMultiMetadataFactory {
-public:
-    FromIRMultiMetadataFactory(
-        Storage<std::unique_ptr<IProvider>>& providersStorage,
-        IMetadataTargetProvider* metadataTargetProvider,
-        IMultiMetadataIRFactory* metadataIRFactory,
-        IRangeProvider* defaultScanRange,
-        IOffsetCalculator* offsetCalculator,
-        ICapstoneProvider* capstoneProvider,
-        IFarAddressResolverProvider* farAddressResolverProvider,
-        INamespaceProvider* nsProvider = nullptr
-    );
+namespace MHTR {
+    class FromIRMultiMetadataFactory : public IMultiMetadataFactory {
+    public:
+        FromIRMultiMetadataFactory(
+            Storage<std::unique_ptr<IProvider>>& providersStorage,
+            IMetadataTargetProvider* metadataTargetProvider,
+            IMultiMetadataIRFactory* metadataIRFactory,
+            IRangeProvider* defaultScanRange,
+            IOffsetCalculator* offsetCalculator,
+            ICapstoneProvider* capstoneProvider,
+            IFarAddressResolverProvider* farAddressResolverProvider,
+            INamespaceProvider* nsProvider = nullptr
+        );
 
-    std::vector<std::unique_ptr<ILookableMetadata>> ProduceAll() override;
+        std::vector<std::unique_ptr<ILookableMetadata>> ProduceAll() override;
 
-    Storage<std::unique_ptr<IProvider>>& mProvidersStorage;
-    IMetadataTargetProvider* mMetadataTargetProvider;
-    IMultiMetadataIRFactory* mMetadataIRProvider;
-    IRangeProvider* mDefaultScanRange;
-    IOffsetCalculator* mOffsetCalculator;
-    ICapstoneProvider* mCapstoneProvider;
-    IFarAddressResolverProvider* mFarAddressResolverProvider;
-    INamespaceProvider* mNsProvider;
+        Storage<std::unique_ptr<IProvider>>& mProvidersStorage;
+        IMetadataTargetProvider* mMetadataTargetProvider;
+        IMultiMetadataIRFactory* mMetadataIRProvider;
+        IRangeProvider* mDefaultScanRange;
+        IOffsetCalculator* mOffsetCalculator;
+        ICapstoneProvider* mCapstoneProvider;
+        IFarAddressResolverProvider* mFarAddressResolverProvider;
+        INamespaceProvider* mNsProvider;
 
-    // Internal
-    std::unordered_map<std::string, IRangeProvider*> mRangeProviderMap;
+        // Internal
+        std::unordered_map<std::string, IRangeProvider*> mRangeProviderMap;
 
-private:
-    MetadataTarget* MetadataTargetFromIR(const MetadataTargetIR& ir);
+    private:
+        MetadataTarget* MetadataTargetFromIR(const MetadataTargetIR& ir);
 
-    std::unique_ptr<ILookableMetadata> CreateMetadataLookupFromIR(const MetadataIR& ir);
-    std::unique_ptr<ILookableMetadata> CreatePatternValidateLookupFromIR(MetadataTarget& target, const PatternValidateLookupIR& ir);
-    std::unique_ptr<ILookableMetadata> CreateInsnImmLookupFromIR(MetadataTarget& target, const InsnImmediateLookupIR& ir);
-    std::unique_ptr<ILookableMetadata> CreateFarAddressLookupFromIR(MetadataTarget& target, const FarAddressLookupIR& ir);
-    std::unique_ptr<ILookableMetadata> CreatePatternSingleResultLookupFromIR(MetadataTarget& target, const PatternSingleResultLookupIR& ir);
-    std::unique_ptr<ILookableMetadata> CreateHardcodedLookupFromIR(MetadataTarget& target, const MetadataResult& ir);
+        std::unique_ptr<ILookableMetadata> CreateMetadataLookupFromIR(const MetadataIR& ir);
+        std::unique_ptr<ILookableMetadata> CreatePatternValidateLookupFromIR(MetadataTarget& target, const PatternValidateLookupIR& ir);
+        std::unique_ptr<ILookableMetadata> CreateInsnImmLookupFromIR(MetadataTarget& target, const InsnImmediateLookupIR& ir);
+        std::unique_ptr<ILookableMetadata> CreateFarAddressLookupFromIR(MetadataTarget& target, const FarAddressLookupIR& ir);
+        std::unique_ptr<ILookableMetadata> CreatePatternSingleResultLookupFromIR(MetadataTarget& target, const PatternSingleResultLookupIR& ir);
+        std::unique_ptr<ILookableMetadata> CreateHardcodedLookupFromIR(MetadataTarget& target, const MetadataResult& ir);
 
-    IRangeProvider* CreateMetadataScanRangeFromIR(const MetadataIR& ir);
-    IRangeProvider* CreateScanRangeFromIR(const ScanRangeIR& ir);
-    IRangeProvider* CreateScanRangePipelineFromIR(const MetadataScanRangePipelineIR& pipeline);
-};
+        IRangeProvider* CreateMetadataScanRangeFromIR(const MetadataIR& ir);
+        IRangeProvider* CreateScanRangeFromIR(const ScanRangeIR& ir);
+        IRangeProvider* CreateScanRangePipelineFromIR(const MetadataScanRangePipelineIR& pipeline);
+    };
+}

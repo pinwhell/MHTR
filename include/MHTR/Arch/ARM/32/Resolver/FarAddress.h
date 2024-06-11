@@ -5,11 +5,15 @@
 #include <CStone/IProvider.h>
 #include <MHTR/Resolver/IFarAddress.h>
 
-class ARM32FarAddressResolver : public IFarAddressResolver {
-public:
-    ARM32FarAddressResolver(ICapstoneProvider* cstoneProvider);
+namespace MHTR {
 
-    uint64_t TryResolve(uint64_t at, bool bDerref = false) override;
+    class ARM32FarAddressResolver : public IFarAddressResolver {
+    public:
+        ARM32FarAddressResolver(ICapstoneProvider* cstoneProvider);
 
-    ICapstoneProvider* mCStoneProvider;
-};
+        uint64_t TryResolve(uint64_t at, bool bDerref = false) override;
+
+        ICapstoneProvider* mCStoneProvider;
+    };
+
+}

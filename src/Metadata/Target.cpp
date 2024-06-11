@@ -1,5 +1,7 @@
 #include <MHTR/Metadata/Target.h>
 
+using namespace MHTR;
+
 MetadataTarget::MetadataTarget(const std::string& name, INamespace* ns)
 	: mFullIdentifier(name, ns)
 	, mResult(0)

@@ -8,59 +8,63 @@
 #include <MHTR/IOffsetCalculator.h>
 #include <CStone/IProvider.h>
 
-class MetadataLookupException : public std::runtime_error {
-public:
-	MetadataLookupException(const std::string& what);
-};
+namespace MHTR {
 
-class PatternCheckLookup : public ILookableMetadata {
-public:
-	PatternCheckLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern, bool bUniqueLookup = true);
+	class MetadataLookupException : public std::runtime_error {
+	public:
+		MetadataLookupException(const std::string& what);
+	};
 
-	void Lookup() override;
-	MetadataTarget* GetTarget() override;
+	class PatternCheckLookup : public ILookableMetadata {
+	public:
+		PatternCheckLookup(MetadataTarget& target, IRangeProvider* scanRange, const std::string& pattern, bool bUniqueLookup = true);
 
-	MetadataTarget& mTarget;
-	IRangeProvider* mScanRange;
-	std::string mPattern;
-	bool mbUniqueLookup;
+		void Lookup() override;
+		MetadataTarget* GetTarget() override;
 
-private:
-	void Check();
-};
+		MetadataTarget& mTarget;
+		IRangeProvider* mScanRange;
+		std::string mPattern;
+		bool mbUniqueLookup;
 
-class PatternSingleResultLookup : public ILookableMetadata {
-public:
-	PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, IOffsetCalculator* offsetCalculator, const std::string& pattern);
+	private:
+		void Check();
+	};
 
-	void Lookup() override;
-	MetadataTarget* GetTarget() override;
+	class PatternSingleResultLookup : public ILookableMetadata {
+	public:
+		PatternSingleResultLookup(MetadataTarget& target, IRangeProvider* scanRange, IOffsetCalculator* offsetCalculator, const std::string& pattern);
 
-	MetadataTarget& mTarget;
-	IRangeProvider* mScanRange;
-	IOffsetCalculator* mOffsetCalculator;
-	std::string mPattern;
-};
+		void Lookup() override;
+		MetadataTarget* GetTarget() override;
 
-class InsnImmediateLookup : public ILookableMetadata {
-public:
-	InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, ICapstoneProvider* cstoneProvider, size_t immIndex = 0);
+		MetadataTarget& mTarget;
+		IRangeProvider* mScanRange;
+		IOffsetCalculator* mOffsetCalculator;
+		std::string mPattern;
+	};
 
-	void Lookup() override;
-	MetadataTarget* GetTarget() override;
+	class InsnImmediateLookup : public ILookableMetadata {
+	public:
+		InsnImmediateLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, ICapstoneProvider* cstoneProvider, size_t immIndex = 0);
 
-	IAddressesProvider* mInsnAddrsProvider;
-	ICapstoneProvider* mCStoneProvider;
-	MetadataTarget& mTarget;
-	size_t mImmIndex;
-};
+		void Lookup() override;
+		MetadataTarget* GetTarget() override;
 
-class HardcodedLookup : public ILookableMetadata {
-public:
-	HardcodedLookup(MetadataTarget& target, const MetadataResult& hardcoded);
+		IAddressesProvider* mInsnAddrsProvider;
+		ICapstoneProvider* mCStoneProvider;
+		MetadataTarget& mTarget;
+		size_t mImmIndex;
+	};
 
-	MetadataTarget* GetTarget() override;
-	void Lookup() override;
+	class HardcodedLookup : public ILookableMetadata {
+	public:
+		HardcodedLookup(MetadataTarget& target, const MetadataResult& hardcoded);
 
-	MetadataTarget& mTarget;
-};
+		MetadataTarget* GetTarget() override;
+		void Lookup() override;
+
+		MetadataTarget& mTarget;
+	};
+
+}

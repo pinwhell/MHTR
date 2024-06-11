@@ -5,6 +5,8 @@
 #include <MHTR/Provider/AsmExtractedProcedureEntry.h>
 #include <MHTR/Provider/ProcedureRange.h>
 
+using namespace MHTR;
+
 ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns)
 {
     mpRangeProviders.emplace_back(baseRangeProvider);

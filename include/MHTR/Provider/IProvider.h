@@ -1,6 +1,8 @@
 #pragma once
 
-class IProvider { // Annotation
-public:
-	virtual ~IProvider() {}
-};
+namespace MHTR {
+	class IProvider { // Annotation
+	public:
+		virtual ~IProvider() {}
+	};
+}

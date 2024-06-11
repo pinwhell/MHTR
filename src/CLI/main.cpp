@@ -2,6 +2,8 @@
 
 #include <MHTR/CLI/MH.h>
 
+using namespace MHTR;
+
 int MHunterMain(int argc, const char** argv)
 {
     try { return MHCLI(argc, argv).Run(); }

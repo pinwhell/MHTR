@@ -4,19 +4,21 @@
 
 #include <string>
 
-class FromMemoryBinaryFactory : public IBinaryFactory {
-public:
-    FromMemoryBinaryFactory(const void* entry);
+namespace MHTR {
+    class FromMemoryBinaryFactory : public IBinaryFactory {
+    public:
+        FromMemoryBinaryFactory(const void* entry);
 
-    std::unique_ptr<IBinary> CreateBinary() override;
+        std::unique_ptr<IBinary> CreateBinary() override;
 
-    const void* mEntry;
-};
+        const void* mEntry;
+    };
 
-class FromPathBinaryFactory : public IBinaryFactory {
-    FromPathBinaryFactory(const std::string& path);
+    class FromPathBinaryFactory : public IBinaryFactory {
+        FromPathBinaryFactory(const std::string& path);
 
-    std::unique_ptr<IBinary> CreateBinary() override;
+        std::unique_ptr<IBinary> CreateBinary() override;
 
-    std::string mPath;
-};
+        std::string mPath;
+    };
+}

@@ -6,15 +6,19 @@
 #include <MHTR/Synther/NamespacedIdentifier.h>
 #include <MHTR/Metadata/Result.h>
 
-struct MetadataTarget {
-	MetadataTarget(const std::string& name, INamespace* ns = nullptr);
+namespace MHTR {
 
-	bool TrySetResult(const MetadataResult&& result);
+	struct MetadataTarget {
+		MetadataTarget(const std::string& name, INamespace* ns = nullptr);
 
-	std::string GetName() const;
-	std::string GetFullName() const;
+		bool TrySetResult(const MetadataResult&& result);
 
-	NamespacedIdentifier mFullIdentifier;
-	std::atomic<bool> mHasResult;
-	MetadataResult mResult;
-};
+		std::string GetName() const;
+		std::string GetFullName() const;
+
+		NamespacedIdentifier mFullIdentifier;
+		std::atomic<bool> mHasResult;
+		MetadataResult mResult;
+	};
+
+}

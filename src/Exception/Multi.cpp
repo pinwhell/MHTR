@@ -1,6 +1,8 @@
 #include <sstream>
 #include <MHTR/Exception/Multi.h>
 
+using namespace MHTR;
+
 MultiException::MultiException(const std::vector<std::string>& exceptions)
     : std::runtime_error(""), mExceptions(exceptions) {}
 

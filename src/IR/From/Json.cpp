@@ -2,6 +2,8 @@
 #include <MHTR/IR/From/Json.h>
 #include <MHTR/Exception/UnexpectedLayout.h>
 
+using namespace MHTR;
+
 EMetadataScanRangeStage MetadataScanRangeStageIR::getType() const
 {
     return (EMetadataScanRangeStage) mStage.index();

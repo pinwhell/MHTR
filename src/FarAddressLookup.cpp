@@ -5,6 +5,8 @@
 #include <MHTR/Metadata/Lookups.h>
 #include <MHTR/FarAddressLookup.h>
 
+using namespace MHTR;
+
 FarAddressLookup::FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IOffsetCalculator* offsetCalculator, bool bDeref)
     : mTarget(target)
     , mInsnAddressesProvider(insnAddrsProvider)

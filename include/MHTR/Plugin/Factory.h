@@ -4,12 +4,16 @@
 #include <MHTR/Library.h>
 #include <MHTR/Plugin/IPlugin.h>
 
-class PluginFactory {
-public:
-    PluginFactory(Library&& lib);
+namespace MHTR {
 
-    std::unique_ptr<IPlugin> CreatePlugin();
+    class PluginFactory {
+    public:
+        PluginFactory(Library&& lib);
 
-    Library mLibrary;
-    CreatePluginFn mCreatePluginFn;
-};
+        std::unique_ptr<IPlugin> CreatePlugin();
+
+        Library mLibrary;
+        CreatePluginFn mCreatePluginFn;
+    };
+
+}

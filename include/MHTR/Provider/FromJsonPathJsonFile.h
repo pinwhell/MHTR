@@ -3,11 +3,15 @@
 #include <MHTR/Provider/IJson.h>
 #include <MHTR/Provider/FromFileJson.h>
 
-class FromJsonPathJsonFileProvider : public IJsonProvider {
-public:
-    FromJsonPathJsonFileProvider(IJsonProvider* jsonContainingPath, const std::string& jsonPathKey = "path");
+namespace MHTR {
 
-    nlohmann::json* GetJson() override;
+    class FromJsonPathJsonFileProvider : public IJsonProvider {
+    public:
+        FromJsonPathJsonFileProvider(IJsonProvider* jsonContainingPath, const std::string& jsonPathKey = "path");
 
-    FromFileJsonProvider mProvider;
-};
+        nlohmann::json* GetJson() override;
+
+        FromFileJsonProvider mProvider;
+    };
+
+}

@@ -1,5 +1,7 @@
 #include <MHTR/PatternScanConfig.h>
 
+using namespace MHTR;
+
 PatternScanConfig::PatternScanConfig() : mPattern(""), mResDisp(0) {}
 
 PatternScanConfig::PatternScanConfig(const std::string& pattern, int64_t resultDisplacement) : mPattern(pattern), mResDisp(resultDisplacement) {}

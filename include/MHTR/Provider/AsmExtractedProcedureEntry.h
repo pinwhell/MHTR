@@ -5,13 +5,17 @@
 #include <MHTR/Provider/IProcedureEntry.h>
 #include <MHTR/Provider/IAddresses.h>
 
-class AsmExtractedProcedureEntryProvider : public IProcedureEntryProvider {
-public:
+namespace MHTR {
 
-    AsmExtractedProcedureEntryProvider(ICapstoneProvider* cstoneProvider, IAddressesProvider* adressesProvider);
+    class AsmExtractedProcedureEntryProvider : public IProcedureEntryProvider {
+    public:
 
-    uint64_t GetEntry() override;
+        AsmExtractedProcedureEntryProvider(ICapstoneProvider* cstoneProvider, IAddressesProvider* adressesProvider);
 
-    ICapstoneProvider* mCStoneProvider;
-    IAddressesProvider* mAddressesProvider;
-};
+        uint64_t GetEntry() override;
+
+        ICapstoneProvider* mCStoneProvider;
+        IAddressesProvider* mAddressesProvider;
+    };
+
+}

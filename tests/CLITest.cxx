@@ -2,6 +2,8 @@
 #include <filesystem>
 #include <MHTR/CLI/MH.h>
 
+using namespace MHTR;
+
 int main(int argc, const char** realArgv) {
 	std::filesystem::current_path(MHR_SAMPLES_DIR);
 

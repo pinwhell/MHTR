@@ -1,6 +1,8 @@
 #include <sstream>
 #include <MHTR/Metadata/Metadata.h>
 
+using namespace MHTR;
+
 template<>
 std::string Metadata<uint64_t>::ToString() const {
 	std::stringstream ss;

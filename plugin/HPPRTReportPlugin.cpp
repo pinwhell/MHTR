@@ -8,6 +8,8 @@
 #include <MHTR/Metadata/Utility.h>
 #include <MHTR/Metadata/Synthers.h>
 
+using namespace MHTR;
+
 class HPPRTReportWriter : public IPlugin {
 public:
 	HPPRTReportWriter()

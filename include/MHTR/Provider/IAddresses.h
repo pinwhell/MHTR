@@ -4,7 +4,11 @@
 #include <vector>
 #include <MHTR/Provider/IProvider.h>
 
-class IAddressesProvider : public IProvider {
-public:
-    virtual std::vector<uint64_t> GetAllAddresses() = 0;
-};
+namespace MHTR {
+
+    class IAddressesProvider : public IProvider {
+    public:
+        virtual std::vector<uint64_t> GetAllAddresses() = 0;
+    };
+
+}

@@ -18,6 +18,8 @@
 #include <CStone/Provider.h>
 #include <BS_thread_pool.hpp>
 
+using namespace MHTR;
+
 static auto DEFAULT_NTHREADS = 1;
 
 #ifdef WINDOWS

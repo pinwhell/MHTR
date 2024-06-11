@@ -1,6 +1,8 @@
 #include <iostream>
 #include <MHTR/Plugin/IPlugin.h>
 
+using namespace MHTR;
+
 class SampleReportPlugin : public IPlugin {
 public:
 	MHTRPLUGIN_METADATA("Sample Report Plugin", "")

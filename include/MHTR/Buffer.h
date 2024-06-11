@@ -2,4 +2,8 @@
 
 #include <vector>
 
-using Buffer = std::vector<unsigned char>;
+namespace MHTR {
+
+	using Buffer = std::vector<unsigned char>;
+
+}

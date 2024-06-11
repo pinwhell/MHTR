@@ -5,16 +5,20 @@
 #include <MHTR/IOffsetCalculator.h>
 #include <MHTR/ILookableMetadata.h>
 
-class FarAddressLookup : public ILookableMetadata {
-public:
-    FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IOffsetCalculator* offsetCalculator, bool bDeref = false);
+namespace MHTR {
 
-    MetadataTarget* GetTarget() override;
-    void Lookup() override;
+    class FarAddressLookup : public ILookableMetadata {
+    public:
+        FarAddressLookup(MetadataTarget& target, IAddressesProvider* insnAddrsProvider, IFarAddressResolver* farAddrResolver, IOffsetCalculator* offsetCalculator, bool bDeref = false);
 
-    MetadataTarget& mTarget;
-    IAddressesProvider* mInsnAddressesProvider;
-    IFarAddressResolver* mFarAddressResolver;
-    IOffsetCalculator* mOffsetCalculator;
-    bool mDeref;
-};
+        MetadataTarget* GetTarget() override;
+        void Lookup() override;
+
+        MetadataTarget& mTarget;
+        IAddressesProvider* mInsnAddressesProvider;
+        IFarAddressResolver* mFarAddressResolver;
+        IOffsetCalculator* mOffsetCalculator;
+        bool mDeref;
+    };
+
+}

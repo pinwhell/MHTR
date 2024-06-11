@@ -6,12 +6,16 @@
 #include <MHTR/Metadata/Metadata.h>
 #include <MHTR/Metadata/EMetadata.h>
 
-struct MetadataResult {
-	MetadataResult(uint64_t offset);
-	MetadataResult(const std::string& pattern);
+namespace MHTR {
 
-	std::string ToString() const;
-	EMetadataResult getType() const;
+	struct MetadataResult {
+		MetadataResult(uint64_t offset);
+		MetadataResult(const std::string& pattern);
 
-	std::variant<OffsetMetadata, PatternMetadata> mMetadata;
-};
+		std::string ToString() const;
+		EMetadataResult getType() const;
+
+		std::variant<OffsetMetadata, PatternMetadata> mMetadata;
+	};
+
+}

@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <MHTR/Provider/IProvider.h>
 
-class IProcedureEntryProvider : public IProvider {
-public:
-    virtual uint64_t GetEntry() = 0;
-};
+namespace MHTR {
+    class IProcedureEntryProvider : public IProvider {
+    public:
+        virtual uint64_t GetEntry() = 0;
+    };
+}

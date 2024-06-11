@@ -1,5 +1,7 @@
 #include <MHTR/Plugin/Factory.h>
 
+using namespace MHTR;
+
 PluginFactory::PluginFactory(Library&& lib)
     : mLibrary(std::move(lib))
     , mCreatePluginFn((CreatePluginFn)nullptr)

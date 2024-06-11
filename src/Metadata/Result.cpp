@@ -1,5 +1,7 @@
 #include <MHTR/Metadata/Result.h>
 
+using namespace MHTR;
+
 MetadataResult::MetadataResult(uint64_t offset)
 	: mMetadata(offset)
 {}

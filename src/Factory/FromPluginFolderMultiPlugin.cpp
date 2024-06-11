@@ -3,6 +3,8 @@
 #include <MHTR/Plugin/Factory.h>
 #include <MHTR/Pltform.h>
 
+using namespace MHTR;
+
 FromPluginFolderMultiPluginFactory::FromPluginFolderMultiPluginFactory(const std::string& pluginDirPath, int argc, const char* argv[])
     : mPluginDirPath(std::filesystem::absolute(pluginDirPath).string())
     , mArgc(argc)

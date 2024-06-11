@@ -8,6 +8,8 @@
 #include <MHTR/Synther/MultiLineGroup.h>
 #include <MHTR/Metadata/Utility.h>
 
+using namespace MHTR;
+
 template<typename T>
 inline std::string Literal(T str)
 {

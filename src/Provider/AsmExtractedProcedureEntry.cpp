@@ -3,6 +3,8 @@
 #include <MHTR/Provider/AsmExtractedProcedureEntry.h>
 #include <MHTR/Exception/Multi.h>
 
+using namespace MHTR;
+
 AsmExtractedProcedureEntryProvider::AsmExtractedProcedureEntryProvider(ICapstoneProvider* cstoneProvider, IAddressesProvider* adressesProvider)
     : mCStoneProvider(cstoneProvider)
     , mAddressesProvider(adressesProvider)

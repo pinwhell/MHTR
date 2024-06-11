@@ -1,6 +1,8 @@
 #include <fmt/format.h>
 #include <MHTR/Factory/MetadataTarget.h>
 
+using namespace MHTR;
+
 MetadataTarget* MetadataTargetFactory::GetMetadataTarget(const std::string& name, INamespace* ns)
 {
     std::string fullyQualifiedName = fmt::format("{}{}", ns ? ns->GetNamespace() + "::" : "", name);

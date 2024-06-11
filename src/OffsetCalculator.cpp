@@ -1,5 +1,7 @@
 #include <MHTR/OffsetCalculator.h>
 
+using namespace MHTR;
+
 OffsetCalculator::OffsetCalculator(IRangeProvider* rangeProvider)
     : mRangeProvider(rangeProvider)
 {}

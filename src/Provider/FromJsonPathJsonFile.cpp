@@ -2,6 +2,8 @@
 #include <MHTR/Provider/FromJsonPathJsonFile.h>
 #include <MHTR/Exception/UnexpectedLayout.h>
 
+using namespace MHTR;
+
 FromJsonPathJsonFileProvider::FromJsonPathJsonFileProvider(IJsonProvider* jsonContainingPath, const std::string& jsonPathKey)
     : mProvider([jsonContainingPath, &jsonPathKey] {
     const auto& json = (*jsonContainingPath->GetJson());

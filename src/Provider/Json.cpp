@@ -1,5 +1,7 @@
 #include <MHTR/Provider/Json.h>
 
+using namespace MHTR;
+
 JsonProvider::JsonProvider(const char* jsonSrc)
     : mJson(nlohmann::json::parse(jsonSrc))
 {}

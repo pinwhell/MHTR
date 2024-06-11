@@ -22,6 +22,7 @@
 #include <MHTR/Provider/FromFileJson.h>
 #include <MHTR/Metadata/Lookups.h>
 
+using namespace MHTR;
 
 class IMetadataLookupContextProvider {
 public:
