@@ -21,6 +21,6 @@ namespace MHTR {
         Storage<std::unique_ptr<ICapstoneProvider>> mCStoneProvidersStorage;
         Storage<std::unique_ptr<IBinary>> mBinariesStorage;
         IMultiPluginFactory* mAllPluginsFactory;
-        std::vector<std::unique_ptr<IPlugin>> mAllPlugins;
+        MultiPluginInstance mAllPlugins;
     };
 }

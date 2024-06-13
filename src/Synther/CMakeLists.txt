@@ -10,9 +10,6 @@ install(TARGETS Synthesizer
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
 
-install(DIRECTORY ${MHTR_INCLUDE_DIR}/Synther
-DESTINATION include/MHTR)
-
 install(EXPORT MHTRSynthesizerTargets
         FILE MHTRSynthesizerTargets.cmake
         NAMESPACE MHTR::

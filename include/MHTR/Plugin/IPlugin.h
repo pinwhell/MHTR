@@ -5,6 +5,11 @@
 #include <MHTR/Api.h>
 #include <MHTR/Metadata/Container.h>
 
+namespace cxxopts {
+	class Options;
+	class ParseResult;
+}
+
 namespace MHTR {
 
 	class IPlugin {
@@ -12,7 +17,8 @@ namespace MHTR {
 		virtual ~IPlugin() {}
 		virtual std::string GetName() const = 0;
 		virtual std::string GetDescription() const { return ""; }
-		virtual void Init(int argc = 0, const char* argv[] = nullptr) = 0;
+		virtual void OnCLIRegister(cxxopts::Options& options) = 0;
+		virtual void OnCLIParsed(cxxopts::ParseResult& parseRes) = 0;
 		virtual void OnResult(const MetadataTargetSet& result) = 0;
 	};
 

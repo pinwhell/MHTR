@@ -1,5 +1,6 @@
 #include <MHTR/CLI/MH.h>
 #include <iostream>
+#include <algorithm>
 #include <fmt/core.h>
 #include <MHTR/Provider/FromFileJson.h>
 #include <MHTR/Provider/Json.h>
@@ -66,17 +67,16 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
     : mAllPluginsFactory(pluginsFactory)
     , mCLIOptions("Metadata Hunter CLI", "Robust Binary Analizis Framework.")
 {
-    mCLIOptions.add_options()
-        ("t,targets", "JSON targets path", cxxopts::value<std::string>())
-        ("j,threads", "Number of threads", cxxopts::value<int>(DEFAULT_NTHREADS)->default_value("1"))
-        ("r,report", "Output result report", cxxopts::value<std::string>(), "[output path]")
-        ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]")
-        ("plugin-dir", "Directory path containing Plugins", cxxopts::value<std::string>());
-        ("h,help", "Print help");
-
     mCLIOptions.allow_unrecognised_options();
 
-    mCLIParseRes = mCLIOptions.parse(argc, argv);
+    mCLIOptions.add_options()
+        ("h,help", "Print help")
+        ("t,targets", "JSON targets path", cxxopts::value<std::string>())
+        ("j,threads", "Number of threads", cxxopts::value<int>(DEFAULT_NTHREADS)->default_value("1"))
+        ("plugin-dir", "Directory path containing Plugins", cxxopts::value<std::string>())
+        ("r,report", "Output result report", cxxopts::value<std::string>(), "[output path]")
+        ("rhpp,report-hpp", "Output result report to hpp file", cxxopts::value<std::string>(), "[output path]");
+
 
     mAllPlugins = mAllPluginsFactory ?
         mAllPluginsFactory->CreatePlugins() :
@@ -88,8 +88,18 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
             MHTRFromCurrentExePathPluginDirGet()
             , argc, argv).CreatePlugins();
 
-    for (auto& plugin : mAllPlugins)
-        std::cout << fmt::format("Loaded:'{}'\n", plugin->GetName());
+    std::for_each(mAllPlugins.begin(), mAllPlugins.end(), 
+        [&](const PluginInstance& pluginInstance) {
+            pluginInstance->OnCLIRegister(mCLIOptions);
+        });
+
+    mCLIParseRes = mCLIOptions.parse(argc, argv);
+
+    std::for_each(mAllPlugins.begin(), mAllPlugins.end(),
+        [&](const PluginInstance& pluginInstance) {
+            pluginInstance->OnCLIParsed(mCLIParseRes);
+            std::cout << fmt::format("Loaded:'{}'\n", pluginInstance->GetName());
+        });  
 }
 
 int MHCLI::Run()

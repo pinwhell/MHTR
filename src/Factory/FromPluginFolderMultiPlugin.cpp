@@ -15,9 +15,9 @@ FromPluginFolderMultiPluginFactory::FromPluginFolderMultiPluginFactory(const std
     : FromPluginFolderMultiPluginFactory(pluginDirPath.string(), argc, argv)
 {}
 
-std::vector<std::unique_ptr<IPlugin>> FromPluginFolderMultiPluginFactory::CreatePlugins()
+MultiPluginInstance FromPluginFolderMultiPluginFactory::CreatePlugins()
 {
-    std::vector<std::unique_ptr<IPlugin>> result;
+    MultiPluginInstance result;
     std::unordered_set<std::string> loadedLibs;
     std::unordered_set<std::string> loadedPlugins;
 
@@ -38,21 +38,13 @@ std::vector<std::unique_ptr<IPlugin>> FromPluginFolderMultiPluginFactory::Create
 
         loadedLibs.insert(currFilename);
 
-        std::unique_ptr<IPlugin> thisPlugin = PluginFactory(Library::Load(currFilePath.c_str())).CreatePlugin();
+        PluginInstance thisPlugin = PluginFactory(Library::Load(currFilePath.c_str())).CreatePlugin();
         std::string thisPluginName = thisPlugin->GetName();
 
         if (loadedPlugins.count(thisPluginName))
             continue;
 
         // At this point, the actual plugin hasnt been loaded ...
-
-        try { thisPlugin->Init(mArgc, mArgv); } // Lets try and initilize it ...
-        catch (...)
-        {
-            continue;
-        }
-
-        // At this point, we succesfully initialized it ...
 
         loadedPlugins.insert(thisPluginName);
         result.emplace_back(std::move(thisPlugin));

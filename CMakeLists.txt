@@ -29,12 +29,10 @@ endif()
 #	Export Targets	#
 #####################
 
-install(FILES 
-${MHTR_INCLUDE_DIR}/Pltform.h 
-${MHTR_INCLUDE_DIR}/Api.h 
-DESTINATION include/MHTR)
+install(DIRECTORY ${MHTR_INCLUDE_DIR} 
+DESTINATION include)
 
-configure_file(cmake/MHTRConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/MHTRConfig.cmake @ONLY)
+configure_file(cmake/MHTRConfig.in.cmake ${CMAKE_CURRENT_BINARY_DIR}/MHTRConfig.cmake @ONLY)
 
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/MHTRConfig.cmake

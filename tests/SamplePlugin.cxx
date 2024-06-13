@@ -7,13 +7,11 @@ class SampleReportPlugin : public IPlugin {
 public:
 	MHTRPLUGIN_METADATA("Sample Report Plugin", "")
 
-	void Init(int argc = 0, const char* argv[] = nullptr) override
-	{
-		if (!argc)
-			return;
+	void OnCLIRegister(cxxopts::Options& options) override
+	{}
 
-		std::cout << "SampleReportPlugin Initialized with " << argc << " Command Line Arguments...\n";
-	}
+	void OnCLIParsed(cxxopts::ParseResult& parseRes) override
+	{}
 
 	void OnResult(const MetadataTargetSet& result) override
 	{
@@ -21,7 +19,7 @@ public:
 			return;
 
 		std::cout << "SampleReportPlugin Processing " << result.size() << " Results ...\n";
-	}
+	}	
 };
 
 MHTRPLUGIN_EXPORT(SampleReportPlugin)

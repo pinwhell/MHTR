@@ -10,7 +10,7 @@ namespace MHTR {
         FromPluginFolderMultiPluginFactory(const std::string& pluginDirPath, int argc = 0, const char* argv[] = nullptr);
         FromPluginFolderMultiPluginFactory(const std::filesystem::path& pluginDirPath, int argc = 0, const char* argv[] = nullptr);
 
-        std::vector<std::unique_ptr<IPlugin>> CreatePlugins() override;
+        MultiPluginInstance CreatePlugins() override;
 
         std::string mPluginDirPath;
         int mArgc;

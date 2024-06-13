@@ -17,9 +17,6 @@ install(TARGETS Metadata MetadataSynthers
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
 
-install(DIRECTORY ${MHTR_INCLUDE_DIR}/Metadata
-        DESTINATION include/MHTR)
-
 install(EXPORT MHTRPluginMetadataTargets
         FILE MHTRPluginMetadataTargets.cmake
         NAMESPACE MHTR::

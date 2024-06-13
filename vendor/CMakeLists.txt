@@ -27,12 +27,14 @@ add_subdirectory(capstone)
 set(FMT_INSTALL ON)
 add_subdirectory(fmt)
 
+set(CXXOPTS_ENABLE_INSTALL ON)
+add_subdirectory(cxxopts)
+
 set (TBS_MT OFF)
 add_subdirectory(TBS)
 add_subdirectory(json)
 add_subdirectory(ELFPP)
 add_subdirectory(CStone)
-add_subdirectory(cxxopts)
 
 add_library(BSThreadPool INTERFACE)
 target_include_directories(BSThreadPool INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/thread-pool/include)

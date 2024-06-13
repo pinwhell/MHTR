@@ -12,27 +12,28 @@ using namespace MHTR;
 
 class HPPRTReportWriter : public IPlugin {
 public:
-	HPPRTReportWriter()
-		: mCLIOptions(GetName())
-	{
-		mCLIOptions.allow_unrecognised_options();
-	}
-
 	MHTRPLUGIN_METADATA("HPPRT Report Writer Plugin", "Creates a Runtime Hpp Report using MHTRSDK")
 
-	void Init(int argc, const char* argv[]) override
+	void OnCLIRegister(cxxopts::Options& options) override
 	{
-		mCLIOptions.add_options()
+		mOptions = &options;
+		options.add_options()
 			("rhpprt,report-hpprt", "Generates HPP Runtime Report using MHTRSDK", cxxopts::value<std::string>());
+	}
 
-		mCLIOptions.allow_unrecognised_options();
+	void OnCLIParsed(cxxopts::ParseResult& parseRes) override
+	{
+		mbWant = parseRes.count("report-hpprt") != 0;
 
-		mCLIParseRes = mCLIOptions.parse(argc, argv);
+		if (!mbWant)
+			return;
+
+		mReportOutputPath = parseRes["report-hpprt"].as<std::string>();
 	}
 
 	void OnResult(const MetadataTargetSet& result) override
 	{
-		if (result.empty() || !mCLIParseRes.count("report-hpprt"))
+		if (!mbWant || result.empty())
 			return;
 
 		// At this point there is result available & user requested a
@@ -66,11 +67,12 @@ public:
 			&hppHeader,
 			&fullNsBlock
 			});
-		FileWrite(mCLIParseRes["report-hpprt"].as<std::string>(), &fullHpp);
+		FileWrite(mReportOutputPath, &fullHpp);
 	}
 
-	cxxopts::Options mCLIOptions;
-	cxxopts::ParseResult mCLIParseRes;
+	bool mbWant = false;
+	std::string mReportOutputPath;
+	cxxopts::Options* mOptions;
 };
 
 MHTRPLUGIN_EXPORT(HPPRTReportWriter)
