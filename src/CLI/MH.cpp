@@ -14,6 +14,7 @@
 #include <MHTR/IR/From/Json.h>
 #include <MHTR/Binary/IBinary.h>
 #include <MHTR/Factory/FromTargetBinJsonBinary.h>
+#include <MHTR/Provider/FromTargetBinJsonArchModeProvider.h>
 #include <MHTR/Factory/FromPluginFolderMultiPlugin.h>
 #include <MHTR/Pltform.h>
 #include <CStone/Provider.h>

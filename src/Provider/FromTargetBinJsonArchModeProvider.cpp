@@ -1,4 +1,6 @@
-#include <Provider/FromTargetBinJsonArchModeProvider.h>
+#include <MHTR/Provider/FromTargetBinJsonArchModeProvider.h>
+
+using namespace MHTR;
 
 FromTargetBinJsonArchModeProvider::FromTargetBinJsonArchModeProvider(IJsonProvider* binTargetJson)
     : mMode([binTargetJson] {
