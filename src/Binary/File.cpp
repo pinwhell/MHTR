@@ -1,9 +1,10 @@
 #include <Binary/File.h>
 #include <Binary/Factory.h>
 
-BinaryFile::BinaryFile(const char* filePath)
-	: mFileView(filePath)
-	, mFormatedBinary(FromMemoryBinaryFactory(mFileView).CreateBinary())
+BinaryFile::BinaryFile(const char* filePath, IBinaryArchModeProvider* binaryArchModeProvider)
+	: mBinaryArchModeProvider(binaryArchModeProvider)
+	, mFileView(filePath)
+	, mFormatedBinary(FromMemoryBinaryFactory(mFileView, mBinaryArchModeProvider).CreateBinary())
 	, mOffsetCalculator(this)
 {}
 

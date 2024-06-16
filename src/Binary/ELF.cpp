@@ -3,32 +3,17 @@
 #include <fmt/core.h>
 #include <Arch/ARM/32/Resolver/FarAddress.h>
 
-ELFBinary::ELFBinary(const void* entry)
+ELFBinary::ELFBinary(const void* entry, IBinaryArchModeProvider* archModeProvider)
     : mEntry(entry)
     , mELF(ELFPP::FromBuffer(mEntry))
     , mDefaultCalculator(this)
+    , mArchModeProvider(archModeProvider)
 {}
 
 std::unique_ptr<ICapstone> ELFBinary::CreateInstance(bool bDetailedInst)
 {
-    auto machine = mELF->GetTargetMachine();
-    ECapstoneArchMode archMode{ ECapstoneArchMode::UNDEFINED };
-
-    switch (machine)
-    {
-    case EELFMachine::ARM:
-    {
-        if (mELF->Is64())
-            archMode = ECapstoneArchMode::AARCH64_ARM;
-        else
-            archMode = ELFPP::ARMIsThumb(mELF.get()) ? ECapstoneArchMode::ARM32_THUMB : ECapstoneArchMode::ARM32_ARM;
-        break;
-    }
-
-    default:
-        break;
-    }
-
+    auto archMode = mArchModeProvider ? mArchModeProvider->GetBinaryArchMode() : TryDeduceArchMode();
+    archMode = archMode == ECapstoneArchMode::UNDEFINED ? TryDeduceArchMode() : archMode;
     return CapstoneFactory(archMode).CreateInstance(bDetailedInst);
 }
 
@@ -57,4 +42,27 @@ Range ELFBinary::GetRange()
 IOffsetCalculator* ELFBinary::GetOffsetCalculator()
 {
     return &mDefaultCalculator;
+}
+
+ECapstoneArchMode ELFBinary::TryDeduceArchMode()
+{
+    auto machine = mELF->GetTargetMachine();
+    ECapstoneArchMode archMode{ ECapstoneArchMode::UNDEFINED };
+
+    switch (machine)
+    {
+    case EELFMachine::ARM:
+    {
+        if (mELF->Is64())
+            archMode = ECapstoneArchMode::AARCH64_ARM;
+        else
+            archMode = ELFPP::ARMIsThumb(mELF.get()) ? ECapstoneArchMode::ARM32_THUMB : ECapstoneArchMode::ARM32_ARM;
+        break;
+    }
+
+    default:
+        break;
+    }
+
+    return archMode;
 }
