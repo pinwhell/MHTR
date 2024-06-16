@@ -31,6 +31,8 @@ set(CXXOPTS_ENABLE_INSTALL ON)
 add_subdirectory(cxxopts)
 
 set (TBS_MT OFF)
+set(TBS_USE_SSE2 OFF)
+set(TBS_USE_AVX OFF)
 add_subdirectory(TBS)
 add_subdirectory(json)
 add_subdirectory(ELFPP)

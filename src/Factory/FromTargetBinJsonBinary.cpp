@@ -5,7 +5,8 @@
 
 using namespace MHTR;
 
-FromTargetBinJsonBinaryFactory::FromTargetBinJsonBinaryFactory(IJsonProvider* _json)
+FromTargetBinJsonBinaryFactory::FromTargetBinJsonBinaryFactory(IJsonProvider* _json, IBinaryArchModeProvider* archModeProvider)
+    : mArchModeProvider(archModeProvider)
 {
     const auto& json = (*_json->GetJson());
 
@@ -17,5 +18,5 @@ FromTargetBinJsonBinaryFactory::FromTargetBinJsonBinaryFactory(IJsonProvider* _j
 
 std::unique_ptr<IBinary> FromTargetBinJsonBinaryFactory::CreateBinary()
 {
-    return std::make_unique<BinaryFile>(mPath.c_str());
+    return std::make_unique<BinaryFile>(mPath.c_str(), mArchModeProvider);
 }

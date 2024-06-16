@@ -127,7 +127,10 @@ int MHCLI::Run()
             )
         ).get();
         FromJsonMultiMetadataIRFactory irFactory(&metadataIrJsonProvider);
-        IBinary* bin = mBinariesStorage.Store(FromTargetBinJsonBinaryFactory(&binTargetJsonProvider).CreateBinary()).get();
+        IBinaryArchModeProvider* archModeProvider = (IBinaryArchModeProvider*)mProvidersStorage.Store(
+            std::make_unique<FromTargetBinJsonArchModeProvider>(&binTargetJsonProvider)
+        ).get();
+        IBinary* bin = mBinariesStorage.Store(FromTargetBinJsonBinaryFactory(&binTargetJsonProvider, archModeProvider).CreateBinary()).get();
         IOffsetCalculator* offsetCalculator = bin->GetOffsetCalculator();
         ICapstoneProvider* capstoneProvider = mCStoneProvidersStorage.Store(std::make_unique<CapstoneConcurrentProvider>(bin)).get();
 
