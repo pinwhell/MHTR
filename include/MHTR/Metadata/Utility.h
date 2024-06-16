@@ -11,5 +11,5 @@ namespace MHTR {
 
 	NamespaceMetadataTargetSetMap NsMultiMetadataMapFromMultiMetadata(const MetadataTargetSet& targets);
 	NamespaceSet AllNsFromMultiMetadataTarget(const MetadataTargetSet& targets);
-
+	std::string ToLiteral(MetadataTarget* target);
 }

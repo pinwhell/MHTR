@@ -2,4 +2,6 @@
 
 #include <string>
 
-std::string IndentMake(int spaces = 4);
+using Indent = std::string;
+
+Indent IndentMake(int spaces = 4);

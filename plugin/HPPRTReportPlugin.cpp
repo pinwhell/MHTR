@@ -55,7 +55,7 @@ public:
 			&includeSdk,
 			&empty
 			});
-		MultiNsMultiMetadataSynther<ProviderAssignFunctionSynther> multiFn(result);
+		MultiNsMultiMetadataSynther multiFn(result, ProviderAssignFunctionSynther<>::Synth);
 		MetadataProviderMergerFunction multiProviderMerger(result);
 		MultiLineSynthesizerGroup multiFnAndMerger({
 			&multiFn,

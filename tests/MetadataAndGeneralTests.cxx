@@ -113,7 +113,7 @@ void TestImmediateLookup(IMetadataLookupContextProvider* metdtContextProvider)
 
             immLookup.Lookup();
 
-            auto lines = MultiNsMultiMetadataSynther<ConstAssignSynther>({ &target }).Synth();
+            auto lines = MultiNsMultiMetadataSynther({ &target }, ConstAssignSynther::Synth).Synth();
 
             for (const auto& line : lines)
                 std::cout << line << std::endl;
@@ -136,7 +136,7 @@ void FarAddressLookupTest(IMetadataLookupContextProvider* metdtContextProvider)
 
             stackCheckGuardAddr.Lookup();
 
-            auto lines = MultiNsMultiMetadataSynther<ConstAssignSynther>({ &target }).Synth();
+            auto lines = MultiNsMultiMetadataSynther({ &target }, ConstAssignSynther::Synth).Synth();
 
             for (const auto& line : lines)
                 std::cout << line << std::endl;
@@ -208,7 +208,7 @@ void TestDumpMetadata()
         &r2
     };
 
-    auto lines = MultiNsMultiMetadataSynther<ConstAssignSynther>(targets).Synth();
+    auto lines = MultiNsMultiMetadataSynther(targets, ConstAssignSynther::Synth).Synth();
 
     for (const auto& line : lines)
         std::cout << line << std::endl;
@@ -311,18 +311,152 @@ void DummyResultMake(std::function<void(const MetadataTargetSet&)> callback)
     callback(dummyResults);
 }
 
+template<typename JsonSynther>
+class JsonAccessSynther : public ILineSynthesizer {
+public:
+
+    JsonAccessSynther(const std::string& objectName, const std::string& key, const std::string& type, bool bWrite = false)
+        : mObjectName(objectName)
+        , mKey(key)
+        , mType(type)
+        , mbWrite(bWrite)
+    {}
+
+    JsonAccessSynther(const std::string& objectName, ILineSynthesizer* key, const std::string& type, bool bWrite = false)
+        : JsonAccessSynther(objectName, key->Synth(), type, bWrite)
+    {}
+
+    std::string Synth() const override
+    {
+        return JsonSynther::AccessSynth(mObjectName, mKey, mType, mbWrite);
+    }
+
+    std::string mObjectName;
+    std::string mKey;
+    std::string mType;
+    bool mbWrite;
+};
+
+class AssignSynther : public ILineSynthesizer {
+public:
+    AssignSynther(ILineSynthesizer* lhs, ILineSynthesizer* rhs)
+        : mLhs(lhs)
+        , mRhs(rhs)
+    {}
+
+    std::string Synth() const override
+    {
+        return mLhs->Synth() + " = " + mRhs->Synth();
+    }
+
+    ILineSynthesizer* mLhs;
+    ILineSynthesizer* mRhs;
+};
+
+class XoredSynther : public ILineSynthesizer {
+public:
+    XoredSynther(ILineSynthesizer* xoring, std::string key)
+        : mXoring(xoring)
+        , mKey(key)
+    {}
+
+    std::string Synth() const override
+    {
+        return mXoring->Synth() + " ^ " + mKey;
+    }
+
+    ILineSynthesizer* mXoring;
+    std::string mKey;
+};
+
+class NlohmannJsonSynther {
+public:
+    static std::string GetType()
+    {
+        return "nlohmann::json";
+    }
+
+    static std::string GetTypeInc()
+    {
+        return "nlohmann/json.hpp";
+    }
+
+    static std::string AccessSynth(const std::string& objectName, const std::string& key, const std::string& type, bool bWrite = false) {
+        if (bWrite)
+            return objectName + "[" + key + "]";
+
+        return objectName + "[" + key + "].get<" + type + ">()";
+    }
+};
+
+class JsonCppSynther {
+public:
+
+    static std::string GetType()
+    {
+        return "Json::Value";
+    }
+
+    static std::string GetTypeInc()
+    {
+        return "json/value.h";
+    }
+
+    static std::string AccessSynth(const std::string& objectName, const std::string& key, const std::string& type, bool bWrite = false) {
+        if (bWrite)
+            return objectName + "[" + key + "]";
+
+        return objectName + "[" + key + "].as<" + type + ">()";
+    }
+};
+
+#include <fmt/core.h>
+
 int main(int argc, const char* argv[])
 {
     std::filesystem::current_path(MHR_SAMPLES_DIR);
+        
 
     DummyResultMake([](const MetadataTargetSet& results) {
+        auto all = MultiNsMultiMetadataSynther(results, [](const std::string& ns, const MetadataTargetSet& targets, const Indent& indent) {
+            MultiLine allTargetsAssign;
+            allTargetsAssign.emplace_back("MHTR::MetadataProvider all;");
+            std::transform(targets.begin(), targets.end(), std::back_inserter(allTargetsAssign), [](MetadataTarget* target) {
+                std::string type = std::holds_alternative<PatternMetadata>(target->mResult.mMetadata) ? "std::string" : "uint64_t";
+                JsonAccessSynther<NlohmannJsonSynther> targetJsonAccess("json", Literal(target->GetFullName()), type, false);
+                Line providerWrite("all[" + Literal(target->GetFullName()) + "]");
+                XoredSynther targetJsonAccessXored(&targetJsonAccess, "0x0");
+                return AssignSynther(&providerWrite, &targetJsonAccessXored).Synth();
+                });   
+            allTargetsAssign.emplace_back("return all;");
+            LineGroup allTargetsAssignGroup(allTargetsAssign);
+            Line fnArg("const " + NlohmannJsonSynther::GetType() + "& json");
+            return MetadataProviderFunction(ns + "Create", &allTargetsAssignGroup, &fnArg).Synth();
+            }).Synth();
+
+        for(const auto& one : all)
+            std::cout << one << std::endl;
+
+        //MultiNsMultiMetadataSynther bodySynther(results, FromJsonProviderAssignFunctionSynther<NlohmannJsonSynther>::Synth);
+        //auto res = bodySynther.Synth();
+            //<MultiNsMultiMetadataSynther<FromJsonProviderAssignFunctionSynther<NlohmannJsonSynther>>>::Synth(results);
+
+        
+
+        /*
         MultiNsMultiMetadataSynther<ProviderAssignFunctionSynther> fn(results);
 
         for (const std::string& line : fn.Synth())
-            std::cout << line << "\n";
+            std::cout << line << "\n";*/
         });
     
     //TestCreationAndMetadataLookup();
+
+    
+    /*JsonAccessSynther<NlohmannJsonSynther> jsonAccessSynther("foo", Literal("foo"), "int");
+    XoredSynther jsonAccessXored(&jsonAccessSynther, "0xDEADBEEFull");
+    JsonAccessSynther<NlohmannJsonSynther> jsonAccessWriteSynther("foo", Literal("foo"), "int", true);
+    std::cout << JsonAssignSynther(&jsonAccessWriteSynther, &jsonAccessXored).Synth() << std::endl;*/
 
     return 0;
 }

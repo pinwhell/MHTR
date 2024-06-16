@@ -10,10 +10,29 @@
 
 using namespace MHTR;
 
-template<typename T>
-inline std::string Literal(T str)
+MultiNsMultiMetadataSynther::MultiNsMultiMetadataSynther(const MetadataTargetSet& targets, const SynthCallback& callback, Indent indent)
+    : mTargets(targets)
+    , mCallback(callback)
+    , mIndent(indent)
+{}
+
+std::vector<std::string> MultiNsMultiMetadataSynther::Synth() const
 {
-    return fmt::format("\"{}\"", str);
+    std::vector<std::string> result;
+    NamespaceMetadataTargetSetMap nsTargetsMap = NsMultiMetadataMapFromMultiMetadata(mTargets);
+    int n = 0;
+
+    for (const auto& kvNsTargets : nsTargetsMap)
+    {
+        std::vector<std::string> currNsRes = mCallback(kvNsTargets.first, kvNsTargets.second, mIndent);
+
+        result.insert(result.end(), currNsRes.begin(), currNsRes.end());
+
+        if (n++ < nsTargetsMap.size() - 1)
+            result.push_back(""); // Empty line separating Namespaces
+    }
+
+    return result;
 }
 
 std::vector<std::string> ConstAssignSynther::Synth(const std::string& ns, const MetadataTargetSet& targets, const std::string& indent)
@@ -22,14 +41,10 @@ std::vector<std::string> ConstAssignSynther::Synth(const std::string& ns, const 
 
     std::transform(targets.begin(), targets.end(), std::back_inserter(allMetadata), [](MetadataTarget* target) {
         const auto& metadata = target->mResult.mMetadata;
-
-        if (std::holds_alternative<PatternMetadata>(metadata))
-            return Line(fmt::format("constexpr auto {} = {};", target->GetName(), Literal(std::get<PatternMetadata>(metadata).mValue)));
-
-        if (std::holds_alternative<OffsetMetadata>(metadata))
-            return Line(fmt::format("constexpr uint64_t {} = 0x{:X};", target->GetName(), std::get<OffsetMetadata>(metadata).mValue));
-
-        throw std::logic_error("metadata line synthesizer not implemented");
+        const std::string literalValue = ToLiteral(target);
+        const std::string type = std::holds_alternative<PatternMetadata>(metadata) ? "auto" : "uint64_t";
+        
+        return Line(fmt::format("constexpr {} {} = {};", type, target->GetName(), literalValue));
         });
 
     std::vector<ILineSynthesizer*> allMetadataSynthers; std::transform(allMetadata.begin(), allMetadata.end(), std::back_inserter(allMetadataSynthers), [](Line& line) {
@@ -51,16 +66,11 @@ std::vector<std::string> TextReportSynther::Synth(const std::string& ns, const M
     std::vector<Line> content;
 
     std::transform(targets.begin(), targets.end(), std::back_inserter(content), [](MetadataTarget* target) {
-        const auto& result = target->mResult;
-        bool bIsPattern = std::holds_alternative<PatternMetadata>(result.mMetadata);
-        auto resultStr = target->mResult.ToString(); resultStr = bIsPattern ? Literal(resultStr) : resultStr;
-
         return fmt::format(
             "{}: {}",
             target->GetName(),
             target->mHasResult
-            ? resultStr
-
+            ? ToLiteral(target)
             : "Not found."
         );
         });
@@ -78,30 +88,6 @@ std::vector<std::string> TextReportSynther::Synth(const std::string& ns, const M
         }).Synth();
 }
 
-HppConstAssignSynther::HppConstAssignSynther(const MetadataTargetSet& targets)
-    : mTargets(targets)
-{}
-
-std::vector<std::string> HppConstAssignSynther::Synth() const
-{
-    Line pragmaOnce("#pragma once");
-    Line emptyLine(Line::Empty());
-    Line includeCstdint("#include <cstdint>");
-    LineSynthesizerGroup headerGroup({
-        &pragmaOnce,
-        &emptyLine,
-        &includeCstdint,
-        &emptyLine
-        });
-    MultiNsMultiMetadataSynther<ConstAssignSynther> allNsSynther(mTargets);
-    MultiLineSynthesizerGroup synthGroup({
-        &headerGroup,
-        &allNsSynther,
-        });
-
-    return synthGroup.Synth();
-}
-
 MetadataProviderFunction::MetadataProviderFunction(const std::string& fnName, IMultiLineSynthesizer* fnContent, ILineSynthesizer* fnArgLn, std::string fnIndent)
     : mFunction(fnName, fnContent, fnArgLn, "MHTR::MetadataProvider", fnIndent)
 {}
@@ -109,29 +95,6 @@ MetadataProviderFunction::MetadataProviderFunction(const std::string& fnName, IM
 std::vector<std::string> MetadataProviderFunction::Synth() const
 {
     return mFunction.Synth();
-}
-
-std::vector<std::string> ProviderAssignFunctionSynther::Synth(const std::string& ns, const MetadataTargetSet& targets, const std::string& indent)
-{
-    std::vector<Line> metadataLines;
-
-    metadataLines.emplace_back("MHTR::MetadataMap result;");
-    std::transform(targets.begin(), targets.end(), std::back_inserter(metadataLines), [](MetadataTarget* target) {
-        bool bIsPattern = std::holds_alternative<PatternMetadata>(target->mResult.mMetadata);
-        std::string fullValue = bIsPattern ? Literal(target->mResult.ToString()) : target->mResult.ToString() + "ull";
-        return Line("result[" + Literal(target->GetFullName()) + "] = " + fullValue + ";");
-        });
-
-    metadataLines.emplace_back("return MHTR::MetadataProvider(std::move(result));");
-
-    std::vector<ILineSynthesizer*> allFnLines; std::transform(metadataLines.begin(), metadataLines.end(), std::back_inserter(allFnLines), [](Line& line) {
-        return &line;
-        });
-
-    LineSynthesizerGroup allFnLinesGroup(allFnLines);
-    Line noArgs(Line::Empty());
-
-    return MetadataProviderFunction(ns + "Create", &allFnLinesGroup, &noArgs, indent).Synth();
 }
 
 MetadataProviderMergerFunctionBody::MetadataProviderMergerFunctionBody(const NamespaceSet& allNs)

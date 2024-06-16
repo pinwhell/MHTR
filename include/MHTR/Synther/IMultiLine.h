@@ -3,8 +3,10 @@
 #include <vector>
 #include <string>
 
+using MultiLine = std::vector<std::string>;
+
 class IMultiLineSynthesizer {
 public:
     virtual ~IMultiLineSynthesizer() {}
-    virtual std::vector<std::string> Synth() const = 0;
+    virtual MultiLine Synth() const = 0;
 };

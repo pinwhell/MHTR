@@ -29,3 +29,15 @@ NamespaceSet MHTR::AllNsFromMultiMetadataTarget(const MetadataTargetSet& targets
 
 	return result;
 }
+
+template<typename T>
+inline std::string Literal(T str)
+{
+	return '"' + str + '"';
+}
+
+std::string MHTR::ToLiteral(MetadataTarget* target)
+{
+	bool bIsPattern = std::holds_alternative<PatternMetadata>(target->mResult.mMetadata);
+	return bIsPattern ? Literal(target->mResult.ToString()) : target->mResult.ToString() + "ull";
+}

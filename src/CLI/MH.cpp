@@ -199,13 +199,26 @@ int MHCLI::Run()
         BS::thread_pool pool(nThreads);
 
         if (mCLIParseRes.count("report")) pool.detach_task([this, &foundTargetVec] {
-            MultiNsMultiMetadataSynther<TextReportSynther> reportSynther(foundTargetVec);
+            MultiNsMultiMetadataSynther reportSynther(foundTargetVec, TextReportSynther::Synth);
             FileWrite(mCLIParseRes["report"].as<std::string>(), &reportSynther);
             });
 
         if (mCLIParseRes.count("report-hpp")) pool.detach_task([this, &foundTargetVec] {
-            HppConstAssignSynther report(foundTargetVec);
-            FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &report);
+            MultiNsMultiMetadataSynther bodySynther(foundTargetVec, ConstAssignSynther::Synth);
+            Line pragmaOnce("#pragma once");
+            Line cstdintInclude("#include <cstdint>");
+            LineSynthesizerGroup headGroup({
+                &pragmaOnce,
+                &Line::mEmpty,
+                &cstdintInclude,
+                &Line::mEmpty
+                });
+            MultiLineSynthesizerGroup fullHpp({
+                &headGroup,
+                &bodySynther
+                });
+            //HppSynther report(&bodySynther);
+            FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &fullHpp);
             });
 
         pool.detach_loop((size_t)0, mAllPlugins.size(), [this, &foundTargetVec](size_t idx) {

@@ -12,4 +12,5 @@ public:
     static Line Empty();
 
     std::string mLine;
+    static Line mEmpty;
 };
