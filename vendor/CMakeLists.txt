@@ -24,6 +24,8 @@ set(CAPSTONE_EVM_SUPPORT OFF)
 add_subdirectory(capstone)
 
 set (TBS_MT OFF)
+set(TBS_USE_SSE2 OFF)
+set(TBS_USE_AVX OFF)
 add_subdirectory(TBS)
 add_subdirectory(json)
 add_subdirectory(fmt)
