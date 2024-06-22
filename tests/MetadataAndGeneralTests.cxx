@@ -411,14 +411,21 @@ public:
 };
 
 #include <fmt/core.h>
+#include <MHTR/Synther/Cxx/Header.h>
+#include <MHTR/Synther/MultiLineSingleLine.h>
 
 int main(int argc, const char* argv[])
 {
     std::filesystem::current_path(MHR_SAMPLES_DIR);
-        
 
     DummyResultMake([](const MetadataTargetSet& results) {
-        auto all = MultiNsMultiMetadataSynther(results, [](const std::string& ns, const MetadataTargetSet& targets, const Indent& indent) {
+        CxxHeaderHead head; head
+            .GetIncBlockBuilder()
+            ->Add("cstdint")
+            ->Add("MHTRSDK.h")
+            ->Add(NlohmannJsonSynther::GetTypeInc());
+
+        MultiNsMultiMetadataSynther bodySynther(results, [](const std::string& ns, const MetadataTargetSet& targets, const Indent& indent) {
             MultiLine allTargetsAssign;
             allTargetsAssign.emplace_back("MHTR::MetadataProvider all;");
             std::transform(targets.begin(), targets.end(), std::back_inserter(allTargetsAssign), [](MetadataTarget* target) {
@@ -432,31 +439,17 @@ int main(int argc, const char* argv[])
             LineGroup allTargetsAssignGroup(allTargetsAssign);
             Line fnArg("const " + NlohmannJsonSynther::GetType() + "& json");
             return MetadataProviderFunction(ns + "Create", &allTargetsAssignGroup, &fnArg).Synth();
+            });
+
+        const auto all = MultiLineSynthesizerGroup({
+            &head,
+            &MultiLineSingleLine::mEmptyLine,
+            &bodySynther
             }).Synth();
 
         for(const auto& one : all)
             std::cout << one << std::endl;
-
-        //MultiNsMultiMetadataSynther bodySynther(results, FromJsonProviderAssignFunctionSynther<NlohmannJsonSynther>::Synth);
-        //auto res = bodySynther.Synth();
-            //<MultiNsMultiMetadataSynther<FromJsonProviderAssignFunctionSynther<NlohmannJsonSynther>>>::Synth(results);
-
-        
-
-        /*
-        MultiNsMultiMetadataSynther<ProviderAssignFunctionSynther> fn(results);
-
-        for (const std::string& line : fn.Synth())
-            std::cout << line << "\n";*/
         });
-    
-    //TestCreationAndMetadataLookup();
-
-    
-    /*JsonAccessSynther<NlohmannJsonSynther> jsonAccessSynther("foo", Literal("foo"), "int");
-    XoredSynther jsonAccessXored(&jsonAccessSynther, "0xDEADBEEFull");
-    JsonAccessSynther<NlohmannJsonSynther> jsonAccessWriteSynther("foo", Literal("foo"), "int", true);
-    std::cout << JsonAssignSynther(&jsonAccessWriteSynther, &jsonAccessXored).Synth() << std::endl;*/
 
     return 0;
 }

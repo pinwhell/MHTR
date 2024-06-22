@@ -3,6 +3,7 @@
 #include <memory>
 #include <MHTR/Library.h>
 #include <MHTR/Plugin/IPlugin.h>
+#include <MHTR/Plugin/Export.h>
 
 namespace MHTR {
 

@@ -17,6 +17,7 @@
 #include <MHTR/Provider/FromTargetBinJsonArchModeProvider.h>
 #include <MHTR/Factory/FromPluginFolderMultiPlugin.h>
 #include <MHTR/Pltform.h>
+#include <MHTR/Plugin/Registration.h>
 #include <CStone/Provider.h>
 #include <BS_thread_pool.hpp>
 
@@ -30,6 +31,9 @@ static auto DEFAULT_NTHREADS = 1;
 #include <unistd.h>
 #include <limits.h>
 #endif
+
+#include <MHTR/Synther/Cxx/Header.h>
+#include <MHTR/Synther/MultiLineSingleLine.h>
 
 std::string GetExecutablePath() {
 #ifdef WINDOWS
@@ -88,6 +92,9 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
             ) :
             MHTRFromCurrentExePathPluginDirGet()
             , argc, argv).CreatePlugins();
+
+    auto allGlobalPlugins = PluginRegistration::InstanceAll();
+    mAllPlugins.insert(mAllPlugins.end(), std::make_move_iterator(allGlobalPlugins.begin()), std::make_move_iterator(allGlobalPlugins.end()));
 
     std::for_each(mAllPlugins.begin(), mAllPlugins.end(), 
         [&](const PluginInstance& pluginInstance) {
@@ -208,20 +215,16 @@ int MHCLI::Run()
             });
 
         if (mCLIParseRes.count("report-hpp")) pool.detach_task([this, &foundTargetVec] {
+            CxxHeaderHead headerHead; headerHead.GetIncBlockBuilder()
+                ->Add("cstdint");
+
             MultiNsMultiMetadataSynther bodySynther(foundTargetVec, ConstAssignSynther::Synth);
-            Line pragmaOnce("#pragma once");
-            Line cstdintInclude("#include <cstdint>");
-            LineSynthesizerGroup headGroup({
-                &pragmaOnce,
-                &Line::mEmpty,
-                &cstdintInclude,
-                &Line::mEmpty
-                });
             MultiLineSynthesizerGroup fullHpp({
-                &headGroup,
+                &headerHead,
+                &MultiLineSingleLine::mEmptyLine,
                 &bodySynther
                 });
-            //HppSynther report(&bodySynther);
+
             FileWrite(mCLIParseRes["report-hpp"].as<std::string>(), &fullHpp);
             });
 

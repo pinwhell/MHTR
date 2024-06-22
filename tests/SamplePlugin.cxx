@@ -1,5 +1,6 @@
 #include <iostream>
 #include <MHTR/Plugin/IPlugin.h>
+#include <MHTR/Plugin/Export.h>
 
 using namespace MHTR;
 

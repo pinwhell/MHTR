@@ -1,4 +1,4 @@
-file(GLOB SYTHER_SRC *.cpp)
+file(GLOB_RECURSE SYTHER_SRC *.cpp)
 
 add_library(Synthesizer STATIC ${SYTHER_SRC})
 target_include_directories(Synthesizer PUBLIC ${IFACE_INCLUDE_DIR})

@@ -1,5 +1,7 @@
 #include <MHTR/Synther/MultiLineGroup.h>
 
+MultiLineSynthesizerGroup MultiLineSynthesizerGroup::mEmpty({});
+
 MultiLineSynthesizerGroup::MultiLineSynthesizerGroup(const std::vector<IMultiLineSynthesizer*>& multiLineSynthers)
     : mMultiLinesSynthers(multiLineSynthers)
 {}

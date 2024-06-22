@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <string>
-#include <MHTR/Api.h>
 #include <MHTR/Metadata/Container.h>
 
 namespace cxxopts {
@@ -30,13 +29,5 @@ std::string GetName() const { \
 std::string GetDescription() const { \
 	return desc; \
 }
-
-#define MHTRPLUGIN_EXPORT(x) \
-MHTR_EXPORT IPlugin* CreatePlugin() \
-{ \
-	return new x(); \
-}
-
-	using CreatePluginFn = IPlugin * (*)();
 
 }

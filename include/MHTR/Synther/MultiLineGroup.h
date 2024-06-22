@@ -8,6 +8,8 @@ public:
 
     std::vector<std::string> Synth() const override;
 
+    static MultiLineSynthesizerGroup mEmpty;
+
 private:
     std::vector<IMultiLineSynthesizer*> mMultiLinesSynthers;
 };

@@ -14,8 +14,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${BIN_OUTPUT}/plugins)
 #	Plugins	  #
 ###############
 
-add_library(HPPRTReportPlugin SHARED HPPRTReportPlugin.cpp)
-target_link_libraries(HPPRTReportPlugin MHTRPluginSDK MetadataSynthers)
+target_sources(MetadataHunter PUBLIC HPPRTReportPlugin.cpp)
+target_link_libraries(MetadataHunter cxxopts)
 
 install(TARGETS MHTRPluginSDK
         EXPORT MHTRPluginSDKTargets

@@ -1,10 +1,12 @@
 #include <cxxopts.hpp>
-#include <MHTR/Plugin/IPlugin.h>
+#include <MHTR/Plugin/Registration.h>
 #include <MHTR/Synther/Line.h>
 #include <MHTR/Synther/LineGroup.h>
 #include <MHTR/Synther/MultiLineGroup.h>
 #include <MHTR/Synther/NamespaceBlock.h>
 #include <MHTR/Synther/FileOperations.h>
+#include <MHTR/Synther/MultiLineSingleLine.h>
+#include <MHTR/Synther/Cxx/Header.h>
 #include <MHTR/Metadata/Utility.h>
 #include <MHTR/Metadata/Synthers.h>
 
@@ -38,6 +40,9 @@ public:
 
 		// At this point there is result available & user requested a
 		// report from the plugin
+		CxxHeaderHead headerHead; headerHead.GetIncBlockBuilder()
+			->Add("cstdint")
+			->Add("MHTRSDK.h");
 
 		NamespaceMetadataTargetSetMap namespacedMap = NsMultiMetadataMapFromMultiMetadata(result);
 		NamespaceSet allNs = AllNsFromMultiMetadataTarget(result);
@@ -45,26 +50,17 @@ public:
 		std::string reportNsName = ""; for (const std::string& ns : allNs)
 			reportNsName += ns;
 
-		Line empty = Line::Empty();
-		LineSynthesizerGroup newLineMultiLineSynther({ &empty });
-		Line pragmaOnce("#pragma once");
-		Line includeSdk("#include <MHTRSDK.h>");
-		LineSynthesizerGroup hppHeader({
-			&pragmaOnce,
-			&empty,
-			&includeSdk,
-			&empty
-			});
 		MultiNsMultiMetadataSynther multiFn(result, ProviderAssignFunctionSynther<>::Synth);
 		MetadataProviderMergerFunction multiProviderMerger(result);
 		MultiLineSynthesizerGroup multiFnAndMerger({
 			&multiFn,
-			&newLineMultiLineSynther,
+			&MultiLineSingleLine::mEmptyLine,
 			&multiProviderMerger
 			});
 		NamespaceBlock fullNsBlock(&multiFnAndMerger, reportNsName);
 		MultiLineSynthesizerGroup fullHpp({
-			&hppHeader,
+			&headerHead,
+			&MultiLineSingleLine::mEmptyLine,
 			&fullNsBlock
 			});
 		FileWrite(mReportOutputPath, &fullHpp);
@@ -75,4 +71,4 @@ public:
 	cxxopts::Options* mOptions;
 };
 
-MHTRPLUGIN_EXPORT(HPPRTReportWriter)
+MHTRPLUGIN_REGISTER(HPPRTReportWriter)
