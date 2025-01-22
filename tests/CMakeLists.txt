@@ -1,3 +1,5 @@
+find_package(cxxopts REQUIRED)
+
 add_definitions(-DMHR_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
 
 file(GLOB MHR_TESTS_SRCS *.cpp)
@@ -19,7 +21,7 @@ target_link_libraries(MetadataAndGeneralTests MetadataHunter)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/test/cli)
 
 add_executable(CLITest CLITest.cxx ${CMAKE_CURRENT_SOURCE_DIR}/../src/CLI/MH.cpp)
-target_link_libraries(CLITest MetadataHunter BSThreadPool cxxopts)
+target_link_libraries(CLITest MetadataHunter BSThreadPool cxxopts::cxxopts)
 
 
 #####################

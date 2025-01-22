@@ -1,12 +1,15 @@
+find_package(CStone REQUIRED)
+find_package(fmt REQUIRED)
+
 add_library(Metadata STATIC Metadata.cpp Target.cpp Result.cpp Utility.cpp)
 target_include_directories(Metadata PUBLIC ${IFACE_INCLUDE_DIR})
 
 add_library(MetadataLookups INTERFACE)
 target_sources(MetadataLookups INTERFACE Lookups.cpp)
-target_link_libraries(MetadataLookups INTERFACE TBS fmt CStone)
+target_link_libraries(MetadataLookups INTERFACE TBS fmt::fmt cstone::cstone)
 
 add_library(MetadataSynthers STATIC Synthers.cpp)
-target_link_libraries(MetadataSynthers PUBLIC Synthesizer PRIVATE fmt)
+target_link_libraries(MetadataSynthers PUBLIC Synthesizer PRIVATE fmt::fmt)
 target_include_directories(MetadataSynthers PUBLIC ${IFACE_INCLUDE_DIR})
 
 

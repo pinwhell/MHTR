@@ -2,7 +2,7 @@
 #include <MHTR/Binary/ELF.h>
 #include <MHTR/Binary/Unknown.h>
 #include <MHTR/Binary/File.h>
-#include <ELFPP.hpp>
+#include <ELFPP/ELFPP.hpp>
 
 using namespace MHTR;
 

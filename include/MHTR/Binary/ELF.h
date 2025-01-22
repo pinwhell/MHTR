@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <ELFPP.hpp>
+#include <ELFPP/ELFPP.hpp>
 #include <MHTR/Range.h>
 #include <MHTR/Binary/IBinary.h>
 #include <MHTR/OffsetCalculator.h>

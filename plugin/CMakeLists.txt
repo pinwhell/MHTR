@@ -2,9 +2,10 @@
 #  Plugin SDK #
 ###############
 
+find_package(cxxopts REQUIRED)
 add_library(MHTRPluginSDK STATIC PluginSDK.cpp)
 target_compile_features(MHTRPluginSDK INTERFACE cxx_std_17)
-target_link_libraries(MHTRPluginSDK Metadata cxxopts)
+target_link_libraries(MHTRPluginSDK Metadata cxxopts::cxxopts)
 target_include_directories(MHTRPluginSDK PUBLIC $<BUILD_INTERFACE:${INCLUDE_DIR}> $<INSTALL_INTERFACE:include>)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_OUTPUT}/plugins)

@@ -4,24 +4,6 @@
 [submodule "vendor/TBS"]
 	path = vendor/TBS
 	url = https://github.com/pinwhell/TBS
-[submodule "vendor/capstone"]
-	path = vendor/capstone
-	url = https://github.com/capstone-engine/capstone
-[submodule "vendor/json"]
-	path = vendor/json
-	url = https://github.com/nlohmann/json
-[submodule "vendor/fmt"]
-	path = vendor/fmt
-	url = https://github.com/fmtlib/fmt
-[submodule "vendor/ELFPP"]
-	path = vendor/ELFPP
-	url = https://github.com/pinwhell/ELFPP
-[submodule "vendor/CStone"]
-	path = vendor/CStone
-	url = https://github.com/pinwhell/CStone
-[submodule "vendor/cxxopts"]
-	path = vendor/cxxopts
-	url = https://github.com/jarro2783/cxxopts
 [submodule "vendor/thread-pool"]
 	path = vendor/thread-pool
 	url = https://github.com/bshoshany/thread-pool.git
