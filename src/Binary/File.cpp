@@ -11,7 +11,7 @@ BinaryFile::BinaryFile(const char* filePath, IBinaryArchModeProvider* binaryArch
 {}
 
 Range BinaryFile::GetRange() {
-	return Range(mFileView, mFileView.size());
+	return mFormatedBinary->GetRange();
 }
 
 std::unique_ptr<ICapstone> BinaryFile::CreateInstance(bool bDetailedInst)

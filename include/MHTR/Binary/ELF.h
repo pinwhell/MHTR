@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 #include <ELFPP/ELFPP.hpp>
 #include <MHTR/Range.h>
 #include <MHTR/Binary/IBinary.h>
@@ -25,5 +26,10 @@ namespace MHTR {
         std::unordered_map<std::string, std::unique_ptr<IFarAddressResolver>> mFarAddressResolvers;
         OffsetCalculator mDefaultCalculator;
         IBinaryArchModeProvider* mArchModeProvider;
+
+    private:
+        void Map();
+        std::vector<uint8_t> mMappedBuffer;
+        size_t mMappedSize = 0;
     };
 }
