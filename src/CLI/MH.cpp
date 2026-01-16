@@ -121,13 +121,38 @@ int MHCLI::Run()
 
     std::transform(targets.begin(), targets.end(), std::back_inserter(allVecLookables), [&](const auto& target) {
         JsonProvider binTargetJsonProvider(target);
-        FromJsonPathJsonFileProvider metadataIrJsonProvider(&binTargetJsonProvider, "metadataPath");
+        
+        // Handle Multi-Metadata Merging
+        std::unique_ptr<IJsonProvider> metadataProvider;
+        nlohmann::json mergedMetadata = nlohmann::json::array();
+
+        if (target.contains("metadataPaths")) {
+            auto paths = target["metadataPaths"];
+            if (paths.is_array()) {
+                for (const auto& path : paths) {
+                    FromFileJsonProvider fileProvider(path.get<std::string>());
+                    const auto& content = *fileProvider.GetJson();
+                    if (content.is_array()) {
+                        mergedMetadata.insert(mergedMetadata.end(), content.begin(), content.end());
+                    } else {
+                        mergedMetadata.push_back(content);
+                    }
+                }
+                metadataProvider = std::make_unique<JsonProvider>(mergedMetadata);
+            }
+        } 
+        
+        // Fallback to single path
+        if (!metadataProvider) {
+            metadataProvider = std::make_unique<FromJsonPathJsonFileProvider>(&binTargetJsonProvider, "metadataPath");
+        }
+
         FromJsonSingleNamespaceProvider* nsProvider = (FromJsonSingleNamespaceProvider*)mProvidersStorage.Store(
             std::make_unique<FromJsonSingleNamespaceProvider>(
                 &binTargetJsonProvider
             )
         ).get();
-        FromJsonMultiMetadataIRFactory irFactory(&metadataIrJsonProvider);
+        FromJsonMultiMetadataIRFactory irFactory(metadataProvider.get());
         IBinaryArchModeProvider* archModeProvider = (IBinaryArchModeProvider*)mProvidersStorage.Store(
             std::make_unique<FromTargetBinJsonArchModeProvider>(&binTargetJsonProvider)
         ).get();
