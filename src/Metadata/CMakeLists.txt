@@ -8,7 +8,7 @@ target_link_libraries(MetadataLookups INTERFACE tbs::tbs cstone::cstone)
 
 add_library(MetadataSynthers STATIC Synthers.cpp)
 target_compile_features(MetadataSynthers PUBLIC cxx_std_20)
-target_link_libraries(MetadataSynthers PUBLIC Synthesizer)
+target_link_libraries(MetadataSynthers PUBLIC Synthesizer Metadata)
 target_include_directories(MetadataSynthers PUBLIC ${IFACE_INCLUDE_DIR})
 
 
