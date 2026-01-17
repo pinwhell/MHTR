@@ -7,3 +7,6 @@
 [submodule "vendor/thread-pool"]
 	path = vendor/thread-pool
 	url = https://github.com/bshoshany/thread-pool.git
+[submodule "CStone"]
+	path = vendor/CStone
+	url = https://github.com/pinwhell/CStone
