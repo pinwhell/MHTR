@@ -18,11 +18,11 @@ ProcedureRangeProviderChain::ProcedureRangeProviderChain(IRangeProvider* baseRan
         ).get();
 
         auto procEntryProv = (IProcedureEntryProvider*)mProviders.Store(
-            std::make_unique<AsmExtractedProcedureEntryProvider>(procPatternCfg.mCapstoneProvider, addressesProv)
+            std::make_unique<AsmExtractedProcedureEntryProvider>(procPatternCfg.mBranchCapstoneProvider, addressesProv)
         ).get();
 
         auto procRangeProv = (IRangeProvider*)mProviders.Store(
-            std::make_unique<ProcedureRangeProvider>(procPatternCfg.mCapstoneProvider, procEntryProv, procPatternCfg.mDefSize)
+            std::make_unique<ProcedureRangeProvider>(procPatternCfg.mFnCapstoneProvider, procEntryProv, procPatternCfg.mDefSize)
         ).get();
 
         mpRangeProviders.push_back(procRangeProv);

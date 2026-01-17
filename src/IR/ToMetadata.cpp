@@ -196,7 +196,8 @@ IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangePipelineFromIR(const 
                 scanCFG.mDisp
             ),             
                 size_t(fnStage.mDefFnSize),
-                GetCapstoneProvider(fnStage.mBinaryArchMode)
+                GetCapstoneProvider(fnStage.mBranchBinaryArchMode),
+                GetCapstoneProvider(fnStage.mFnBinaryArchMode)
             }));
     }
 

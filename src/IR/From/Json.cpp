@@ -94,7 +94,16 @@ MetadataScanRangeStageFunctionIR FromJsonMetadataIRParser::ParseMetadataScanRang
 
     result.mDefFnSize = stage.contains("defFnSize") ? stage["defFnSize"].get<uint64_t>() : 0;
     result.mScanCFG = stage["pattern"].is_object() ? ParsePatternScanConfig(stage["pattern"]) : ParsePatternScanConfig(stage);
-    result.mBinaryArchMode = json_optional_ECapstoneArchMode_or_throw(stage, "binaryArchMode");
+
+    auto legacyArchMode = json_optional_ECapstoneArchMode_or_throw(stage, "binaryArchMode");
+
+    result.mFnBinaryArchMode = json_optional_ECapstoneArchMode_or_throw(stage, "fnBinaryArchMode");
+    if (!result.mFnBinaryArchMode)
+        result.mFnBinaryArchMode = legacyArchMode;
+
+    result.mBranchBinaryArchMode = json_optional_ECapstoneArchMode_or_throw(stage, "branchBinaryArchMode");
+    if (!result.mBranchBinaryArchMode)
+        result.mBranchBinaryArchMode = legacyArchMode;
 
     return result;
 }

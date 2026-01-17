@@ -8,7 +8,8 @@ namespace MHTR {
 	struct FunctionScanConfig {
 		PatternScanConfig mScanConfig;
 		size_t mDefSize;
-		ICapstoneProvider* mCapstoneProvider;
+		ICapstoneProvider* mBranchCapstoneProvider;
+		ICapstoneProvider* mFnCapstoneProvider;
 	};
 
 }

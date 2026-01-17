@@ -19,7 +19,8 @@ namespace MHTR {
     struct MetadataScanRangeStageFunctionIR {
         uint64_t mDefFnSize;
         PatternScanConfigIR mScanCFG;
-        std::optional<ECapstoneArchMode> mBinaryArchMode;
+        std::optional<ECapstoneArchMode> mFnBinaryArchMode;
+        std::optional<ECapstoneArchMode> mBranchBinaryArchMode;
     };
 
     struct MetadataScanRangeStageIR {
