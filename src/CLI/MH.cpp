@@ -130,7 +130,7 @@ int MHCLI::Run()
             auto paths = target["metadataPaths"];
             if (paths.is_array()) {
                 for (const auto& path : paths) {
-                    FromFileJsonProvider fileProvider(path.get<std::string>());
+                    FromFileJsonProvider fileProvider(path.template get<std::string>());
                     const auto& content = *fileProvider.GetJson();
                     if (content.is_array()) {
                         mergedMetadata.insert(mergedMetadata.end(), content.begin(), content.end());

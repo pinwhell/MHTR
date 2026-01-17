@@ -1,5 +1,6 @@
 #include <format>
 #include <MHTR/PatternScan.h>
+#include <algorithm>
 
 using namespace MHTR;
 
@@ -39,12 +40,12 @@ PatternScanAddresses::PatternScanAddresses(IRangeProvider* scanRangeProvider, co
 
 std::vector<uint64_t> PatternScanAddresses::GetAllAddresses()
 {
-    std::vector<uint64_t> results;
-
+	TBS::Pattern::Results results;
     PatternScanOrExcept(mScanRangeProvider, mScanCFG.mPattern, results, false);
 
-    for (auto& result : results)
-        result += mScanCFG.mResDisp;
-
-    return results;
+	std::vector<uint64_t> out_results;
+	std::transform(results.begin(), results.end(), std::back_inserter(out_results), [this](auto r) {
+		return r + mScanCFG.mResDisp;
+		});
+	return out_results;
 }
