@@ -15,7 +15,8 @@ if (USE_STATIC_LINKING)
 endif()
 
 
-find_package(CBuildKit REQUIRED)
+include(cmake/CBuildKit.cmake)
+
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 option(BUILD_TESTS "Build tests" ON)
 

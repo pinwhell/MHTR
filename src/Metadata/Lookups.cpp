@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fmt/core.h>
+#include <format>
 #include <MHTR/Metadata/Lookups.h>
 #include <MHTR/PatternScan.h>
 #include <CStone/CStone.h>
@@ -80,19 +80,19 @@ void InsnImmediateLookup::Lookup()
 		}
 		catch (DismFailedException& e)
 		{
-			std::cerr << fmt::format("'{}' diassembly failed\n", mTarget.GetFullName());
+			std::cerr << std::format("'{}' diassembly failed\n", mTarget.GetFullName());
 		}
 		catch (std::exception& e)
 		{
-			std::cerr << fmt::format("'{}':{}\n", mTarget.GetFullName(), e.what());
+			std::cerr << std::format("'{}':{}\n", mTarget.GetFullName(), e.what());
 		}
 	}
 
 	if (immResults.size() < 1)
-		throw MetadataLookupException(fmt::format("'{}' no immediates found.", mTarget.GetFullName()));
+		throw MetadataLookupException(std::format("'{}' no immediates found.", mTarget.GetFullName()));
 
 	if (immResults.size() > 1)
-		throw MetadataLookupException(fmt::format("'{}' multiple instruction immediates", mTarget.GetFullName()));
+		throw MetadataLookupException(std::format("'{}' multiple instruction immediates", mTarget.GetFullName()));
 
 	mTarget.TrySetResult(MetadataResult(*immResults.begin()));
 }

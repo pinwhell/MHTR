@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <format>
 #include <MHTR/Provider/FromJsonPathJsonFile.h>
 #include <MHTR/Exception/UnexpectedLayout.h>
 
@@ -9,7 +9,7 @@ FromJsonPathJsonFileProvider::FromJsonPathJsonFileProvider(IJsonProvider* jsonCo
     const auto& json = (*jsonContainingPath->GetJson());
 
     if (json.contains(jsonPathKey) == false)
-        throw UnexpectedLayoutException(fmt::format("path with key '{}' not found", jsonPathKey));
+        throw UnexpectedLayoutException(std::format("path with key '{}' not found", jsonPathKey));
 
     return json[jsonPathKey].get<std::string>();
         }())

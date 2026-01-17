@@ -1,7 +1,6 @@
 #include <MHTR/CLI/MH.h>
 #include <iostream>
 #include <algorithm>
-#include <fmt/core.h>
 #include <MHTR/Provider/FromFileJson.h>
 #include <MHTR/Provider/Json.h>
 #include <MHTR/Provider/FromJsonPathJsonFile.h>
@@ -19,6 +18,7 @@
 #include <MHTR/Pltform.h>
 #include <CStone/Provider.h>
 #include <BS_thread_pool.hpp>
+#include <format>
 
 using namespace MHTR;
 
@@ -99,7 +99,7 @@ MHCLI::MHCLI(int argc, const char* argv[], IMultiPluginFactory* pluginsFactory)
     std::for_each(mAllPlugins.begin(), mAllPlugins.end(),
         [&](const PluginInstance& pluginInstance) {
             pluginInstance->OnCLIParsed(mCLIParseRes);
-            std::cout << fmt::format("Loaded:'{}'\n", pluginInstance->GetName());
+            std::cout << std::format("Loaded:'{}'\n", pluginInstance->GetName());
         });  
 }
 
@@ -211,7 +211,7 @@ int MHCLI::Run()
             }
             catch (const std::exception& e)
             {
-                std::cerr << fmt::format("'{}':{}\n", lookable->GetTarget()->GetFullName(), e.what());
+                std::cerr << std::format("'{}':{}\n", lookable->GetTarget()->GetFullName(), e.what());
             }
             });
     }
@@ -255,7 +255,7 @@ int MHCLI::Run()
             });
     }
 
-    std::cout << fmt::format("{}/{} targets successful.", foundTargets.size(), allTargets.size()) << std::endl;
+    std::cout << std::format("{}/{} targets successful.", foundTargets.size(), allTargets.size()) << std::endl;
 
     return 0;
 }

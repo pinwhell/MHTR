@@ -1,6 +1,10 @@
+add_subdirectory(CStone)
+
+add_subdirectory(cxxopts)
+add_subdirectory(ELFPP)
+add_subdirectory(json)
+
 set (TBS_MT OFF)
-set(TBS_USE_SSE2 OFF)
-set(TBS_USE_AVX OFF)
 add_subdirectory(TBS)
 
 add_library(BSThreadPool INTERFACE)

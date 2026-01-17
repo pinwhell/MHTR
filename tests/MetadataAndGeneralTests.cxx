@@ -84,9 +84,9 @@ void TestCapstone(IMetadataLookupContextProvider* metdtContextProvider)
             if (t.joinable())
                 t.join(); // Wait thread finish
 
-            //std::cout << fmt::format(
+            //std::cout << std::format(
             //    "{}\n",
-            //    fmt::ptr(
+            //    (void*)(
             //        (void*)buffView.OffsetFromBase(
             //            (uint64_t)ARM32FarPcRelLEATryResolve(
             //                capstone,
@@ -177,8 +177,8 @@ void RunMetadataTests()
         TestMetadataLookupContextProvider metdtContextProvider(&binOffCalctor, &bin, &bin);
 
         metdtContextProvider.ContextProvide([&](IOffsetCalculator* relDispCalculator, IRangeProvider* scanRangeProvider, ICapstoneProvider* cStoneInstancer) {
-            ProcedureRangeProviderChain procedureRangeProviderChain(cStoneInstancer, scanRangeProvider, {
-                {PatternScanConfig("00 F0 57 B9 D0 B5 02 AF 04 46", 0), 0}  // buffView.start<uint64_t>() + 0x1AC8
+            ProcedureRangeProviderChain procedureRangeProviderChain(scanRangeProvider, {
+                {PatternScanConfig("00 F0 57 B9 D0 B5 02 AF 04 46", 0), 0, cStoneInstancer}  // buffView.start<uint64_t>() + 0x1AC8
                 });
 
             procedureRangeProviderChain.GetRange();
@@ -410,7 +410,7 @@ public:
     }
 };
 
-#include <fmt/core.h>
+#include <format>
 
 int main(int argc, const char* argv[])
 {

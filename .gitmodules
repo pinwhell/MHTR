@@ -10,3 +10,12 @@
 [submodule "CStone"]
 	path = vendor/CStone
 	url = https://github.com/pinwhell/CStone
+[submodule "json"]
+	path = vendor/json
+	url = https://github.com/nlohmann/json
+[submodule "ELFPP"]
+	path = vendor/ELFPP
+	url = https://github.com/pinwhell/ELFPP
+[submodule "cxxopts"]
+	path = vendor/cxxopts
+	url = https://github.com/jarro2783/cxxopts

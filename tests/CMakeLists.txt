@@ -1,5 +1,3 @@
-find_package(cxxopts REQUIRED)
-
 add_definitions(-DMHR_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
 
 file(GLOB MHR_TESTS_SRCS *.cpp)

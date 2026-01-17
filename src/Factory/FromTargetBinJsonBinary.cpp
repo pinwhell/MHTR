@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <format>
 #include <MHTR/Factory/FromTargetBinJsonBinary.h>
 #include <MHTR/Exception/UnexpectedLayout.h>
 #include <MHTR/Binary/File.h>
@@ -11,7 +11,7 @@ FromTargetBinJsonBinaryFactory::FromTargetBinJsonBinaryFactory(IJsonProvider* _j
     const auto& json = (*_json->GetJson());
 
     if (json.contains("binaryPath") == false)
-        throw UnexpectedLayoutException(fmt::format("invalid binary target format"));
+        throw UnexpectedLayoutException(std::format("invalid binary target format"));
 
     mPath = json["binaryPath"].get<std::string>();
 }

@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <format>
 #include <MHTR/IR/From/Json.h>
 #include <MHTR/Exception/UnexpectedLayout.h>
 
@@ -15,7 +15,7 @@ std::optional<ECapstoneArchMode> json_optional_ECapstoneArchMode_or_throw(const 
     auto archMode = ECapstoneArchModeFromString(*archModeStr);
     if (archMode == ECapstoneArchMode::UNDEFINED)
         throw UnexpectedLayoutException(
-            fmt::format("invalid binaryArchMode '{}'", *archModeStr)
+            std::format("invalid binaryArchMode '{}'", *archModeStr)
         );
 
     return archMode;
@@ -69,7 +69,7 @@ MetadataIR FromJsonMetadataIRParser::Parse(const nlohmann::json& metadata)
     }
     catch (const std::exception& e)
     {
-        throw UnexpectedLayoutException(fmt::format("'{}':{}", result.mTarget.mName, e.what()));
+        throw UnexpectedLayoutException(std::format("'{}':{}", result.mTarget.mName, e.what()));
     }
 
     return result;
@@ -85,7 +85,7 @@ PatternScanConfigIR FromJsonMetadataIRParser::ParsePatternScanConfig(const nlohm
 MetadataScanRangeStageFunctionIR FromJsonMetadataIRParser::ParseMetadataScanRangeStageFunction(const nlohmann::json& stage)
 {
     if (!stage.contains("pattern"))
-        throw UnexpectedLayoutException(fmt::format("Pattern Scan Information missing"));
+        throw UnexpectedLayoutException(std::format("Pattern Scan Information missing"));
 
     // At this point, is gurantee 
     // a pattern thing exists
@@ -117,7 +117,7 @@ MetadataScanRangeStageIR FromJsonMetadataIRParser::ParseMetadataScanRangeStage(c
 MetadataScanRangePipelineIR FromJsonMetadataIRParser::ParseMetadataScanRangePipeline(const nlohmann::json& pipeline)
 {
     if (pipeline.is_array() == false)
-        throw UnexpectedLayoutException(fmt::format("Pipeline invalid pipeline type."));
+        throw UnexpectedLayoutException(std::format("Pipeline invalid pipeline type."));
 
     MetadataScanRangePipelineIR result;
 
@@ -153,7 +153,7 @@ ScanRangeIR FromJsonMetadataIRParser::ParseScanRange(const nlohmann::json& scanR
         return result;
     }
 
-    throw UnexpectedLayoutException(fmt::format("Invalid format of scan range"));
+    throw UnexpectedLayoutException(std::format("Invalid format of scan range"));
 }
 
 MetadataTargetIR FromJsonMetadataIRParser::ParseMetadataTarget(const nlohmann::json& metadataTarget)
@@ -216,7 +216,7 @@ MetadataResult FromJsonMetadataIRParser::ParseHardcoded(const nlohmann::json& me
     if (value.is_string())
         return MetadataResult(value.get<std::string>());
 
-    throw UnexpectedLayoutException(fmt::format("invalid 'value' format"));
+    throw UnexpectedLayoutException(std::format("invalid 'value' format"));
 }
 
 MetadataScanRangeIR FromJsonMetadataIRParser::ParseMetadataScanRange(const nlohmann::json& metadata)
@@ -247,7 +247,7 @@ EMetadataLookup FromJsonMetadataIRParser::TryParseMetadataLookupType(const nlohm
         if (type == "HARDCODED")
             return EMetadataLookup::HARDCODED;
 
-        throw UnexpectedLayoutException(fmt::format("'{}' invalid metadata lookup type", type));
+        throw UnexpectedLayoutException(std::format("'{}' invalid metadata lookup type", type));
     }
 
     // At this point, type wasnt defined 

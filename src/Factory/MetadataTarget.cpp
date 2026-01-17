@@ -1,11 +1,11 @@
-#include <fmt/format.h>
+#include <format>
 #include <MHTR/Factory/MetadataTarget.h>
 
 using namespace MHTR;
 
 MetadataTarget* MetadataTargetFactory::GetMetadataTarget(const std::string& name, INamespace* ns)
 {
-    std::string fullyQualifiedName = fmt::format("{}{}", ns ? ns->GetNamespace() + "::" : "", name);
+    std::string fullyQualifiedName = std::format("{}{}", ns ? ns->GetNamespace() + "::" : "", name);
 
     if (mMetadataTargetMap.find(fullyQualifiedName) != mMetadataTargetMap.end())
         return mMetadataTargetMap[fullyQualifiedName].get();

@@ -2,7 +2,6 @@
 #  Plugin SDK #
 ###############
 
-find_package(cxxopts REQUIRED)
 add_library(MHTRPluginSDK STATIC PluginSDK.cpp)
 target_compile_features(MHTRPluginSDK INTERFACE cxx_std_17)
 target_link_libraries(MHTRPluginSDK Metadata cxxopts::cxxopts)
@@ -25,7 +24,7 @@ install(TARGETS MHTRPluginSDK
         RUNTIME DESTINATION bin
         INCLUDES DESTINATION include)
 
-install(EXPORT MHTRPluginSDKTargets
-        FILE MHTRPluginSDKTargets.cmake
-        NAMESPACE MHTR::
-        DESTINATION lib/cmake/MHTR)
+# install(EXPORT MHTRPluginSDKTargets
+        # FILE MHTRPluginSDKTargets.cmake
+        # NAMESPACE MHTR::
+        # DESTINATION lib/cmake/MHTR)

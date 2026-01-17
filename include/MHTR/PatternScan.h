@@ -2,10 +2,10 @@
 
 #include <string>
 #include <stdexcept>
+#include <TBS/TBS.hpp>
 #include <MHTR/Provider/IAddresses.h>
 #include <MHTR/Provider/IRange.h>
 #include <MHTR/PatternScanConfig.h>
-#include <TBS.hpp>
 
 namespace MHTR {
     class PatternScanException : public std::runtime_error {

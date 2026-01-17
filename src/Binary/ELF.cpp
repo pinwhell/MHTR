@@ -1,8 +1,8 @@
-#include <fmt/core.h>
 #include <MHTR/Binary/ELF.h>
 #include <MHTR/Arch/ARM/32/Resolver/FarAddress.h>
-#include <MHTR/Arch/ARM/64/Resolver/FarAddress.h>
+#include <MHTR/Arch/AArch64/Resolver/FarAddress.h>
 #include <CStone/Factory.h>
+#include <format>
 
 using namespace MHTR;
 
@@ -75,7 +75,7 @@ IFarAddressResolver* ELFBinary::GetFarAddressResolver(ICapstoneProvider* cstoneP
 {
     auto machine = mELF->GetTargetMachine();
     bool bIs64 = mELF->Is64();
-    std::string key = fmt::format("{}{}{}", fmt::ptr(cstoneProvider), (int)machine, bIs64);
+    std::string key = std::format("{}{}{}", (void*)(cstoneProvider), (int)machine, bIs64);
 
     if (mFarAddressResolvers.find(key) != mFarAddressResolvers.end())
         return mFarAddressResolvers[key].get();
@@ -84,7 +84,7 @@ IFarAddressResolver* ELFBinary::GetFarAddressResolver(ICapstoneProvider* cstoneP
         return (mFarAddressResolvers[key] = std::make_unique<ARM32FarAddressResolver>(cstoneProvider)).get();
 
     if (machine == EELFMachine::AARCH64 && bIs64)
-        return (mFarAddressResolvers[key] = std::make_unique<ARM64FarAddressResolver>(cstoneProvider)).get();
+        return (mFarAddressResolvers[key] = std::make_unique<AArch64FarAddressResolver>(cstoneProvider)).get();
     
     return nullptr;
 }

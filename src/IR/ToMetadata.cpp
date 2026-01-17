@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <format>
 #include <algorithm>
 #include <iterator>
 #include <MHTR/IR/ToMetadata.h>
@@ -155,7 +155,7 @@ std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateHardcodedLo
 IRangeProvider* FromIRMultiMetadataFactory::CreateMetadataScanRangeFromIR(const MetadataIR& ir)
 {
     if (mRangeProviderMap.find(ir.mTarget.mName) != mRangeProviderMap.end())
-        throw UnexpectedLayoutException(fmt::format("'{}':Metadata Scan Range duplicated detected."));
+        throw UnexpectedLayoutException(std::format("Metadata Scan Range duplicated detected."));
 
     return mRangeProviderMap[ir.mTarget.mName] = CreateScanRangeFromIR(std::get<MetadataScanRangeIR>(ir.mMetadata).mScanRange);
 }
@@ -170,7 +170,7 @@ IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangeFromIR(const ScanRang
         auto& key = std::get<std::string>(ir.mScanRange);
 
         if (mRangeProviderMap.find(key) == mRangeProviderMap.end())
-            throw UnexpectedLayoutException(fmt::format("'{}':Scan Range Reference not found."));
+            throw UnexpectedLayoutException(std::format("Scan Range Reference not found."));
 
         return mRangeProviderMap[key];
     }
@@ -185,7 +185,7 @@ IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangePipelineFromIR(const 
     for (const auto& stage : pipeline.mStages)
     {
         if (!std::holds_alternative<MetadataScanRangeStageFunctionIR>(stage.mStage))
-            throw std::logic_error(fmt::format("Unimplemented Stage detected"));
+            throw std::logic_error(std::format("Unimplemented Stage detected"));
 
         const auto& fnStage = std::get<MetadataScanRangeStageFunctionIR>(stage.mStage);
         const auto& scanCFG = fnStage.mScanCFG;

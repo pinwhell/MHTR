@@ -1,4 +1,4 @@
-#include <fmt/core.h>
+#include <format>
 #include <MHTR/PatternScan.h>
 
 using namespace MHTR;
@@ -12,10 +12,10 @@ void MHTR::PatternScanOrExcept(IRangeProvider* scanRangeProvider, const std::str
 	Range range = scanRangeProvider->GetRange();
 
 	if (!TBS::Light::Scan(range.GetStart(), range.GetEnd(), results, pattern.c_str()))
-		throw PatternScanException(fmt::format("'{}' not found.", pattern));
+		throw PatternScanException(std::format("'{}' not found.", pattern));
 
 	if (bUniqueLookup && results.size() != 1)
-		throw PatternScanException(fmt::format("'{}' not unique with {} results.", pattern, results.size()));
+		throw PatternScanException(std::format("'{}' not unique with {} results.", pattern, results.size()));
 }
 
 void MHTR::PatternScanOrExceptWithName(const std::string& name, IRangeProvider* scanRangeProvider, const std::string& pattern, TBS::Pattern::Results& results, bool bUniqueLookup)
@@ -24,7 +24,7 @@ void MHTR::PatternScanOrExceptWithName(const std::string& name, IRangeProvider* 
 		PatternScanOrExcept(scanRangeProvider, pattern, results, bUniqueLookup);
 	}
 	catch (const PatternScanException& e) {
-		throw PatternScanException(fmt::format("'{}':{}", name, e.what()));
+		throw PatternScanException(std::format("'{}':{}", name, e.what()));
 	}
 }
 

@@ -1,4 +1,4 @@
-#include <fmt/format.h>
+#include <format>
 #include <iterator>
 #include <algorithm>
 #include <MHTR/Metadata/Synthers.h>
@@ -44,7 +44,7 @@ std::vector<std::string> ConstAssignSynther::Synth(const std::string& ns, const 
         const std::string literalValue = ToLiteral(target);
         const std::string type = std::holds_alternative<PatternMetadata>(metadata) ? "auto" : "uint64_t";
         
-        return Line(fmt::format("constexpr {} {} = {};", type, target->GetName(), literalValue));
+        return Line(std::format("constexpr {} {} = {};", type, target->GetName(), literalValue));
         });
 
     std::vector<ILineSynthesizer*> allMetadataSynthers; std::transform(allMetadata.begin(), allMetadata.end(), std::back_inserter(allMetadataSynthers), [](Line& line) {
@@ -61,12 +61,12 @@ std::vector<std::string> ConstAssignSynther::Synth(const std::string& ns, const 
 
 std::vector<std::string> TextReportSynther::Synth(const std::string& ns, const MetadataTargetSet& targets, const std::string& indent)
 {
-    Line heading(fmt::format("{}:", ns));
+    Line heading(std::format("{}:", ns));
     LineSynthesizerGroup headingLineGroup({ &heading });
     std::vector<Line> content;
 
     std::transform(targets.begin(), targets.end(), std::back_inserter(content), [](MetadataTarget* target) {
-        return fmt::format(
+        return std::format(
             "{}: {}",
             target->GetName(),
             target->mHasResult

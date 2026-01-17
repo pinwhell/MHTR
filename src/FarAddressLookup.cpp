@@ -1,5 +1,5 @@
 #include <unordered_set>
-#include <fmt/core.h>
+#include <format>
 #include <MHTR/Exception/Multi.h>
 #include <MHTR/Metadata/Target.h>
 #include <MHTR/Metadata/Lookups.h>
@@ -45,13 +45,13 @@ void FarAddressLookup::Lookup()
     if (addrRes.size() < 1)
     {
         if (errs.empty())
-            throw MetadataLookupException(fmt::format("'{}' no far-addresses found.", mTarget.GetFullName()));
+            throw MetadataLookupException(std::format("'{}' no far-addresses found.", mTarget.GetFullName()));
         else
-            throw MetadataLookupException(fmt::format("'{}' {}", mTarget.GetFullName(), MultiException(errs).what()));
+            throw MetadataLookupException(std::format("'{}' {}", mTarget.GetFullName(), MultiException(errs).what()));
     }
 
     if (addrRes.size() > 1)
-        throw MetadataLookupException(fmt::format("'{}' multiple diferent far-addresses found.", mTarget.GetFullName()));
+        throw MetadataLookupException(std::format("'{}' multiple diferent far-addresses found.", mTarget.GetFullName()));
 
     mTarget.TrySetResult(MetadataResult(*addrRes.begin()));
 }

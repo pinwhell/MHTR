@@ -7,9 +7,9 @@
 
 namespace MHTR {
 
-    class ARM64FarAddressResolver : public IFarAddressResolver {
+    class AArch64FarAddressResolver : public IFarAddressResolver {
     public:
-        ARM64FarAddressResolver(ICapstoneProvider* cstoneProvider);
+        AArch64FarAddressResolver(ICapstoneProvider* cstoneProvider);
 
         uint64_t TryResolve(uint64_t at, bool bDerref = false) override;
 
