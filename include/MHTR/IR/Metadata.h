@@ -7,6 +7,8 @@
 
 #include <MHTR/Metadata/EMetadata.h>
 #include <MHTR/Metadata/Result.h>
+#include <optional>
+#include <CStone/ECStone.h>
 
 namespace MHTR {
     struct PatternScanConfigIR {
@@ -17,6 +19,7 @@ namespace MHTR {
     struct MetadataScanRangeStageFunctionIR {
         uint64_t mDefFnSize;
         PatternScanConfigIR mScanCFG;
+        std::optional<ECapstoneArchMode> mBinaryArchMode;
     };
 
     struct MetadataScanRangeStageIR {
@@ -59,10 +62,12 @@ namespace MHTR {
     struct InsnImmediateLookupIR {
         MetadataScanComboIR mScanCombo;
         size_t mImmIndex;
+        std::optional<ECapstoneArchMode> mBinaryArchMode;
     };
 
     struct FarAddressLookupIR {
         MetadataScanComboIR mScanCombo;
+        std::optional<ECapstoneArchMode> mBinaryArchMode;
     };
 
     struct MetadataTargetIR {

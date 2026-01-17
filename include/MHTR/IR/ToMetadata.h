@@ -10,6 +10,7 @@
 #include <MHTR/Factory/IMultiMetadata.h>
 #include <MHTR/IR/IFactory.h>
 #include <MHTR/IOffsetCalculator.h>
+#include <MHTR/Provider/CapstoneFactoryAndProvider.h>
 
 namespace MHTR {
     class FromIRMultiMetadataFactory : public IMultiMetadataFactory {
@@ -20,7 +21,7 @@ namespace MHTR {
             IMultiMetadataIRFactory* metadataIRFactory,
             IRangeProvider* defaultScanRange,
             IOffsetCalculator* offsetCalculator,
-            ICapstoneProvider* capstoneProvider,
+            ICapstoneProvider* defCapstoneProvider,
             IFarAddressResolverProvider* farAddressResolverProvider,
             INamespaceProvider* nsProvider = nullptr
         );
@@ -32,12 +33,13 @@ namespace MHTR {
         IMultiMetadataIRFactory* mMetadataIRProvider;
         IRangeProvider* mDefaultScanRange;
         IOffsetCalculator* mOffsetCalculator;
-        ICapstoneProvider* mCapstoneProvider;
+        ICapstoneProvider* mDefaultCapstoneProvider;
         IFarAddressResolverProvider* mFarAddressResolverProvider;
         INamespaceProvider* mNsProvider;
 
         // Internal
         std::unordered_map<std::string, IRangeProvider*> mRangeProviderMap;
+        std::unordered_map<ECapstoneArchMode, CapstoneFactoryAndProvider*> mCapstoneFactoriesAndProvidersMap;
 
     private:
         MetadataTarget* MetadataTargetFromIR(const MetadataTargetIR& ir);
@@ -52,5 +54,7 @@ namespace MHTR {
         IRangeProvider* CreateMetadataScanRangeFromIR(const MetadataIR& ir);
         IRangeProvider* CreateScanRangeFromIR(const ScanRangeIR& ir);
         IRangeProvider* CreateScanRangePipelineFromIR(const MetadataScanRangePipelineIR& pipeline);
+
+        ICapstoneProvider* GetCapstoneProvider(std::optional<ECapstoneArchMode> mode = std::nullopt);
     };
 }

@@ -9,7 +9,7 @@
 namespace MHTR {
     class ProcedureRangeProviderChain : public IRangeProvider {
     public:
-        ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns);
+        ProcedureRangeProviderChain(IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns);
 
         Range GetRange() override;
 

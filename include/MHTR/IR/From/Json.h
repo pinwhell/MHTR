@@ -37,4 +37,12 @@ namespace MHTR {
         nlohmann::json mJson;
         FromJsonMetadataIRParser mParser;
     };
+
+    template<typename T>
+    inline std::optional<T> json_optional_get(const nlohmann::json& j, const std::string& key)
+    {
+        if (!j.contains(key) || j[key].is_null())
+            return std::nullopt;
+        return j[key].get<T>();
+    }
 }

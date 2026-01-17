@@ -4,6 +4,23 @@
 
 using namespace MHTR;
 
+
+
+std::optional<ECapstoneArchMode> json_optional_ECapstoneArchMode_or_throw(const nlohmann::json& stage, const std::string& name)
+{
+    auto archModeStr = json_optional_get<std::string>(stage, name);
+    if (!archModeStr)
+        return std::nullopt;
+
+    auto archMode = ECapstoneArchModeFromString(*archModeStr);
+    if (archMode == ECapstoneArchMode::UNDEFINED)
+        throw UnexpectedLayoutException(
+            fmt::format("invalid binaryArchMode '{}'", *archModeStr)
+        );
+
+    return archMode;
+}
+
 EMetadataScanRangeStage MetadataScanRangeStageIR::getType() const
 {
     return (EMetadataScanRangeStage) mStage.index();
@@ -77,6 +94,7 @@ MetadataScanRangeStageFunctionIR FromJsonMetadataIRParser::ParseMetadataScanRang
 
     result.mDefFnSize = stage.contains("defFnSize") ? stage["defFnSize"].get<uint64_t>() : 0;
     result.mScanCFG = stage["pattern"].is_object() ? ParsePatternScanConfig(stage["pattern"]) : ParsePatternScanConfig(stage);
+    result.mBinaryArchMode = json_optional_ECapstoneArchMode_or_throw(stage, "binaryArchMode");
 
     return result;
 }
@@ -175,14 +193,16 @@ InsnImmediateLookupIR FromJsonMetadataIRParser::ParseInsnImmediateLookup(const n
 {
     return {
         std::move(ParseMetadataScanCombo(metadata)),
-        metadata.contains("immIndex") ? metadata["immIndex"].get<size_t>() : 0
+        metadata.contains("immIndex") ? metadata["immIndex"].get<size_t>() : 0,
+        json_optional_ECapstoneArchMode_or_throw(metadata, "binaryArchMode")
     };
 }
 
 FarAddressLookupIR FromJsonMetadataIRParser::ParseFarAddressLookup(const nlohmann::json& metadata)
 {
     return {
-        std::move(ParseMetadataScanCombo(metadata))
+        std::move(ParseMetadataScanCombo(metadata)),
+        json_optional_ECapstoneArchMode_or_throw(metadata, "binaryArchMode")
     };
 }
 

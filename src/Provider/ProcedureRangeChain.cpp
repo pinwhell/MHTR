@@ -7,7 +7,7 @@
 
 using namespace MHTR;
 
-ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* cstoneInstanceProvider, IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns)
+ProcedureRangeProviderChain::ProcedureRangeProviderChain(IRangeProvider* baseRangeProvider, const std::vector<FunctionScanConfig>& nestedProcedurePatterns)
 {
     mpRangeProviders.emplace_back(baseRangeProvider);
 
@@ -18,11 +18,11 @@ ProcedureRangeProviderChain::ProcedureRangeProviderChain(ICapstoneProvider* csto
         ).get();
 
         auto procEntryProv = (IProcedureEntryProvider*)mProviders.Store(
-            std::make_unique<AsmExtractedProcedureEntryProvider>(cstoneInstanceProvider, addressesProv)
+            std::make_unique<AsmExtractedProcedureEntryProvider>(procPatternCfg.mCapstoneProvider, addressesProv)
         ).get();
 
         auto procRangeProv = (IRangeProvider*)mProviders.Store(
-            std::make_unique<ProcedureRangeProvider>(cstoneInstanceProvider, procEntryProv, procPatternCfg.mDefSize)
+            std::make_unique<ProcedureRangeProvider>(procPatternCfg.mCapstoneProvider, procEntryProv, procPatternCfg.mDefSize)
         ).get();
 
         mpRangeProviders.push_back(procRangeProv);

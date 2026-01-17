@@ -10,13 +10,13 @@
 
 using namespace MHTR;
 
-FromIRMultiMetadataFactory::FromIRMultiMetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRFactory* metadataIRFactory, IRangeProvider* defaultScanRange, IOffsetCalculator* offsetCalculator, ICapstoneProvider* capstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespaceProvider* nsProvider)
+FromIRMultiMetadataFactory::FromIRMultiMetadataFactory(Storage<std::unique_ptr<IProvider>>& providersStorage, IMetadataTargetProvider* metadataTargetProvider, IMultiMetadataIRFactory* metadataIRFactory, IRangeProvider* defaultScanRange, IOffsetCalculator* offsetCalculator, ICapstoneProvider* defCapstoneProvider, IFarAddressResolverProvider* farAddressResolverProvider, INamespaceProvider* nsProvider)
     : mProvidersStorage(providersStorage)
     , mMetadataTargetProvider(metadataTargetProvider)
     , mMetadataIRProvider(metadataIRFactory)
     , mDefaultScanRange(defaultScanRange)
     , mOffsetCalculator(offsetCalculator)
-    , mCapstoneProvider(capstoneProvider)
+    , mDefaultCapstoneProvider(defCapstoneProvider)
     , mFarAddressResolverProvider(farAddressResolverProvider)
     , mNsProvider(nsProvider)
 {}
@@ -92,7 +92,7 @@ std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateInsnImmLook
 {
     auto& scanCombo = ir.mScanCombo;
     auto& scanCFG = scanCombo.mScanCFG;
-
+    
     IRangeProvider* scanRange = CreateScanRangeFromIR(scanCombo.mScanRange);
     IAddressesProvider* addressesProvider = (IAddressesProvider*)mProvidersStorage.Store(
         std::make_unique<PatternScanAddresses>(
@@ -104,7 +104,20 @@ std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateInsnImmLook
         )
     ).get();
 
-    return std::make_unique<InsnImmediateLookup>(target, addressesProvider, mCapstoneProvider, ir.mImmIndex);
+    return std::make_unique<InsnImmediateLookup>(
+        target, 
+        addressesProvider, 
+        GetCapstoneProvider(ir.mBinaryArchMode), 
+        ir.mImmIndex);
+}
+
+ICapstoneProvider* FromIRMultiMetadataFactory::GetCapstoneProvider(std::optional<ECapstoneArchMode> mode_)
+{
+    if (!mode_) return mDefaultCapstoneProvider;
+    if (mCapstoneFactoriesAndProvidersMap.find(*mode_) == mCapstoneFactoriesAndProvidersMap.end())
+        mCapstoneFactoriesAndProvidersMap[*mode_] = (CapstoneFactoryAndProvider*)mProvidersStorage.Store(
+            std::make_unique<CapstoneFactoryAndProvider>(*mode_)).get();
+    return mCapstoneFactoriesAndProvidersMap[*mode_];
 }
 
 std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateFarAddressLookupFromIR(MetadataTarget& target, const FarAddressLookupIR& ir)
@@ -122,7 +135,7 @@ std::unique_ptr<ILookableMetadata> FromIRMultiMetadataFactory::CreateFarAddressL
             )
         )
     ).get();
-    IFarAddressResolver* farAddressResolver = mFarAddressResolverProvider->GetFarAddressResolver(mCapstoneProvider);
+    IFarAddressResolver* farAddressResolver = mFarAddressResolverProvider->GetFarAddressResolver(GetCapstoneProvider(ir.mBinaryArchMode));
 
     return std::make_unique<FarAddressLookup>(target, addressesProvider, farAddressResolver, mOffsetCalculator);
 }
@@ -182,9 +195,10 @@ IRangeProvider* FromIRMultiMetadataFactory::CreateScanRangePipelineFromIR(const 
                 scanCFG.mPattern,
                 scanCFG.mDisp
             ),             
-                size_t(fnStage.mDefFnSize)
+                size_t(fnStage.mDefFnSize),
+                GetCapstoneProvider(fnStage.mBinaryArchMode)
             }));
     }
 
-    return (IRangeProvider*)mProvidersStorage.Store(std::make_unique<ProcedureRangeProviderChain>(mCapstoneProvider, mDefaultScanRange, configs)).get();
+    return (IRangeProvider*)mProvidersStorage.Store(std::make_unique<ProcedureRangeProviderChain>(mDefaultScanRange, configs)).get();
 }
